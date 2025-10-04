@@ -1,0 +1,828 @@
+[
+  {
+    "report_id": "df089452-018b-4519-9147-8fb4883bf05c",
+    "source_id": "mock-event-1",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+    "description": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz\n\nDetails: Threat Intelligence Report: Lazarus Group Campaign\n            \n            Overview: This campaign demonstrates credential harvesting techniques \n            attributed to Lazarus Group. The threat actor is leveraging Mimikatz \n            to establish persistence and exfiltrate sensitive data.\n            \n            TTPs Observed:\n            - Initial Access: Spear phishing with malicious attachments\n            - Execution: PowerShell script execution, WMI command execution\n            - Persistence: Registry modification, scheduled task creation\n            - Privilege Escalation: Token manipulation, UAC bypass\n            - Defense Evasion: Process hollowing, code injection\n            - Credential Access: LSASS dumping, credential harvesting\n            - Discovery: Network enumeration, system information gathering\n            - Lateral Movement: Remote desktop, Windows admin shares\n            - Collection: Data staging, file compression\n            - Exfiltration: Data transfer over C2 channel\n            \n            Indicators of Compromise:\n            - Malicious domains used for C2 communication\n            - File hashes of dropped malware samples\n            - Registry keys created for persistence\n            - Network signatures of C2 traffic\n\nContains 8 attributes (8 IOCs)\n\nObjects: malware, attack-pattern",
+    "confidence": 76,
+    "severity": "undefined",
+    "published": false,
+    "analysis_status": "complete",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "malicious-6349.com",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "c2-886.net",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "phishing-75.org",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "24e2923310f117fb290472b733a8d3ff63b07ca34d3ac55a0d5cb59970c67e02",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "e740723389e840e0cb8ad58d15a3427a",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "0004799087d7b4ddd377012d5614f45f9c7bf705",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "144.240.51.254",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 server IP address",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "84.96.103.160",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 server IP address",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "lazarus group"
+    ],
+    "malware_families": [
+      "mimikatz",
+      "Mimikatz"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Credential Harvesting\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Spearphishing Attachment",
+        "technique_id": "T1566.001",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"Lazarus Group\"",
+      "misp-galaxy:malware=\"Mimikatz\"",
+      "attack-pattern:\"Credential Harvesting\"",
+      "type:OSINT"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-1",
+      "uuid": "event-uuid-1",
+      "info": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "date": "2025-10-04",
+      "timestamp": "1759559343",
+      "published": false,
+      "analysis": "2",
+      "threat_level_id": "4",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "3",
+      "comment": "Threat Intelligence Report: Lazarus Group Campaign\n            \n            Overview: This campaign demonstrates credential harvesting techniques \n            attributed to Lazarus Group. The threat actor is leveraging Mimikatz \n            to establish persistence and exfiltrate sensitive data.\n            \n            TTPs Observed:\n            - Initial Access: Spear phishing with malicious attachments\n            - Execution: PowerShell script execution, WMI command execution\n            - Persistence: Registry modification, scheduled task creation\n            - Privilege Escalation: Token manipulation, UAC bypass\n            - Defense Evasion: Process hollowing, code injection\n            - Credential Access: LSASS dumping, credential harvesting\n            - Discovery: Network enumeration, system information gathering\n            - Lateral Movement: Remote desktop, Windows admin shares\n            - Collection: Data staging, file compression\n            - Exfiltration: Data transfer over C2 channel\n            \n            Indicators of Compromise:\n            - Malicious domains used for C2 communication\n            - File hashes of dropped malware samples\n            - Registry keys created for persistence\n            - Network signatures of C2 traffic",
+      "Attribute": [
+        {
+          "id": "attr-1",
+          "event_id": "mock-event-1",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "malicious-6349.com",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-2",
+          "event_id": "mock-event-1",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "c2-886.net",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-3",
+          "event_id": "mock-event-1",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "phishing-75.org",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-4",
+          "event_id": "mock-event-1",
+          "type": "sha256",
+          "category": "Payload delivery",
+          "value": "24e2923310f117fb290472b733a8d3ff63b07ca34d3ac55a0d5cb59970c67e02",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-5",
+          "event_id": "mock-event-1",
+          "type": "md5",
+          "category": "Payload delivery",
+          "value": "e740723389e840e0cb8ad58d15a3427a",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-6",
+          "event_id": "mock-event-1",
+          "type": "sha1",
+          "category": "Payload delivery",
+          "value": "0004799087d7b4ddd377012d5614f45f9c7bf705",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-7",
+          "event_id": "mock-event-1",
+          "type": "ip-dst",
+          "category": "Network activity",
+          "value": "144.240.51.254",
+          "to_ids": true,
+          "comment": "C2 server IP address",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-8",
+          "event_id": "mock-event-1",
+          "type": "ip-dst",
+          "category": "Network activity",
+          "value": "84.96.103.160",
+          "to_ids": true,
+          "comment": "C2 server IP address",
+          "timestamp": "1759562943"
+        }
+      ],
+      "Tag": [
+        {
+          "name": "misp-galaxy:threat-actor=\"Lazarus Group\""
+        },
+        {
+          "name": "misp-galaxy:malware=\"Mimikatz\""
+        },
+        {
+          "name": "attack-pattern:\"Credential Harvesting\""
+        },
+        {
+          "name": "tlp:amber"
+        },
+        {
+          "name": "type:OSINT"
+        }
+      ],
+      "RelatedEvent": [],
+      "Object": [
+        {
+          "id": "obj-1",
+          "name": "malware",
+          "template_uuid": "malware-template-uuid",
+          "description": "Malware sample: Mimikatz",
+          "meta-category": "file",
+          "Attribute": [
+            {
+              "type": "text",
+              "object_relation": "name",
+              "value": "Mimikatz"
+            },
+            {
+              "type": "text",
+              "object_relation": "family",
+              "value": "Mimikatz"
+            }
+          ]
+        },
+        {
+          "id": "obj-2",
+          "name": "attack-pattern",
+          "template_uuid": "attack-pattern-template-uuid",
+          "description": "MITRE ATT&CK technique",
+          "meta-category": "misc",
+          "Attribute": [
+            {
+              "type": "text",
+              "object_relation": "name",
+              "value": "Spearphishing Attachment"
+            },
+            {
+              "type": "text",
+              "object_relation": "id",
+              "value": "T1566.001"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "report_id": "73a57d51-2d08-4389-9255-79c674c574d9",
+    "source_id": "mock-event-2",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "Shadow Brokers - Data Exfiltration Campaign Using Banking Trojan",
+    "description": "Shadow Brokers - Data Exfiltration Campaign Using Banking Trojan\n\nDetails: Threat Intelligence Report: Shadow Brokers Campaign\n            \n            Overview: This campaign demonstrates data exfiltration techniques \n            attributed to Shadow Brokers. The threat actor is leveraging Banking Trojan \n            to establish persistence and exfiltrate sensitive data.\n            \n            TTPs Observed:\n            - Initial Access: Spear phishing with malicious attachments\n            - Execution: PowerShell script execution, WMI command execution\n            - Persistence: Registry modification, scheduled task creation\n            - Privilege Escalation: Token manipulation, UAC bypass\n            - Defense Evasion: Process hollowing, code injection\n            - Credential Access: LSASS dumping, credential harvesting\n            - Discovery: Network enumeration, system information gathering\n            - Lateral Movement: Remote desktop, Windows admin shares\n            - Collection: Data staging, file compression\n            - Exfiltration: Data transfer over C2 channel\n            \n            Indicators of Compromise:\n            - Malicious domains used for C2 communication\n            - File hashes of dropped malware samples\n            - Registry keys created for persistence\n            - Network signatures of C2 traffic\n\nContains 8 attributes (8 IOCs)\n\nObjects: malware, attack-pattern",
+    "confidence": 91,
+    "severity": "medium",
+    "published": true,
+    "analysis_status": "ongoing",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "malicious-7575.com",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "c2-931.net",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "phishing-71.org",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "8a418cee42e68be86a13153de9d40e8e7137251f92603191542f272b56759054",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "59001818bdbeaa1a74f011b16fabd5c9",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "365efef971ca68958797e4834c14672cb651aa65",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "126.137.209.228",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 server IP address",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "162.131.10.250",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 server IP address",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "shadow brokers"
+    ],
+    "malware_families": [
+      "banking trojan",
+      "Banking Trojan",
+      "Banking"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Data Exfiltration\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Spearphishing Attachment",
+        "technique_id": "T1566.001",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"Shadow Brokers\"",
+      "misp-galaxy:malware=\"Banking Trojan\"",
+      "attack-pattern:\"Data Exfiltration\"",
+      "type:OSINT"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-2",
+      "uuid": "event-uuid-2",
+      "info": "Shadow Brokers - Data Exfiltration Campaign Using Banking Trojan",
+      "date": "2025-10-03",
+      "timestamp": "1759487343",
+      "published": true,
+      "analysis": "1",
+      "threat_level_id": "2",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "2",
+      "comment": "Threat Intelligence Report: Shadow Brokers Campaign\n            \n            Overview: This campaign demonstrates data exfiltration techniques \n            attributed to Shadow Brokers. The threat actor is leveraging Banking Trojan \n            to establish persistence and exfiltrate sensitive data.\n            \n            TTPs Observed:\n            - Initial Access: Spear phishing with malicious attachments\n            - Execution: PowerShell script execution, WMI command execution\n            - Persistence: Registry modification, scheduled task creation\n            - Privilege Escalation: Token manipulation, UAC bypass\n            - Defense Evasion: Process hollowing, code injection\n            - Credential Access: LSASS dumping, credential harvesting\n            - Discovery: Network enumeration, system information gathering\n            - Lateral Movement: Remote desktop, Windows admin shares\n            - Collection: Data staging, file compression\n            - Exfiltration: Data transfer over C2 channel\n            \n            Indicators of Compromise:\n            - Malicious domains used for C2 communication\n            - File hashes of dropped malware samples\n            - Registry keys created for persistence\n            - Network signatures of C2 traffic",
+      "Attribute": [
+        {
+          "id": "attr-1",
+          "event_id": "mock-event-2",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "malicious-7575.com",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-2",
+          "event_id": "mock-event-2",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "c2-931.net",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-3",
+          "event_id": "mock-event-2",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "phishing-71.org",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-4",
+          "event_id": "mock-event-2",
+          "type": "sha256",
+          "category": "Payload delivery",
+          "value": "8a418cee42e68be86a13153de9d40e8e7137251f92603191542f272b56759054",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-5",
+          "event_id": "mock-event-2",
+          "type": "md5",
+          "category": "Payload delivery",
+          "value": "59001818bdbeaa1a74f011b16fabd5c9",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-6",
+          "event_id": "mock-event-2",
+          "type": "sha1",
+          "category": "Payload delivery",
+          "value": "365efef971ca68958797e4834c14672cb651aa65",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-7",
+          "event_id": "mock-event-2",
+          "type": "ip-dst",
+          "category": "Network activity",
+          "value": "126.137.209.228",
+          "to_ids": true,
+          "comment": "C2 server IP address",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-8",
+          "event_id": "mock-event-2",
+          "type": "ip-dst",
+          "category": "Network activity",
+          "value": "162.131.10.250",
+          "to_ids": true,
+          "comment": "C2 server IP address",
+          "timestamp": "1759562943"
+        }
+      ],
+      "Tag": [
+        {
+          "name": "misp-galaxy:threat-actor=\"Shadow Brokers\""
+        },
+        {
+          "name": "misp-galaxy:malware=\"Banking Trojan\""
+        },
+        {
+          "name": "attack-pattern:\"Data Exfiltration\""
+        },
+        {
+          "name": "tlp:amber"
+        },
+        {
+          "name": "type:OSINT"
+        }
+      ],
+      "RelatedEvent": [],
+      "Object": [
+        {
+          "id": "obj-1",
+          "name": "malware",
+          "template_uuid": "malware-template-uuid",
+          "description": "Malware sample: Banking Trojan",
+          "meta-category": "file",
+          "Attribute": [
+            {
+              "type": "text",
+              "object_relation": "name",
+              "value": "Banking Trojan"
+            },
+            {
+              "type": "text",
+              "object_relation": "family",
+              "value": "Banking"
+            }
+          ]
+        },
+        {
+          "id": "obj-2",
+          "name": "attack-pattern",
+          "template_uuid": "attack-pattern-template-uuid",
+          "description": "MITRE ATT&CK technique",
+          "meta-category": "misc",
+          "Attribute": [
+            {
+              "type": "text",
+              "object_relation": "name",
+              "value": "Spearphishing Attachment"
+            },
+            {
+              "type": "text",
+              "object_relation": "id",
+              "value": "T1566.001"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "report_id": "bdddfeb4-8878-4ec3-9669-bc9e7fe8f8d9",
+    "source_id": "mock-event-3",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "APT28 - Initial Access Campaign Using RAT",
+    "description": "APT28 - Initial Access Campaign Using RAT\n\nDetails: Threat Intelligence Report: APT28 Campaign\n            \n            Overview: This campaign demonstrates initial access techniques \n            attributed to APT28. The threat actor is leveraging RAT \n            to establish persistence and exfiltrate sensitive data.\n            \n            TTPs Observed:\n            - Initial Access: Spear phishing with malicious attachments\n            - Execution: PowerShell script execution, WMI command execution\n            - Persistence: Registry modification, scheduled task creation\n            - Privilege Escalation: Token manipulation, UAC bypass\n            - Defense Evasion: Process hollowing, code injection\n            - Credential Access: LSASS dumping, credential harvesting\n            - Discovery: Network enumeration, system information gathering\n            - Lateral Movement: Remote desktop, Windows admin shares\n            - Collection: Data staging, file compression\n            - Exfiltration: Data transfer over C2 channel\n            \n            Indicators of Compromise:\n            - Malicious domains used for C2 communication\n            - File hashes of dropped malware samples\n            - Registry keys created for persistence\n            - Network signatures of C2 traffic\n\nContains 8 attributes (8 IOCs)\n\nObjects: malware, attack-pattern",
+    "confidence": 71,
+    "severity": "low",
+    "published": false,
+    "analysis_status": "initial",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "malicious-9333.com",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "c2-857.net",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "phishing-41.org",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 domain used by threat actor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "d9d496130687b80390c9e082ad6894401243b05cee06298ce0fcf451a35e200c",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "deb1f734684fb96e2b164309f9a65a4c",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "b3e499b5b239ab4c03966ab4f26ad6deee36111d",
+        "category": "Payload delivery",
+        "confidence": 75,
+        "comment": "Hash of malicious payload",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "102.164.23.50",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 server IP address",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "3.198.190.248",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "C2 server IP address",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "apt28"
+    ],
+    "malware_families": [
+      "rat",
+      "RAT"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Initial Access\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Spearphishing Attachment",
+        "technique_id": "T1566.001",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"APT28\"",
+      "misp-galaxy:malware=\"RAT\"",
+      "attack-pattern:\"Initial Access\"",
+      "type:OSINT"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-3",
+      "uuid": "event-uuid-3",
+      "info": "APT28 - Initial Access Campaign Using RAT",
+      "date": "2025-10-04",
+      "timestamp": "1759534143",
+      "published": false,
+      "analysis": "0",
+      "threat_level_id": "3",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "1",
+      "comment": "Threat Intelligence Report: APT28 Campaign\n            \n            Overview: This campaign demonstrates initial access techniques \n            attributed to APT28. The threat actor is leveraging RAT \n            to establish persistence and exfiltrate sensitive data.\n            \n            TTPs Observed:\n            - Initial Access: Spear phishing with malicious attachments\n            - Execution: PowerShell script execution, WMI command execution\n            - Persistence: Registry modification, scheduled task creation\n            - Privilege Escalation: Token manipulation, UAC bypass\n            - Defense Evasion: Process hollowing, code injection\n            - Credential Access: LSASS dumping, credential harvesting\n            - Discovery: Network enumeration, system information gathering\n            - Lateral Movement: Remote desktop, Windows admin shares\n            - Collection: Data staging, file compression\n            - Exfiltration: Data transfer over C2 channel\n            \n            Indicators of Compromise:\n            - Malicious domains used for C2 communication\n            - File hashes of dropped malware samples\n            - Registry keys created for persistence\n            - Network signatures of C2 traffic",
+      "Attribute": [
+        {
+          "id": "attr-1",
+          "event_id": "mock-event-3",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "malicious-9333.com",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-2",
+          "event_id": "mock-event-3",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "c2-857.net",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-3",
+          "event_id": "mock-event-3",
+          "type": "domain",
+          "category": "Network activity",
+          "value": "phishing-41.org",
+          "to_ids": true,
+          "comment": "C2 domain used by threat actor",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-4",
+          "event_id": "mock-event-3",
+          "type": "sha256",
+          "category": "Payload delivery",
+          "value": "d9d496130687b80390c9e082ad6894401243b05cee06298ce0fcf451a35e200c",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-5",
+          "event_id": "mock-event-3",
+          "type": "md5",
+          "category": "Payload delivery",
+          "value": "deb1f734684fb96e2b164309f9a65a4c",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-6",
+          "event_id": "mock-event-3",
+          "type": "sha1",
+          "category": "Payload delivery",
+          "value": "b3e499b5b239ab4c03966ab4f26ad6deee36111d",
+          "to_ids": true,
+          "comment": "Hash of malicious payload",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-7",
+          "event_id": "mock-event-3",
+          "type": "ip-dst",
+          "category": "Network activity",
+          "value": "102.164.23.50",
+          "to_ids": true,
+          "comment": "C2 server IP address",
+          "timestamp": "1759562943"
+        },
+        {
+          "id": "attr-8",
+          "event_id": "mock-event-3",
+          "type": "ip-dst",
+          "category": "Network activity",
+          "value": "3.198.190.248",
+          "to_ids": true,
+          "comment": "C2 server IP address",
+          "timestamp": "1759562943"
+        }
+      ],
+      "Tag": [
+        {
+          "name": "misp-galaxy:threat-actor=\"APT28\""
+        },
+        {
+          "name": "misp-galaxy:malware=\"RAT\""
+        },
+        {
+          "name": "attack-pattern:\"Initial Access\""
+        },
+        {
+          "name": "tlp:amber"
+        },
+        {
+          "name": "type:OSINT"
+        }
+      ],
+      "RelatedEvent": [],
+      "Object": [
+        {
+          "id": "obj-1",
+          "name": "malware",
+          "template_uuid": "malware-template-uuid",
+          "description": "Malware sample: RAT",
+          "meta-category": "file",
+          "Attribute": [
+            {
+              "type": "text",
+              "object_relation": "name",
+              "value": "RAT"
+            },
+            {
+              "type": "text",
+              "object_relation": "family",
+              "value": "RAT"
+            }
+          ]
+        },
+        {
+          "id": "obj-2",
+          "name": "attack-pattern",
+          "template_uuid": "attack-pattern-template-uuid",
+          "description": "MITRE ATT&CK technique",
+          "meta-category": "misc",
+          "Attribute": [
+            {
+              "type": "text",
+              "object_relation": "name",
+              "value": "Spearphishing Attachment"
+            },
+            {
+              "type": "text",
+              "object_relation": "id",
+              "value": "T1566.001"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]
