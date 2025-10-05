@@ -1,0 +1,422 @@
+{
+  "agent_id": "127b179f-e4da-4772-b7f9-895e853d7ec7",
+  "status": "success",
+  "timestamp": "2025-10-05T06:15:01.679782",
+  "extraction_summary": {
+    "reports_processed": 3,
+    "total_ttps_extracted": 12,
+    "avg_ttps_per_report": 4.0,
+    "extraction_errors": 0,
+    "processing_time_ms": 639.173
+  },
+  "extraction_results": [
+    {
+      "report_id": "df089452-018b-4519-9147-8fb4883bf05c",
+      "source_report": {
+        "title": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+        "source": "MISP",
+        "confidence": 76
+      },
+      "extracted_ttps": [
+        {
+          "technique_name": "OS Credential Dumping",
+          "tactic": "Credential Access",
+          "description": "Dumping credentials from LSASS process memory using Mimikatz",
+          "indicators": [
+            "mimikatz",
+            "sekurlsa::logonpasswords",
+            "lsass.exe"
+          ],
+          "tools": [
+            "Mimikatz"
+          ],
+          "attack_id": "T1003",
+          "attack_name": "OS Credential Dumping",
+          "subtechnique": false,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 0.86,
+            "attack_mapping": 0.9,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.6499999999999999,
+            "tool_mention": 0.9500000000000001,
+            "context_richness": 0.8833333333333333
+          },
+          "confidence_score": 0.813,
+          "confidence_level": "high"
+        },
+        {
+          "technique_name": "Remote Desktop Protocol",
+          "tactic": "Lateral Movement",
+          "description": "Using RDP to move laterally to other systems in the network",
+          "indicators": [
+            "mstsc.exe",
+            "RDP connection",
+            "port 3389"
+          ],
+          "tools": [],
+          "attack_id": "T1021.001",
+          "attack_name": "Remote Services: Remote Desktop Protocol",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 0.86,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.825,
+            "tool_mention": 0.5,
+            "context_richness": 0.7666666666666666
+          },
+          "confidence_score": 0.803,
+          "confidence_level": "high"
+        },
+        {
+          "technique_name": "Spearphishing Attachment",
+          "tactic": "Initial Access",
+          "description": "Attackers sent emails with malicious Office documents containing VBA macros",
+          "indicators": [
+            "malicious.doc",
+            "macro execution",
+            "suspicious email"
+          ],
+          "tools": [
+            "Emotet",
+            "Microsoft Office"
+          ],
+          "attack_id": "T1566.001",
+          "attack_name": "Phishing: Spearphishing Attachment",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 0.86,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.475,
+            "tool_mention": 0.8,
+            "context_richness": 0.8833333333333333
+          },
+          "confidence_score": 0.792,
+          "confidence_level": "medium"
+        }
+      ],
+      "attack_chain": [
+        "T1566.001",
+        "T1003",
+        "T1021.001"
+      ],
+      "metadata": {
+        "extraction_timestamp": "2025-10-05T06:15:01.259489",
+        "llm_model": "gpt-4",
+        "total_ttps_found": 3,
+        "ttps_after_filtering": 3,
+        "min_confidence_threshold": 0.5
+      }
+    },
+    {
+      "report_id": "73a57d51-2d08-4389-9255-79c674c574d9",
+      "source_report": {
+        "title": "Shadow Brokers - Data Exfiltration Campaign Using Banking Trojan",
+        "source": "MISP",
+        "confidence": 91
+      },
+      "extracted_ttps": [
+        {
+          "technique_name": "PowerShell",
+          "tactic": "Execution",
+          "description": "Execution of PowerShell scripts to download and execute additional payloads",
+          "indicators": [
+            "powershell.exe",
+            "-encodedCommand",
+            "DownloadString"
+          ],
+          "tools": [
+            "PowerShell",
+            "Empire",
+            "Cobalt Strike"
+          ],
+          "attack_id": "T1059.001",
+          "attack_name": "Command and Scripting Interpreter: PowerShell",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 1.0,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.825,
+            "tool_mention": 0.8,
+            "context_richness": 0.8833333333333333
+          },
+          "confidence_score": 0.88,
+          "confidence_level": "high"
+        },
+        {
+          "technique_name": "Remote Desktop Protocol",
+          "tactic": "Lateral Movement",
+          "description": "Using RDP to move laterally to other systems in the network",
+          "indicators": [
+            "mstsc.exe",
+            "RDP connection",
+            "port 3389"
+          ],
+          "tools": [],
+          "attack_id": "T1021.001",
+          "attack_name": "Remote Services: Remote Desktop Protocol",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 1.0,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.825,
+            "tool_mention": 0.5,
+            "context_richness": 0.7666666666666666
+          },
+          "confidence_score": 0.838,
+          "confidence_level": "high"
+        },
+        {
+          "technique_name": "OS Credential Dumping",
+          "tactic": "Credential Access",
+          "description": "Dumping credentials from LSASS process memory using Mimikatz",
+          "indicators": [
+            "mimikatz",
+            "sekurlsa::logonpasswords",
+            "lsass.exe"
+          ],
+          "tools": [
+            "Mimikatz"
+          ],
+          "attack_id": "T1003",
+          "attack_name": "OS Credential Dumping",
+          "subtechnique": false,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 1.0,
+            "attack_mapping": 0.9,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.6499999999999999,
+            "tool_mention": 0.8,
+            "context_richness": 0.8833333333333333
+          },
+          "confidence_score": 0.833,
+          "confidence_level": "high"
+        },
+        {
+          "technique_name": "Spearphishing Attachment",
+          "tactic": "Initial Access",
+          "description": "Attackers sent emails with malicious Office documents containing VBA macros",
+          "indicators": [
+            "malicious.doc",
+            "macro execution",
+            "suspicious email"
+          ],
+          "tools": [
+            "Emotet",
+            "Microsoft Office"
+          ],
+          "attack_id": "T1566.001",
+          "attack_name": "Phishing: Spearphishing Attachment",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 1.0,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.475,
+            "tool_mention": 0.8,
+            "context_richness": 0.8833333333333333
+          },
+          "confidence_score": 0.827,
+          "confidence_level": "high"
+        }
+      ],
+      "attack_chain": [
+        "T1566.001",
+        "T1059.001",
+        "T1003",
+        "T1021.001"
+      ],
+      "metadata": {
+        "extraction_timestamp": "2025-10-05T06:15:01.461544",
+        "llm_model": "gpt-4",
+        "total_ttps_found": 4,
+        "ttps_after_filtering": 4,
+        "min_confidence_threshold": 0.5
+      }
+    },
+    {
+      "report_id": "bdddfeb4-8878-4ec3-9669-bc9e7fe8f8d9",
+      "source_report": {
+        "title": "APT28 - Initial Access Campaign Using RAT",
+        "source": "MISP",
+        "confidence": 71
+      },
+      "extracted_ttps": [
+        {
+          "technique_name": "PowerShell",
+          "tactic": "Execution",
+          "description": "Execution of PowerShell scripts to download and execute additional payloads",
+          "indicators": [
+            "powershell.exe",
+            "-encodedCommand",
+            "DownloadString"
+          ],
+          "tools": [
+            "PowerShell",
+            "Empire",
+            "Cobalt Strike"
+          ],
+          "attack_id": "T1059.001",
+          "attack_name": "Command and Scripting Interpreter: PowerShell",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 0.71,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.825,
+            "tool_mention": 0.8,
+            "context_richness": 0.8833333333333333
+          },
+          "confidence_score": 0.807,
+          "confidence_level": "high"
+        },
+        {
+          "technique_name": "Remote Desktop Protocol",
+          "tactic": "Lateral Movement",
+          "description": "Using RDP to move laterally to other systems in the network",
+          "indicators": [
+            "mstsc.exe",
+            "RDP connection",
+            "port 3389"
+          ],
+          "tools": [],
+          "attack_id": "T1021.001",
+          "attack_name": "Remote Services: Remote Desktop Protocol",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 0.71,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.825,
+            "tool_mention": 0.5,
+            "context_richness": 0.7666666666666666
+          },
+          "confidence_score": 0.765,
+          "confidence_level": "medium"
+        },
+        {
+          "technique_name": "OS Credential Dumping",
+          "tactic": "Credential Access",
+          "description": "Dumping credentials from LSASS process memory using Mimikatz",
+          "indicators": [
+            "mimikatz",
+            "sekurlsa::logonpasswords",
+            "lsass.exe"
+          ],
+          "tools": [
+            "Mimikatz"
+          ],
+          "attack_id": "T1003",
+          "attack_name": "OS Credential Dumping",
+          "subtechnique": false,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 0.71,
+            "attack_mapping": 0.9,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.6499999999999999,
+            "tool_mention": 0.8,
+            "context_richness": 0.8833333333333333
+          },
+          "confidence_score": 0.761,
+          "confidence_level": "medium"
+        },
+        {
+          "technique_name": "Spearphishing Attachment",
+          "tactic": "Initial Access",
+          "description": "Attackers sent emails with malicious Office documents containing VBA macros",
+          "indicators": [
+            "malicious.doc",
+            "macro execution",
+            "suspicious email"
+          ],
+          "tools": [
+            "Emotet",
+            "Microsoft Office"
+          ],
+          "attack_id": "T1566.001",
+          "attack_name": "Phishing: Spearphishing Attachment",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 0.71,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.6875,
+            "description_detail": 0.475,
+            "tool_mention": 0.8,
+            "context_richness": 0.8833333333333333
+          },
+          "confidence_score": 0.755,
+          "confidence_level": "medium"
+        },
+        {
+          "technique_name": "Registry Run Keys / Startup Folder",
+          "tactic": "Persistence",
+          "description": "Creating registry run keys for persistence across system reboots",
+          "indicators": [
+            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+          ],
+          "tools": [],
+          "attack_id": "T1547.001",
+          "attack_name": "Boot or Logon Autostart Execution: Registry Run Keys",
+          "subtechnique": true,
+          "mapping_source": "attack_mapper",
+          "confidence_breakdown": {
+            "report_confidence": 0.71,
+            "attack_mapping": 1.0,
+            "ioc_correlation": 0.5625,
+            "description_detail": 0.6499999999999999,
+            "tool_mention": 0.5,
+            "context_richness": 0.7666666666666666
+          },
+          "confidence_score": 0.714,
+          "confidence_level": "medium"
+        }
+      ],
+      "attack_chain": [
+        "T1566.001",
+        "T1059.001",
+        "T1547.001",
+        "T1003",
+        "T1021.001"
+      ],
+      "metadata": {
+        "extraction_timestamp": "2025-10-05T06:15:01.679782",
+        "llm_model": "gpt-4",
+        "total_ttps_found": 5,
+        "ttps_after_filtering": 5,
+        "min_confidence_threshold": 0.5
+      }
+    }
+  ],
+  "statistics": {
+    "total_reports_processed": 3,
+    "total_ttps_extracted": 12,
+    "total_attack_mappings": 12,
+    "extraction_errors": 0,
+    "mapping_errors": 0,
+    "validation_errors": 0,
+    "last_extraction_time": "2025-10-05T06:15:01.679782",
+    "avg_confidence_score": 0.799,
+    "high_confidence_ttps": 7,
+    "low_confidence_ttps": 0,
+    "avg_processing_time_ms": 213.05766666666668,
+    "fastest_processing_ms": 639.173,
+    "slowest_processing_ms": 639.173,
+    "total_processing_time_ms": 639.173,
+    "cache_hits": 0,
+    "cache_misses": 3
+  }
+}
