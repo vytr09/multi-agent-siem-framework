@@ -1,4 +1,111 @@
+# # Multi-Agent SIEM Framework - Agent Configuration
+
+# agents:
+#   collector:
+#     name: "CTI Collector Agent"
+#     description: "Collects and normalizes threat intelligence from multiple sources"
+#     interval: 300  # Collection interval in seconds (5 minutes)
+    
+#     sources:
+#       misp:
+#         enabled: true
+#         url: "${MISP_URL}"
+#         api_key: "${MISP_API_KEY}"
+#         verify_cert: true
+#         days_back: 1          # How many days back to collect
+#         published_only: true   # Only published events
+#         include_attributes: true
+#         include_objects: true
+#         batch_size: 100
+        
+#       taxii:
+#         enabled: true
+#         url: "${TAXII_URL}"
+#         username: "${TAXII_USERNAME}"
+#         password: "${TAXII_PASSWORD}"
+#         collections: []       # Empty = all collections
+#         poll_interval: 300
+#         max_content_per_request: 100
+        
+#       opencti:
+#         enabled: false        # Optional - can enable later
+#         url: "${OPENCTI_URL}"
+#         api_key: "${OPENCTI_API_KEY}"
+        
+#     normalization:
+#       enabled: true
+#       deduplicate: true
+#       confidence_threshold: 0.5
+#       max_indicators_per_report: 1000
+      
+#     storage:
+#       batch_size: 50
+#       max_retries: 3
+#       retry_delay: 5
+    
+#   extractor:
+#     name: "TTP Extractor Agent"  
+#     description: "Extracts TTPs from CTI reports using LLM and NLP"
+    
+#     llm:
+#       provider: "openai"      # or "anthropic"
+#       model: "gpt-4"
+#       api_key: "${OPENAI_API_KEY}"
+#       max_tokens: 2000
+#       temperature: 0.1
+#       timeout: 120
+      
+#     nlp:
+#       model: "en_core_web_trf"
+#       batch_size: 10
+#       confidence_threshold: 0.7
+      
+#     attack_mapping:
+#       framework_version: "v13"
+#       confidence_threshold: 0.6
+      
+#   rulegen:
+#     name: "Rule Generation Agent"
+#     description: "Generates adaptive Sigma rules from extracted TTPs"
+    
+#     sigma:
+#       template_path: "data/templates/sigma_rules/"
+#       output_formats: ["sigma", "splunk", "elasticsearch"]
+#       optimization: true
+#       versioning: true
+      
+#     platforms:
+#       splunk:
+#         enabled: true
+#         host: "${SPLUNK_HOST}"
+#         api_key: "${SPLUNK_API_KEY}"
+        
+#       elasticsearch:
+#         enabled: true
+#         host: "${ELASTICSEARCH_HOST}"
+#         api_key: "${ELASTICSEARCH_API_KEY}"
+        
+#   evaluator:
+#     name: "Performance Evaluator Agent"
+#     description: "Evaluates rule performance and detects evasion"
+    
+#     metrics:
+#       collection_interval: 3600  # 1 hour
+#       retention_days: 30
+      
+#     thresholds:
+#       false_positive_rate: 0.1
+#       precision: 0.85
+#       recall: 0.8
+      
+#     evasion_detection:
+#       enabled: true
+#       simulation_enabled: false  # Enable in test environments only
+
+
+
 # Multi-Agent SIEM Framework - Agent Configuration
+# Updated for Hybrid NLP + Gemini Extractor
 
 agents:
   collector:
@@ -43,27 +150,90 @@ agents:
       max_retries: 3
       retry_delay: 5
     
+  # ========================================
+  # UPDATED: Hybrid NLP + Gemini Extractor
+  # ========================================
   extractor:
-    name: "TTP Extractor Agent"  
-    description: "Extracts TTPs from CTI reports using LLM and NLP"
+    name: "TTP Extractor Agent (Hybrid NLP + Gemini)"  
+    description: "Extracts TTPs using NLP preprocessing and Gemini LLM"
     
+    # ========== LLM Configuration ==========
+    # CHANGED: From OpenAI to Gemini
     llm:
-      provider: "openai"      # or "anthropic"
-      model: "gpt-4"
-      api_key: "${OPENAI_API_KEY}"
-      max_tokens: 2000
-      temperature: 0.1
-      timeout: 120
+      provider: "gemini"              # ← CHANGED: was "openai"
+      model: "gemini-2.0-flash-lite"       # ← CHANGED: was "gpt-4"
+      api_key: "${GEMINI_API_KEY}"    # ← CHANGED: was "${OPENAI_API_KEY}"
+      use_mock: false                 # ← NEW: false=real API, true=mock
+      max_tokens: 1000
+      temperature: 0.3                # ← CHANGED: was 0.1 (more creative)
+      timeout: 30                     # ← CHANGED: was 120 (Gemini faster)
       
+    # ========== NLP Processing ==========
+    # NEW: NLP configuration (was not present)
     nlp:
-      model: "en_core_web_trf"
-      batch_size: 10
-      confidence_threshold: 0.7
+      enabled: true                   # ← NEW: Enable NLP preprocessing
+      language: "en"
+      enable_ioc_detection: true      # ← NEW: Extract IPs, domains, hashes
       
+      # Entity extraction
+      entity_extraction:
+        enabled: true
+        extract_malware: true
+        extract_tools: true
+        extract_threat_actors: true
+        extract_attack_techniques: true
+      
+      # IOC extraction
+      ioc_extraction:
+        enabled: true
+        extract_ips: true
+        extract_domains: true
+        extract_hashes: true
+        extract_file_paths: true
+        extract_registry_keys: true
+        extract_commands: true
+      
+      # TTP indicators
+      ttp_indicators:
+        enabled: true                 # ← NEW: Identify TTP patterns
+        confidence_threshold: 0.6
+        
+    # ========== ATT&CK Mapping ==========
+    # UNCHANGED: Same as before
     attack_mapping:
-      framework_version: "v13"
+      framework_version: "v14.1"      # ← UPDATED: Latest version
       confidence_threshold: 0.6
       
+    # ========== Confidence Scoring ==========
+    # NEW: Multi-factor confidence configuration
+    confidence_scoring:
+      enabled: true
+      method:
+        nlp_weight: 0.35              # ← NEW: NLP contribution
+        llm_weight: 0.40              # ← NEW: LLM contribution
+        mapping_weight: 0.15          # ← NEW: ATT&CK mapping
+        entity_weight: 0.10           # ← NEW: Entity correlation
+      min_threshold: 0.5
+      high_confidence_threshold: 0.8
+      
+    # ========== Processing Settings ==========
+    # NEW: Processing optimization
+    processing:
+      batch_size: 5                   # ← NEW: Reports per batch
+      enable_caching: true            # ← NEW: Cache results
+      cache_ttl: 3600                 # ← NEW: Cache TTL (1 hour)
+      max_concurrent: 3               # ← NEW: Parallel processing
+      
+    # ========== Feature Flags ==========
+    # NEW: Control hybrid approach
+    features:
+      use_nlp_preprocessing: true     # ← NEW: Enable NLP
+      nlp_entity_boost: true          # ← NEW: Boost with entities
+      extraction_method: "hybrid"     # ← NEW: hybrid/llm_only/nlp_only
+      
+  # ========================================
+  # UNCHANGED: Rule Generation Agent
+  # ========================================
   rulegen:
     name: "Rule Generation Agent"
     description: "Generates adaptive Sigma rules from extracted TTPs"
@@ -85,6 +255,9 @@ agents:
         host: "${ELASTICSEARCH_HOST}"
         api_key: "${ELASTICSEARCH_API_KEY}"
         
+  # ========================================
+  # UNCHANGED: Evaluator Agent
+  # ========================================
   evaluator:
     name: "Performance Evaluator Agent"
     description: "Evaluates rule performance and detects evasion"
