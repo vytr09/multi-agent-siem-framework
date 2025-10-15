@@ -9,11 +9,13 @@ from pathlib import Path
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+import sys
 
 from agents.extractor.agent import ExtractorAgent
 
 load_dotenv()
 
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 async def test_hybrid_with_mock():
     """Test hybrid approach with mock Gemini"""
