@@ -1,3 +1,4 @@
+# core/config.py
 """
 Configuration management for the Multi-Agent SIEM Framework.
 """

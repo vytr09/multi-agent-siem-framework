@@ -1,3 +1,4 @@
+# agents/collector/normalizers/misp_normalizer.py
 """
 MISP data normalizer for converting MISP events to standard CTI format.
 """

@@ -1,3 +1,4 @@
+# agents/base/exceptions.py
 """
 Custom exceptions for the Multi-Agent SIEM Framework.
 
