@@ -1,108 +1,5 @@
+# config/agents.yaml
 # # Multi-Agent SIEM Framework - Agent Configuration
-
-# agents:
-#   collector:
-#     name: "CTI Collector Agent"
-#     description: "Collects and normalizes threat intelligence from multiple sources"
-#     interval: 300  # Collection interval in seconds (5 minutes)
-    
-#     sources:
-#       misp:
-#         enabled: true
-#         url: "${MISP_URL}"
-#         api_key: "${MISP_API_KEY}"
-#         verify_cert: true
-#         days_back: 1          # How many days back to collect
-#         published_only: true   # Only published events
-#         include_attributes: true
-#         include_objects: true
-#         batch_size: 100
-        
-#       taxii:
-#         enabled: true
-#         url: "${TAXII_URL}"
-#         username: "${TAXII_USERNAME}"
-#         password: "${TAXII_PASSWORD}"
-#         collections: []       # Empty = all collections
-#         poll_interval: 300
-#         max_content_per_request: 100
-        
-#       opencti:
-#         enabled: false        # Optional - can enable later
-#         url: "${OPENCTI_URL}"
-#         api_key: "${OPENCTI_API_KEY}"
-        
-#     normalization:
-#       enabled: true
-#       deduplicate: true
-#       confidence_threshold: 0.5
-#       max_indicators_per_report: 1000
-      
-#     storage:
-#       batch_size: 50
-#       max_retries: 3
-#       retry_delay: 5
-    
-#   extractor:
-#     name: "TTP Extractor Agent"  
-#     description: "Extracts TTPs from CTI reports using LLM and NLP"
-    
-#     llm:
-#       provider: "openai"      # or "anthropic"
-#       model: "gpt-4"
-#       api_key: "${OPENAI_API_KEY}"
-#       max_tokens: 2000
-#       temperature: 0.1
-#       timeout: 120
-      
-#     nlp:
-#       model: "en_core_web_trf"
-#       batch_size: 10
-#       confidence_threshold: 0.7
-      
-#     attack_mapping:
-#       framework_version: "v13"
-#       confidence_threshold: 0.6
-      
-#   rulegen:
-#     name: "Rule Generation Agent"
-#     description: "Generates adaptive Sigma rules from extracted TTPs"
-    
-#     sigma:
-#       template_path: "data/templates/sigma_rules/"
-#       output_formats: ["sigma", "splunk", "elasticsearch"]
-#       optimization: true
-#       versioning: true
-      
-#     platforms:
-#       splunk:
-#         enabled: true
-#         host: "${SPLUNK_HOST}"
-#         api_key: "${SPLUNK_API_KEY}"
-        
-#       elasticsearch:
-#         enabled: true
-#         host: "${ELASTICSEARCH_HOST}"
-#         api_key: "${ELASTICSEARCH_API_KEY}"
-        
-#   evaluator:
-#     name: "Performance Evaluator Agent"
-#     description: "Evaluates rule performance and detects evasion"
-    
-#     metrics:
-#       collection_interval: 3600  # 1 hour
-#       retention_days: 30
-      
-#     thresholds:
-#       false_positive_rate: 0.1
-#       precision: 0.85
-#       recall: 0.8
-      
-#     evasion_detection:
-#       enabled: true
-#       simulation_enabled: false  # Enable in test environments only
-
-
 
 # Multi-Agent SIEM Framework - Agent Configuration
 # Updated for Hybrid NLP + Gemini Extractor
@@ -116,9 +13,10 @@ agents:
     sources:
       misp:
         enabled: true
+        use_mock: false
         url: "${MISP_URL}"
         api_key: "${MISP_API_KEY}"
-        verify_cert: true
+        verify_cert: false
         days_back: 1          # How many days back to collect
         published_only: true   # Only published events
         include_attributes: true
@@ -138,6 +36,10 @@ agents:
         enabled: false        # Optional - can enable later
         url: "${OPENCTI_URL}"
         api_key: "${OPENCTI_API_KEY}"
+
+      datasets:
+        enabled: true
+        offline_data_dir: "data/datasets"
         
     normalization:
       enabled: true
@@ -274,3 +176,106 @@ agents:
     evasion_detection:
       enabled: true
       simulation_enabled: false  # Enable in test environments only
+
+
+# agents:
+#   collector:
+#     name: "CTI Collector Agent"
+#     description: "Collects and normalizes threat intelligence from multiple sources"
+#     interval: 300  # Collection interval in seconds (5 minutes)
+    
+#     sources:
+#       misp:
+#         enabled: true
+#         url: "${MISP_URL}"
+#         api_key: "${MISP_API_KEY}"
+#         verify_cert: true
+#         days_back: 1          # How many days back to collect
+#         published_only: true   # Only published events
+#         include_attributes: true
+#         include_objects: true
+#         batch_size: 100
+        
+#       taxii:
+#         enabled: true
+#         url: "${TAXII_URL}"
+#         username: "${TAXII_USERNAME}"
+#         password: "${TAXII_PASSWORD}"
+#         collections: []       # Empty = all collections
+#         poll_interval: 300
+#         max_content_per_request: 100
+        
+#       opencti:
+#         enabled: false        # Optional - can enable later
+#         url: "${OPENCTI_URL}"
+#         api_key: "${OPENCTI_API_KEY}"
+        
+#     normalization:
+#       enabled: true
+#       deduplicate: true
+#       confidence_threshold: 0.5
+#       max_indicators_per_report: 1000
+      
+#     storage:
+#       batch_size: 50
+#       max_retries: 3
+#       retry_delay: 5
+    
+#   extractor:
+#     name: "TTP Extractor Agent"  
+#     description: "Extracts TTPs from CTI reports using LLM and NLP"
+    
+#     llm:
+#       provider: "openai"      # or "anthropic"
+#       model: "gpt-4"
+#       api_key: "${OPENAI_API_KEY}"
+#       max_tokens: 2000
+#       temperature: 0.1
+#       timeout: 120
+      
+#     nlp:
+#       model: "en_core_web_trf"
+#       batch_size: 10
+#       confidence_threshold: 0.7
+      
+#     attack_mapping:
+#       framework_version: "v13"
+#       confidence_threshold: 0.6
+      
+#   rulegen:
+#     name: "Rule Generation Agent"
+#     description: "Generates adaptive Sigma rules from extracted TTPs"
+    
+#     sigma:
+#       template_path: "data/templates/sigma_rules/"
+#       output_formats: ["sigma", "splunk", "elasticsearch"]
+#       optimization: true
+#       versioning: true
+      
+#     platforms:
+#       splunk:
+#         enabled: true
+#         host: "${SPLUNK_HOST}"
+#         api_key: "${SPLUNK_API_KEY}"
+        
+#       elasticsearch:
+#         enabled: true
+#         host: "${ELASTICSEARCH_HOST}"
+#         api_key: "${ELASTICSEARCH_API_KEY}"
+        
+#   evaluator:
+#     name: "Performance Evaluator Agent"
+#     description: "Evaluates rule performance and detects evasion"
+    
+#     metrics:
+#       collection_interval: 3600  # 1 hour
+#       retention_days: 30
+      
+#     thresholds:
+#       false_positive_rate: 0.1
+#       precision: 0.85
+#       recall: 0.8
+      
+#     evasion_detection:
+#       enabled: true
+#       simulation_enabled: false  # Enable in test environments only
