@@ -1,3 +1,4 @@
+# agents/collector/agent.py
 """
 Collector Agent - Collects and normalizes CTI data from multiple sources.
 
@@ -16,6 +17,8 @@ from agents.base.agent import BaseAgent, AgentStatus
 from agents.base.exceptions import CollectorException, MISPConnectionException
 from agents.collector.clients.misp_client import create_misp_client
 from agents.collector.normalizers.misp_normalizer import MISPNormalizer
+from agents.collector.datasets.file_loader import FileDatasetLoader
+from agents.collector.normalizers.pdf_normalizer import PDFDatasetNormalizer
 from core.logging import get_agent_logger
 
 class CollectorAgent(BaseAgent):
@@ -45,6 +48,10 @@ class CollectorAgent(BaseAgent):
         self.collection_interval = config.get("interval", 300)  # 5 minutes
         self.batch_size = config.get("batch_size", 100)
         self.max_retries = config.get("max_retries", 3)
+
+        # Offline dataset loader (for PDF, JSON, CSV files)
+        data_dir = config.get("offline_data_dir", "data/datasets")
+        self.dataset_loader = FileDatasetLoader(data_dir)
         
         # Statistics
         self.stats = {
@@ -88,88 +95,104 @@ class CollectorAgent(BaseAgent):
         try:
             self.set_status(AgentStatus.RUNNING)
             self.update_last_activity()
-            
-            # Parse input parameters
+
             requested_sources = input_data.get("sources", list(self.sources_config.keys()))
-            force_collection = input_data.get("force", False)
-            max_reports = input_data.get("max_reports", 100)
-            
-            self.logger.info("Starting collection cycle", 
-                           sources=requested_sources,
-                           force=force_collection,
-                           max_reports=max_reports)
-            
-            # Collect from all requested sources
-            all_collected_reports = []
-            collection_errors = []
-            
+            max_reports      = input_data.get("max_reports", 100)
+
+            self.logger.info("Starting collection cycle",
+                             sources=requested_sources,
+                             max_reports=max_reports)
+
+            all_raw_reports = []
+            errors          = []
+
+            # 1. Live CTI sources
             for source in requested_sources:
                 try:
-                    if source == "misp" and source in self.sources_config:
+                    if source == "misp" and "misp" in self.sources_config:
                         reports = await self._collect_from_misp(max_reports)
-                        all_collected_reports.extend(reports)
-                        
-                    elif source == "taxii" and source in self.sources_config:
-                        # TODO: Implement TAXII collection
-                        self.logger.warning("TAXII collection not implemented yet")
-                        
-                    else:
-                        self.logger.warning(f"Unknown or unconfigured source: {source}")
-                        
+                        all_raw_reports.extend(reports)
+
+                    elif source == "taxii" and "taxii" in self.sources_config:
+                        # TODO: implement TAXII client _collect_from_taxii
+                        reports = await self._collect_from_taxii(max_reports)
+                        all_raw_reports.extend(reports)
+
+                    elif source == "opencti" and "opencti" in self.sources_config:
+                        # TODO: implement OpenCTI client _collect_from_opencti
+                        reports = await self._collect_from_opencti(max_reports)
+                        all_raw_reports.extend(reports)
+
                 except Exception as e:
-                    error_msg = f"Collection from {source} failed: {str(e)}"
-                    self.logger.error(error_msg, source=source, error=str(e))
-                    collection_errors.append(error_msg)
+                    msg = f"Collection from {source} failed: {e}"
+                    self.logger.error(msg, source=source)
+                    errors.append(msg)
                     self.stats["collection_errors"] += 1
-            
-            # Normalize collected reports
+
+            # 2. Offline datasets
+            if self.sources_config.get("datasets", {}).get("enabled", False):
+                try:
+                    offline_raw = self.dataset_loader.load_pdf_events()
+                    self.logger.info(f"Loaded {len(offline_raw)} offline PDF events")
+                    all_raw_reports.extend(offline_raw)
+                except Exception as e:
+                    msg = f"Offline dataset load failed: {e}"
+                    self.logger.error(msg)
+                    errors.append(msg)
+                    self.stats["collection_errors"] += 1
+
+            # 3. Normalize all reports
             normalized_reports = []
-            if all_collected_reports:
-                normalized_reports = await self._normalize_reports(all_collected_reports)
-            
-            # Update statistics
-            self.stats["total_reports_collected"] += len(all_collected_reports)
-            self.stats["total_reports_normalized"] += len(normalized_reports)
-            self.stats["last_collection_time"] = datetime.utcnow().isoformat()
-            
-            # Calculate total indicators
-            total_indicators = sum(
-                len(report.get("indicators", [])) 
-                for report in normalized_reports
-            )
-            self.stats["total_indicators_extracted"] += total_indicators
-            
-            # Prepare results
+            for raw in all_raw_reports:
+                try:
+                    # PDF-based events have 'content' key
+                    if raw.get("content") is not None:
+                        normalized = PDFDatasetNormalizer().normalize_event(raw)
+                    else:
+                        normalized = self.misp_normalizer.normalize_event(raw)
+                    normalized_reports.append(normalized)
+
+                except Exception as e:
+                    msg = f"Normalization failed: {e}"
+                    self.logger.error(msg)
+                    errors.append(msg)
+                    self.stats["normalization_errors"] += 1
+
+            # 4. Update statistics
+            self.stats["total_reports_collected"]   += len(all_raw_reports)
+            self.stats["total_reports_normalized"]  += len(normalized_reports)
+            indicators_count = sum(len(r.get("indicators", [])) for r in normalized_reports)
+            self.stats["total_indicators_extracted"] += indicators_count
+            self.stats["last_collection_time"]       = datetime.utcnow().isoformat()
+
+            # 5. Prepare result
             result = {
                 "agent_id": self.id,
                 "status": "success",
                 "timestamp": self.get_timestamp(),
                 "collection_summary": {
-                    "sources_processed": requested_sources,
-                    "raw_reports_collected": len(all_collected_reports),
-                    "normalized_reports": len(normalized_reports),
-                    "total_indicators": total_indicators,
-                    "collection_errors": len(collection_errors)
+                    "raw_reports_collected":   len(all_raw_reports),
+                    "normalized_reports":      len(normalized_reports),
+                    "total_indicators":        indicators_count,
+                    "collection_errors":       len(errors)
                 },
                 "normalized_reports": normalized_reports,
-                "errors": collection_errors,
+                "errors": errors,
                 "statistics": self.stats.copy()
             }
-            
+
             self.set_status(AgentStatus.IDLE)
-            
-            self.logger.info("Collection cycle completed", 
-                           raw_reports=len(all_collected_reports),
-                           normalized_reports=len(normalized_reports),
-                           indicators=total_indicators,
-                           errors=len(collection_errors))
-            
+            self.logger.info("Collection cycle completed",
+                             raw=len(all_raw_reports),
+                             normalized=len(normalized_reports),
+                             indicators=indicators_count,
+                             errors=len(errors))
             return result
-            
+
         except Exception as e:
             self.set_status(AgentStatus.ERROR, str(e))
             self.logger.error("Collection execution failed", error=str(e))
-            raise CollectorException(f"Collection execution failed: {str(e)}")
+            raise CollectorException(f"Collection execution failed: {e}")
     
     def validate_input(self, data: Dict[str, Any]) -> bool:
         """
@@ -234,7 +257,7 @@ class CollectorAgent(BaseAgent):
             max_reports: Maximum number of reports to collect
             
         Returns:
-            List of raw MISP events
+            List of raw MISP events (each with full Attributes, Tags, Objects)
         """
         if not self.misp_client:
             raise CollectorException("MISP client not initialized")
@@ -244,22 +267,30 @@ class CollectorAgent(BaseAgent):
             days_back = misp_config.get("days_back", 1)
             
             self.logger.info("Collecting from MISP", 
-                           days_back=days_back,
-                           max_reports=max_reports)
+                        days_back=days_back,
+                        max_reports=max_reports)
             
-            # Collect recent events
-            events = await self.misp_client.get_recent_events(days=days_back)
+            # 1. Get summary list (IDs) - synchronous call
+            summary_list = self.misp_client.misp.search_index(
+                published=True,
+                timestamp=f"{days_back}d",
+                limit=max_reports,
+                pythonify=False
+            )
             
-            # Limit to max_reports
-            if len(events) > max_reports:
-                events = events[:max_reports]
-                self.logger.info(f"Limited MISP results to {max_reports} events")
+            # 2. Fetch full event data for each ID
+            full_events = []
+            for ev in summary_list[:max_reports]:
+                event_id = ev.get("Event", ev).get("id") or ev.get("id")
+                full_resp = self.misp_client.misp.get_event(event_id, pythonify=False)
+                full_events.append(full_resp)
             
-            self.logger.info(f"Collected {len(events)} events from MISP")
-            return events
+            self.logger.info(f"Collected {len(full_events)} full events from MISP")
+            return full_events
             
         except Exception as e:
             raise MISPConnectionException(f"MISP collection failed: {str(e)}")
+
     
     async def _normalize_reports(self, raw_reports: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
@@ -275,16 +306,19 @@ class CollectorAgent(BaseAgent):
         
         for report in raw_reports:
             try:
-                # Determine source type and use appropriate normalizer
-                # For now, assume all reports are from MISP
-                normalized = self.misp_normalizer.normalize_event(report)
+                ## PDF events from FileDatasetLoader have 'content' and 'metadata'
+                if raw.get("content") is not None:
+                    normalized = PDFDatasetNormalizer().normalize_event(raw)
+                else:
+                    # All other raw events go to the MISP normalizer
+                    normalized = self.misp_normalizer.normalize_event(raw)
                 
                 if normalized:
                     normalized_reports.append(normalized)
                     
             except Exception as e:
-                self.logger.error(f"Failed to normalize report: {str(e)}", 
-                                report_id=report.get("Event", {}).get("id", "unknown"))
+                self.logger.error(f"Failed to normalize report: {e}", 
+                                report=raw.get("metadata", raw.get("Event", {})).get("id", "unknown"))
                 self.stats["normalization_errors"] += 1
                 continue
         
