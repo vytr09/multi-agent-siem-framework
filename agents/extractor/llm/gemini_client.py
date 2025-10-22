@@ -25,7 +25,7 @@ class MockGeminiClient:
     """Mock Gemini client for testing (no API calls)"""
     
     def __init__(self, config: Dict[str, Any]):
-        self.model = config.get("model", "gemini-2.0-flash-lite")
+        self.model = config.get("model", "gemini-2.5-pro")
         self.api_key = config.get("api_key", "mock-key")
         
         # Template TTPs
@@ -88,7 +88,7 @@ class GeminiClient:
         if not self.api_key:
             raise ValueError("Gemini API key not provided")
         
-        self.model_name = config.get("model", "gemini-2.0-flash-lite")
+        self.model_name = config.get("model", "gemini-2.5-pro")
         self.temperature = config.get("temperature", 0.3)
         self.max_tokens = config.get("max_tokens", 1000)
         
