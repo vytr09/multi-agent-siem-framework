@@ -16,18 +16,215 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from agents.extractor.agent import ExtractorAgent
 
+# async def test_hybrid_with_mock():
+#     """Test hybrid approach with mock Gemini"""
+#     print("=" * 80)
+#     print("HYBRID NLP + GEMINI EXTRACTOR TEST (MOCK MODE)")
+#     print("=" * 80)
+    
+#     config = {
+#         "llm": {
+#             # "use_mock": True,
+#             "api_key": os.getenv("GEMINI_API_KEY"),  # ← THÊM DÒNG NÀY
+#             "use_mock": False,
+#             "model": "gemini-2.0-flash-lite",
+#             "temperature": 0.3,
+#             "max_tokens": 1000
+#         },
+#         "use_nlp_preprocessing": True,
+#         "nlp_entity_boost": True,
+#         "min_confidence": 0.5,
+#         "enable_caching": True,
+#         "batch_size": 5
+#     }
+    
+#     agent = ExtractorAgent(name="hybrid-test-1", config=config)
+    
+#     try:
+#         print("\n1. Initializing Hybrid Agent...")
+#         await agent.start()
+#         print("   ✓ Agent initialized (NLP + Gemini enabled)")
+        
+#         # Load test data
+#         with open("data/normalized/full_pipeline.json", encoding='utf-8') as f:
+#             test_reports = json.load(f)
+        
+#         test_report = test_reports[0]
+        
+#         print(f"\n2. Processing report: {test_report['title']}")
+#         print(f"   Report ID: {test_report['report_id']}")
+#         print(f"   Description length: {len(test_report['description'])} chars")
+#         print(f"   Threat Actors: {', '.join(test_report.get('threat_actors', []))}")
+#         print(f"   Malware: {', '.join(test_report.get('malware_families', []))}")
+#         print(f"   IOCs: {len(test_report.get('indicators', []))} indicators")
+        
+#         # Extract
+#         start_time = datetime.utcnow()
+        
+#         message = {
+#             "normalized_reports": [test_report]
+#         }
+        
+#         result = await agent.execute(message)
+        
+#         elapsed = (datetime.utcnow() - start_time).total_seconds()
+        
+#         # Display results
+#         print("\n" + "=" * 80)
+#         print("EXTRACTION RESULTS - HYBRID APPROACH")
+#         print("=" * 80)
+        
+#         summary = result.get("extraction_summary", {})
+        
+#         print(f"\nExecution Summary:")
+#         print(f"  Status: {result.get('status')}")
+#         print(f"  Total Processing Time: {summary.get('processing_time_ms'):.0f}ms")
+#         print(f"  NLP Processing Time: {summary.get('nlp_processing_time_ms'):.0f}ms")
+#         print(f"  LLM Processing Time: {summary.get('llm_processing_time_ms'):.0f}ms")
+#         print(f"  Gemini API Calls: {summary.get('gemini_api_calls')}")
+        
+#         print(f"\nExtraction Summary:")
+#         print(f"  Total TTPs Extracted: {summary.get('total_ttps_extracted')}")
+#         print(f"  High Confidence TTPs: {summary.get('high_confidence_ttps')}")
+#         print(f"  Avg Confidence: {result['statistics'].get('avg_confidence_score', 0):.2f}")
+        
+#         # Display NLP analysis
+#         if result.get("extraction_results"):
+#             extraction = result["extraction_results"][0]
+#             nlp_analysis = extraction.get("nlp_analysis", {})
+            
+#             print(f"\nNLP Analysis:")
+#             entities = nlp_analysis.get("entities", {})
+#             print(f"  Malware Found: {', '.join(entities.get('malware', [])[:3])}")
+#             print(f"  Tools Detected: {', '.join(entities.get('tools', [])[:3])}")
+#             print(f"  Threat Actors: {', '.join(entities.get('threat_actors', []))}")
+#             print(f"  IPs Found: {len(entities.get('ips', []))}")
+#             print(f"  Domains Found: {len(entities.get('domains', []))}")
+            
+#             ttp_indicators = nlp_analysis.get("ttp_indicators", {})
+#             if ttp_indicators:
+#                 print(f"  TTP Indicators from NLP:")
+#                 for tactic, techniques in list(ttp_indicators.items())[:5]:
+#                     print(f"    - {tactic}: {', '.join(techniques[:2])}")
+            
+#             # Display extracted TTPs
+#             ttps = extraction.get("extracted_ttps", [])
+            
+#             print(f"\n" + "-" * 80)
+#             print(f"EXTRACTED TTPs ({len(ttps)} total):")
+#             print("-" * 80)
+            
+#             for i, ttp in enumerate(ttps[:10], 1):
+#                 print(f"\n{i}. {ttp.get('technique_name')}")
+#                 print(f"   Attack ID: {ttp.get('attack_id')}")
+#                 print(f"   Tactic: {ttp.get('tactic')}")
+#                 print(f"   Confidence: {ttp.get('confidence_score')} ({ttp.get('confidence_level')})")
+                
+#                 # Show confidence breakdown
+#                 breakdown = ttp.get('confidence_breakdown', {})
+#                 if breakdown:
+#                     print(f"   Breakdown: Base={breakdown.get('base', 0):.2f} " +
+#                           f"Method={breakdown.get('method_bonus', 0):.2f} " +
+#                           f"Mapping={breakdown.get('mapping_bonus', 0):.2f}")
+                
+#                 print(f"   Method: {ttp.get('extraction_method')}")
+                
+#                 if ttp.get('related_entities', {}).get('malware'):
+#                     print(f"   Malware: {', '.join(ttp['related_entities']['malware'][:2])}")
+                
+#                 desc = ttp.get('description', '')
+#                 if desc:
+#                     print(f"   Description: {desc[:100]}...")
+        
+#         # Statistics
+#         print("\n" + "-" * 80)
+#         print("DETAILED STATISTICS:")
+#         stats = result.get("statistics", {})
+#         print(f"  Total Reports Processed: {stats.get('total_reports_processed')}")
+#         print(f"  Total TTPs Extracted: {stats.get('total_ttps_extracted')}")
+#         print(f"  NLP Entities Found: {stats.get('nlp_entities_extracted')}")
+#         print(f"  NLP TTP Indicators Found: {stats.get('nlp_ttp_indicators_found')}")
+#         print(f"  Gemini TTPs Extracted: {stats.get('gemini_ttps_extracted')}")
+#         print(f"  Gemini API Calls: {stats.get('gemini_api_calls')}")
+#         print(f"  Cache Hits: {stats.get('cache_hits')}")
+#         print(f"  Extraction Errors: {stats.get('extraction_errors')}")
+        
+#         # Save results
+#         output_path = Path("data/processed/test_hybrid_extraction.json")
+#         output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+#         with open(output_path, "w", encoding='utf-8') as f:
+#             json.dump(result, f, indent=2, ensure_ascii=False)
+        
+#         print(f"\n✓ Results saved to {output_path}")
+        
+#         # Health check
+#         health = await agent.health_check()
+#         print(f"\nAgent Health: {health.get('health', {}).get('status')}")
+#         print(f"  Health Score: {health.get('health', {}).get('score')}")
+        
+#         await agent.shutdown()
+#         print("\n✓ Agent shutdown complete")
+        
+#         print("\n" + "=" * 80)
+#         print("HYBRID TEST COMPLETED SUCCESSFULLY")
+#         print("=" * 80)
+        
+#     except Exception as e:
+#         print(f"\n✗ Test failed: {e}")
+#         import traceback
+#         traceback.print_exc()
+#         return False
+    
+#     return True
+
 async def test_hybrid_with_mock():
-    """Test hybrid approach with mock Gemini"""
+    """Test hybrid approach with mock Gemini - Multi-report support"""
     print("=" * 80)
-    print("HYBRID NLP + GEMINI EXTRACTOR TEST (MOCK MODE)")
+    print("HYBRID NLP + GEMINI EXTRACTOR TEST")
     print("=" * 80)
     
+    # Load test data first
+    with open("data/normalized/full_pipeline.json", encoding='utf-8') as f:
+        test_reports = json.load(f)
+    
+    total_reports = len(test_reports)
+    print(f"\nTotal available reports: {total_reports}")
+    
+    # Ask user how many reports to process
+    print("\nOptions:")
+    print("1. Process single report (first one)")
+    print("2. Process specific number of reports")
+    print("3. Process all reports")
+    
+    option = input("\nSelect option (1-3): ").strip()
+    
+    if option == "1":
+        reports_to_process = [test_reports[0]]
+        print(f"Processing 1 report")
+    elif option == "2":
+        num = input(f"Enter number of reports to process (1-{total_reports}): ").strip()
+        try:
+            num = int(num)
+            num = min(num, total_reports)
+            reports_to_process = test_reports[:num]
+            print(f"Processing {num} reports")
+        except ValueError:
+            print("Invalid number, processing first report only")
+            reports_to_process = [test_reports[0]]
+    elif option == "3":
+        reports_to_process = test_reports
+        print(f"Processing all {total_reports} reports")
+    else:
+        print("Invalid option, processing first report only")
+        reports_to_process = [test_reports[0]]
+    
+    # Configuration
     config = {
         "llm": {
-            # "use_mock": True,
-            "api_key": os.getenv("GEMINI_API_KEY"),  # ← THÊM DÒNG NÀY
-            "use_mock": False,
-            "model": "gemini-2.0-flash-lite",
+            "api_key": os.getenv("GEMINI_API_KEY"),
+            "use_mock": False,  # Set to True for testing without API
+            "model": "gemini-2.5-pro",
             "temperature": 0.3,
             "max_tokens": 1000
         },
@@ -41,133 +238,155 @@ async def test_hybrid_with_mock():
     agent = ExtractorAgent(name="hybrid-test-1", config=config)
     
     try:
-        print("\n1. Initializing Hybrid Agent...")
-        await agent.start()
-        print("   ✓ Agent initialized (NLP + Gemini enabled)")
-        
-        # Load test data
-        with open("data/normalized/cti_reports_20251004_212903.json") as f:
-            test_reports = json.load(f)
-        
-        test_report = test_reports[0]
-        
-        print(f"\n2. Processing report: {test_report['title']}")
-        print(f"   Report ID: {test_report['report_id']}")
-        print(f"   Description length: {len(test_report['description'])} chars")
-        print(f"   Threat Actors: {', '.join(test_report.get('threat_actors', []))}")
-        print(f"   Malware: {', '.join(test_report.get('malware_families', []))}")
-        print(f"   IOCs: {len(test_report.get('indicators', []))} indicators")
-        
-        # Extract
-        start_time = datetime.utcnow()
-        
-        message = {
-            "normalized_reports": [test_report]
-        }
-        
-        result = await agent.execute(message)
-        
-        elapsed = (datetime.utcnow() - start_time).total_seconds()
-        
-        # Display results
         print("\n" + "=" * 80)
-        print("EXTRACTION RESULTS - HYBRID APPROACH")
+        print("INITIALIZING AGENT")
+        print("=" * 80)
+        await agent.start()
+        print("✓ Agent initialized (NLP + Gemini enabled)")
+        
+        # Storage for all results
+        all_extraction_results = []
+        total_ttps = 0
+        total_processing_time = 0
+        
+        # Process each report
+        print("\n" + "=" * 80)
+        print(f"PROCESSING {len(reports_to_process)} REPORT(S)")
         print("=" * 80)
         
-        summary = result.get("extraction_summary", {})
-        
-        print(f"\nExecution Summary:")
-        print(f"  Status: {result.get('status')}")
-        print(f"  Total Processing Time: {summary.get('processing_time_ms'):.0f}ms")
-        print(f"  NLP Processing Time: {summary.get('nlp_processing_time_ms'):.0f}ms")
-        print(f"  LLM Processing Time: {summary.get('llm_processing_time_ms'):.0f}ms")
-        print(f"  Gemini API Calls: {summary.get('gemini_api_calls')}")
-        
-        print(f"\nExtraction Summary:")
-        print(f"  Total TTPs Extracted: {summary.get('total_ttps_extracted')}")
-        print(f"  High Confidence TTPs: {summary.get('high_confidence_ttps')}")
-        print(f"  Avg Confidence: {result['statistics'].get('avg_confidence_score', 0):.2f}")
-        
-        # Display NLP analysis
-        if result.get("extraction_results"):
-            extraction = result["extraction_results"][0]
-            nlp_analysis = extraction.get("nlp_analysis", {})
+        for idx, test_report in enumerate(reports_to_process, 1):
+            print(f"\n{'─' * 80}")
+            print(f"REPORT {idx}/{len(reports_to_process)}")
+            print(f"{'─' * 80}")
             
-            print(f"\nNLP Analysis:")
-            entities = nlp_analysis.get("entities", {})
-            print(f"  Malware Found: {', '.join(entities.get('malware', [])[:3])}")
-            print(f"  Tools Detected: {', '.join(entities.get('tools', [])[:3])}")
-            print(f"  Threat Actors: {', '.join(entities.get('threat_actors', []))}")
-            print(f"  IPs Found: {len(entities.get('ips', []))}")
-            print(f"  Domains Found: {len(entities.get('domains', []))}")
+            print(f"Title: {test_report['title']}")
+            print(f"Report ID: {test_report['report_id']}")
+            print(f"Description length: {len(test_report['description'])} chars")
+            print(f"Threat Actors: {', '.join(test_report.get('threat_actors', []))}")
+            print(f"Malware: {', '.join(test_report.get('malware_families', []))}")
+            print(f"IOCs: {len(test_report.get('indicators', []))} indicators")
             
-            ttp_indicators = nlp_analysis.get("ttp_indicators", {})
-            if ttp_indicators:
-                print(f"  TTP Indicators from NLP:")
-                for tactic, techniques in list(ttp_indicators.items())[:5]:
-                    print(f"    - {tactic}: {', '.join(techniques[:2])}")
+            # Extract
+            start_time = datetime.utcnow()
             
-            # Display extracted TTPs
-            ttps = extraction.get("extracted_ttps", [])
+            message = {
+                "normalized_reports": [test_report]
+            }
             
-            print(f"\n" + "-" * 80)
-            print(f"EXTRACTED TTPs ({len(ttps)} total):")
-            print("-" * 80)
+            result = await agent.execute(message)
             
-            for i, ttp in enumerate(ttps[:10], 1):
-                print(f"\n{i}. {ttp.get('technique_name')}")
-                print(f"   Attack ID: {ttp.get('attack_id')}")
-                print(f"   Tactic: {ttp.get('tactic')}")
-                print(f"   Confidence: {ttp.get('confidence_score')} ({ttp.get('confidence_level')})")
+            elapsed = (datetime.utcnow() - start_time).total_seconds()
+            total_processing_time += elapsed
+            
+            # Get summary
+            summary = result.get("extraction_summary", {})
+            extraction_results = result.get("extraction_results", [])
+            
+            if extraction_results:
+                extraction = extraction_results[0]
+                ttps = extraction.get("extracted_ttps", [])
+                total_ttps += len(ttps)
                 
-                # Show confidence breakdown
-                breakdown = ttp.get('confidence_breakdown', {})
-                if breakdown:
-                    print(f"   Breakdown: Base={breakdown.get('base', 0):.2f} " +
-                          f"Method={breakdown.get('method_bonus', 0):.2f} " +
-                          f"Mapping={breakdown.get('mapping_bonus', 0):.2f}")
+                print(f"\n✓ Extracted {len(ttps)} TTPs")
+                print(f"  Processing Time: {summary.get('processing_time_ms'):.0f}ms")
+                print(f"  High Confidence: {summary.get('high_confidence_ttps', 0)}")
+                print(f"  Gemini API Calls: {summary.get('gemini_api_calls', 0)}")
                 
-                print(f"   Method: {ttp.get('extraction_method')}")
+                # Show NLP analysis summary
+                nlp_analysis = extraction.get("nlp_analysis", {})
+                entities = nlp_analysis.get("entities", {})
+                print(f"\n  NLP Analysis:")
+                print(f"    Malware: {len(entities.get('malware', []))}")
+                print(f"    Tools: {len(entities.get('tools', []))}")
+                print(f"    Threat Actors: {len(entities.get('threat_actors', []))}")
+                print(f"    IPs: {len(entities.get('ips', []))}")
+                print(f"    Domains: {len(entities.get('domains', []))}")
                 
-                if ttp.get('related_entities', {}).get('malware'):
-                    print(f"   Malware: {', '.join(ttp['related_entities']['malware'][:2])}")
+                # Show top 3 TTPs
+                if ttps:
+                    print(f"\n  Top 3 TTPs:")
+                    for i, ttp in enumerate(ttps[:3], 1):
+                        print(f"    {i}. {ttp.get('technique_name')} ({ttp.get('attack_id')})")
+                        print(f"       Confidence: {ttp.get('confidence_score')} - {ttp.get('extraction_method')}")
                 
-                desc = ttp.get('description', '')
-                if desc:
-                    print(f"   Description: {desc[:100]}...")
+                # Store for final summary
+                all_extraction_results.append({
+                    "report_id": test_report['report_id'],
+                    "title": test_report['title'],
+                    "ttps_count": len(ttps),
+                    "high_confidence_count": summary.get('high_confidence_ttps', 0),
+                    "processing_time_ms": summary.get('processing_time_ms', 0),
+                    "extraction": extraction
+                })
+            else:
+                print(f"\n✗ No extraction results")
         
-        # Statistics
-        print("\n" + "-" * 80)
-        print("DETAILED STATISTICS:")
+        # Final Summary
+        print("\n" + "=" * 80)
+        print("FINAL SUMMARY")
+        print("=" * 80)
+        
+        print(f"\nOverall Statistics:")
+        print(f"  Total Reports Processed: {len(reports_to_process)}")
+        print(f"  Total TTPs Extracted: {total_ttps}")
+        print(f"  Average TTPs per Report: {total_ttps / len(reports_to_process):.1f}")
+        print(f"  Total Processing Time: {total_processing_time:.2f}s")
+        print(f"  Average Time per Report: {(total_processing_time / len(reports_to_process)):.2f}s")
+        
+        # Agent statistics
         stats = result.get("statistics", {})
+        print(f"\nAgent Statistics:")
         print(f"  Total Reports Processed: {stats.get('total_reports_processed')}")
         print(f"  Total TTPs Extracted: {stats.get('total_ttps_extracted')}")
         print(f"  NLP Entities Found: {stats.get('nlp_entities_extracted')}")
-        print(f"  NLP TTP Indicators Found: {stats.get('nlp_ttp_indicators_found')}")
+        print(f"  NLP TTP Indicators: {stats.get('nlp_ttp_indicators_found')}")
         print(f"  Gemini TTPs Extracted: {stats.get('gemini_ttps_extracted')}")
         print(f"  Gemini API Calls: {stats.get('gemini_api_calls')}")
         print(f"  Cache Hits: {stats.get('cache_hits')}")
+        print(f"  Cache Misses: {stats.get('cache_misses')}")
         print(f"  Extraction Errors: {stats.get('extraction_errors')}")
         
-        # Save results
-        output_path = Path("data/processed/test_hybrid_extraction.json")
+        # Per-report breakdown
+        print(f"\n{'-' * 80}")
+        print("PER-REPORT BREAKDOWN:")
+        print(f"{'-' * 80}")
+        print(f"{'#':<4} {'Report ID':<40} {'TTPs':<8} {'High Conf':<10} {'Time (ms)':<10}")
+        print(f"{'-' * 80}")
+        
+        for i, result_item in enumerate(all_extraction_results, 1):
+            print(f"{i:<4} {result_item['report_id'][:40]:<40} "
+                  f"{result_item['ttps_count']:<8} "
+                  f"{result_item['high_confidence_count']:<10} "
+                  f"{result_item['processing_time_ms']:<10.0f}")
+        
+        # Save all results
+        output_path = Path("data/processed/test_hybrid_multi_extraction_gemini-2.5-pro.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
-        with open(output_path, "w") as f:
-            json.dump(result, f, indent=2)
+        final_output = {
+            "test_timestamp": datetime.utcnow().isoformat(),
+            "total_reports": len(reports_to_process),
+            "total_ttps": total_ttps,
+            "total_processing_time_seconds": total_processing_time,
+            "agent_statistics": stats,
+            "per_report_results": all_extraction_results
+        }
         
-        print(f"\n✓ Results saved to {output_path}")
+        with open(output_path, "w", encoding='utf-8') as f:
+            json.dump(final_output, f, indent=2, ensure_ascii=False)
+        
+        print(f"\n✓ All results saved to {output_path}")
         
         # Health check
         health = await agent.health_check()
         print(f"\nAgent Health: {health.get('health', {}).get('status')}")
-        print(f"  Health Score: {health.get('health', {}).get('score')}")
+        print(f"  Health Score: {health.get('health', {}).get('score'):.1f}")
         
         await agent.shutdown()
         print("\n✓ Agent shutdown complete")
         
         print("\n" + "=" * 80)
-        print("HYBRID TEST COMPLETED SUCCESSFULLY")
+        print("MULTI-REPORT TEST COMPLETED SUCCESSFULLY ✓")
         print("=" * 80)
         
     except Exception as e:
@@ -255,7 +474,7 @@ async def test_batch_hybrid():
     config = {
         "llm": {
             "use_mock": True,
-            "model": "gemini-2.0-flash-lite",
+            "model": "gemini-2.5-pro",
             "temperature": 0.3,
             "max_tokens": 1000
         },
@@ -271,7 +490,7 @@ async def test_batch_hybrid():
         await agent.start()
         
         # Load all reports
-        with open("data/normalized/cti_reports_20251004_212903.json") as f:
+        with open("data/normalized/full_pipeline.json") as f:
             test_reports = json.load(f)
         
         print(f"\nProcessing {len(test_reports)} reports with hybrid NLP+Gemini...")
@@ -314,7 +533,7 @@ async def main():
     print("\n")
     
     # Check test data
-    test_data_path = Path("data/normalized/cti_reports_20251004_212903.json")
+    test_data_path = Path("data/normalized/full_pipeline.json")
     if not test_data_path.exists():
         print(f"✗ Test data not found: {test_data_path}")
         return
