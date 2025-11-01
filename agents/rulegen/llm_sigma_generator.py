@@ -1,5 +1,5 @@
 """
-LLM-based Sigma Rule Generator using Gemini API (google-genai)
+LLM-based Sigma Rule Generator using Gemini API (google-genai) - FIXED VERSION
 Generates Sigma rules from TTP data using LLM
 """
 
@@ -8,7 +8,7 @@ import json
 import re
 from typing import Dict, List, Any, Optional
 from google import genai
-from google.genai.types import SafetySetting, SafetyCategory
+from google.genai import types
 from datetime import datetime
 import uuid
 import asyncio
@@ -24,7 +24,7 @@ class LLMSigmaGenerator:
         Args:
             config: Configuration dict with:
                 - api_key: Gemini API key
-                - model: Model name (default: gemini-2.0-flash-lite)
+                - model: Model name (default: gemini-2.0-flash-exp)
                 - temperature: Generation temperature
                 - max_retries: Max retry attempts
         """
@@ -36,32 +36,47 @@ class LLMSigmaGenerator:
             raise ValueError("Gemini API key not found. Set GEMINI_API_KEY environment variable or pass in config")
         
         # Initialize google-genai client
-        self.client = genai.Client(api_key=self.api_key)
+        try:
+            self.client = genai.Client(api_key=self.api_key)
+            print(f"🔍 Debug: Gemini client initialized successfully")
+        except Exception as e:
+            print(f"🔍 Debug: Failed to initialize: {type(e).__name__}: {str(e)}")
+            raise ValueError(f"Failed to initialize Gemini client: {str(e)}")
         
         # Model configuration
-        self.model_name = self.config.get('model', 'gemini-2.0-flash-lite')
+        self.model_name = self.config.get('model', 'gemini-2.0-flash-exp')
         self.temperature = self.config.get('temperature', 0.3)
         self.max_retries = self.config.get('max_retries', 3)
         
         print(f"✓ LLM Generator initialized with model: {self.model_name}")
     
-    def _gen_config(self) -> dict:
-        """Generation configuration for google-genai"""
-        return {
-            'temperature': self.temperature,
-            'top_p': 0.95,
-            'top_k': 40,
-            'max_output_tokens': 4096,
-        }
-    
-    def _safety_settings(self) -> list:
-        """Safety settings for security research content"""
-        return [
-            SafetySetting(category=SafetyCategory.HARM_CATEGORY_HARASSMENT, threshold="BLOCK_NONE"),
-            SafetySetting(category=SafetyCategory.HARM_CATEGORY_HATE_SPEECH, threshold="BLOCK_NONE"),
-            SafetySetting(category=SafetyCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold="BLOCK_NONE"),
-            SafetySetting(category=SafetyCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold="BLOCK_NONE"),
-        ]
+    def _get_generation_config(self) -> types.GenerateContentConfig:
+        """Create generation configuration object"""
+        return types.GenerateContentConfig(
+            temperature=self.temperature,
+            top_p=0.95,
+            top_k=40,
+            max_output_tokens=4096,
+            # Safety settings for security research content
+            safety_settings=[
+                types.SafetySetting(
+                    category='HARM_CATEGORY_HARASSMENT',
+                    threshold='BLOCK_NONE'
+                ),
+                types.SafetySetting(
+                    category='HARM_CATEGORY_HATE_SPEECH',
+                    threshold='BLOCK_NONE'
+                ),
+                types.SafetySetting(
+                    category='HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                    threshold='BLOCK_NONE'
+                ),
+                types.SafetySetting(
+                    category='HARM_CATEGORY_DANGEROUS_CONTENT',
+                    threshold='BLOCK_NONE'
+                ),
+            ]
+        )
     
     def _build_sigma_prompt(self, ttp_data: Dict[str, Any]) -> str:
         """Build prompt for Sigma rule generation"""
@@ -189,7 +204,7 @@ Generate the Sigma rule now:"""
                     print(f"   ⚠️ Failed to extract valid JSON, retrying...")
                     
             except Exception as e:
-                print(f"   ❌ Error: {e}")
+                print(f"   ❌ Error: {type(e).__name__}: {str(e)}")
                 if attempt < self.max_retries - 1:
                     await asyncio.sleep(2 ** attempt)  # Exponential backoff
                 else:
@@ -201,32 +216,37 @@ Generate the Sigma rule now:"""
     async def _generate_with_client(self, prompt: str) -> str:
         """Generate response using google-genai client"""
         def _generate_sync():
-            response = self.client.responses.generate(
+            config = self._get_generation_config()
+            
+            # CORRECT API CALL for google-genai
+            response = self.client.models.generate_content(
                 model=self.model_name,
                 contents=prompt,
-                safety_settings=self._safety_settings(),
-                **self._gen_config()
+                config=config
             )
             
             # Extract text from response
-            text = getattr(response, "text", None)
-            if text:
-                return text
+            if hasattr(response, 'text') and response.text:
+                return response.text
             
             # Fallback: extract from candidates/parts structure
             if hasattr(response, "candidates") and response.candidates:
                 candidate = response.candidates[0]
-                content = getattr(candidate, "content", None)
-                if content and hasattr(content, "parts"):
-                    parts = content.parts or []
-                    texts = [getattr(part, "text", "") for part in parts if getattr(part, "text", None)]
-                    if texts:
-                        return "\n".join(texts)
+                if hasattr(candidate, 'content'):
+                    content = candidate.content
+                    if hasattr(content, "parts") and content.parts:
+                        texts = []
+                        for part in content.parts:
+                            if hasattr(part, "text") and part.text:
+                                texts.append(part.text)
+                        if texts:
+                            return ''.join(texts)
                 
                 # Direct text in candidate
                 if hasattr(candidate, "text") and candidate.text:
                     return candidate.text
             
+            print("🔍 Debug: No text found in response")
             return ""
         
         # Run in thread pool to maintain async interface
@@ -235,6 +255,9 @@ Generate the Sigma rule now:"""
     
     def _extract_json_from_response(self, response_text: str) -> Optional[Dict]:
         """Extract JSON object from LLM response"""
+        
+        if not response_text:
+            return None
         
         # Try to find JSON block
         # Look for ```json ... ``` or just {...}
@@ -319,12 +342,19 @@ Generate the Sigma rule now:"""
         # Add process indicators if available
         process_indicators = [ind['value'] for ind in indicators if ind['type'] == 'process_image']
         if process_indicators:
-            detection['selection']['Image|endswith'] = process_indicators if len(process_indicators) == 1 else process_indicators
+            if len(process_indicators) == 1:
+                detection['selection']['Image|endswith'] = process_indicators[0]
+            else:
+                detection['selection']['Image|endswith'] = process_indicators
         
         # Add command line indicators
         cmdline_indicators = [ind['value'] for ind in indicators if ind['type'] == 'command_line']
         if cmdline_indicators:
             detection['selection']['CommandLine|contains'] = cmdline_indicators
+        
+        # If no indicators, add a basic pattern
+        if not detection['selection']:
+            detection['selection']['Image|endswith'] = f"{technique_name.lower().replace(' ', '_')}.exe"
         
         return {
             'title': f"{technique_name} Detection",
@@ -372,6 +402,11 @@ Generate the Sigma rule now:"""
                         'type': ioc_type,
                         'value': value
                     })
+            elif isinstance(values, str):
+                indicators.append({
+                    'type': ioc_type,
+                    'value': values
+                })
         
         # From tools
         tools = ttp_data.get('tools', [])
@@ -448,7 +483,7 @@ if __name__ == "__main__":
     async def test():
         config = {
             'api_key': os.getenv('GEMINI_API_KEY'),
-            'model': 'gemini-2.0-flash-lite',
+            'model': 'gemini-2.0-flash-exp',
             'temperature': 0.3
         }
         
