@@ -1,5 +1,5 @@
 """
-LLM-based Sigma Rule Generator using Gemini API
+LLM-based Sigma Rule Generator using Gemini API (google-genai)
 Generates Sigma rules from TTP data using LLM
 """
 
@@ -7,14 +7,15 @@ import os
 import json
 import re
 from typing import Dict, List, Any, Optional
-import google.generativeai as genai
+from google import genai
+from google.genai.types import SafetySetting, SafetyCategory
 from datetime import datetime
 import uuid
 import asyncio
 
 
 class LLMSigmaGenerator:
-    """Generate Sigma rules using LLM (Gemini)"""
+    """Generate Sigma rules using LLM (Gemini) with google-genai SDK"""
     
     def __init__(self, config: Optional[Dict] = None):
         """
@@ -34,26 +35,33 @@ class LLMSigmaGenerator:
         if not self.api_key:
             raise ValueError("Gemini API key not found. Set GEMINI_API_KEY environment variable or pass in config")
         
-        # Configure Gemini
-        genai.configure(api_key=self.api_key)
+        # Initialize google-genai client
+        self.client = genai.Client(api_key=self.api_key)
         
         # Model configuration
         self.model_name = self.config.get('model', 'gemini-2.0-flash-lite')
         self.temperature = self.config.get('temperature', 0.3)
         self.max_retries = self.config.get('max_retries', 3)
         
-        # Initialize model
-        self.model = genai.GenerativeModel(
-            model_name=self.model_name,
-            generation_config={
-                'temperature': self.temperature,
-                'top_p': 0.95,
-                'top_k': 40,
-                'max_output_tokens': 4096,
-            }
-        )
-        
         print(f"✓ LLM Generator initialized with model: {self.model_name}")
+    
+    def _gen_config(self) -> dict:
+        """Generation configuration for google-genai"""
+        return {
+            'temperature': self.temperature,
+            'top_p': 0.95,
+            'top_k': 40,
+            'max_output_tokens': 4096,
+        }
+    
+    def _safety_settings(self) -> list:
+        """Safety settings for security research content"""
+        return [
+            SafetySetting(category=SafetyCategory.HARM_CATEGORY_HARASSMENT, threshold="BLOCK_NONE"),
+            SafetySetting(category=SafetyCategory.HARM_CATEGORY_HATE_SPEECH, threshold="BLOCK_NONE"),
+            SafetySetting(category=SafetyCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold="BLOCK_NONE"),
+            SafetySetting(category=SafetyCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold="BLOCK_NONE"),
+        ]
     
     def _build_sigma_prompt(self, ttp_data: Dict[str, Any]) -> str:
         """Build prompt for Sigma rule generation"""
@@ -144,7 +152,7 @@ Generate the Sigma rule now:"""
     
     async def generate_sigma_rule(self, ttp_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Generate Sigma rule using LLM
+        Generate Sigma rule using LLM with google-genai
         
         Args:
             ttp_data: TTP information dict
@@ -165,14 +173,11 @@ Generate the Sigma rule now:"""
             try:
                 print(f"   Attempt {attempt + 1}/{self.max_retries}...")
                 
-                # Generate response
-                response = await asyncio.to_thread(
-                    self.model.generate_content,
-                    prompt
-                )
+                # Generate response using google-genai
+                response = await self._generate_with_client(prompt)
                 
                 # Extract JSON from response
-                sigma_rule = self._extract_json_from_response(response.text)
+                sigma_rule = self._extract_json_from_response(response)
                 
                 if sigma_rule:
                     # Validate and enhance
@@ -192,6 +197,41 @@ Generate the Sigma rule now:"""
                     return self._generate_fallback_rule(ttp_data)
         
         return self._generate_fallback_rule(ttp_data)
+    
+    async def _generate_with_client(self, prompt: str) -> str:
+        """Generate response using google-genai client"""
+        def _generate_sync():
+            response = self.client.responses.generate(
+                model=self.model_name,
+                contents=prompt,
+                safety_settings=self._safety_settings(),
+                **self._gen_config()
+            )
+            
+            # Extract text from response
+            text = getattr(response, "text", None)
+            if text:
+                return text
+            
+            # Fallback: extract from candidates/parts structure
+            if hasattr(response, "candidates") and response.candidates:
+                candidate = response.candidates[0]
+                content = getattr(candidate, "content", None)
+                if content and hasattr(content, "parts"):
+                    parts = content.parts or []
+                    texts = [getattr(part, "text", "") for part in parts if getattr(part, "text", None)]
+                    if texts:
+                        return "\n".join(texts)
+                
+                # Direct text in candidate
+                if hasattr(candidate, "text") and candidate.text:
+                    return candidate.text
+            
+            return ""
+        
+        # Run in thread pool to maintain async interface
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, _generate_sync)
     
     def _extract_json_from_response(self, response_text: str) -> Optional[Dict]:
         """Extract JSON object from LLM response"""
@@ -279,7 +319,7 @@ Generate the Sigma rule now:"""
         # Add process indicators if available
         process_indicators = [ind['value'] for ind in indicators if ind['type'] == 'process_image']
         if process_indicators:
-            detection['selection']['Image|endswith'] = process_indicators[0] if len(process_indicators) == 1 else process_indicators
+            detection['selection']['Image|endswith'] = process_indicators if len(process_indicators) == 1 else process_indicators
         
         # Add command line indicators
         cmdline_indicators = [ind['value'] for ind in indicators if ind['type'] == 'command_line']

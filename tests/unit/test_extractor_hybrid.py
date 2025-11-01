@@ -224,7 +224,7 @@ async def test_hybrid_with_mock():
         "llm": {
             "api_key": os.getenv("GEMINI_API_KEY"),
             "use_mock": False,  # Set to True for testing without API
-            "model": "gemini-2.0-flash-lite",
+            "model": "gemini-2.0-flash-exp",
             "temperature": 0.3,
             "max_tokens": 1000
         },
@@ -360,7 +360,7 @@ async def test_hybrid_with_mock():
                   f"{result_item['processing_time_ms']:<10.0f}")
         
         # Save all results
-        output_path = Path("data/processed/test_hybrid_multi_extraction_gemini-2.5-pro.json")
+        output_path = Path("data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-exp.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
         final_output = {
@@ -473,8 +473,8 @@ async def test_batch_hybrid():
     
     config = {
         "llm": {
-            "use_mock": True,
-            "model": "gemini-2.5-pro",
+            "use_mock": False,
+            "model": "gemini-2.0-flash-exp",
             "temperature": 0.3,
             "max_tokens": 1000
         },

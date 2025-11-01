@@ -1,32 +1,32 @@
 {
-  "test_timestamp": "2025-11-01T14:58:56.818674",
+  "test_timestamp": "2025-11-01T15:04:14.629425",
   "total_reports": 1,
   "total_ttps": 5,
-  "total_processing_time_seconds": 5.299735,
+  "total_processing_time_seconds": 5.815305,
   "agent_statistics": {
     "total_reports_processed": 1,
     "total_ttps_extracted": 5,
     "nlp_entities_extracted": 1,
     "nlp_ttp_indicators_found": 0,
-    "gemini_ttps_extracted": 6,
+    "gemini_ttps_extracted": 5,
     "extraction_errors": 0,
     "gemini_api_calls": 1,
-    "avg_confidence_score": 0.58,
-    "high_confidence_ttps": 0,
-    "processing_time_ms": 5298.737,
-    "nlp_processing_time_ms": 1.0,
-    "llm_processing_time_ms": 5297.737,
+    "avg_confidence_score": 0.7400000000000001,
+    "high_confidence_ttps": 3,
+    "processing_time_ms": 5815.305,
+    "nlp_processing_time_ms": 0.651,
+    "llm_processing_time_ms": 5814.256,
     "cache_hits": 0,
     "cache_misses": 1,
-    "last_extraction_time": "2025-11-01T14:58:56.816678"
+    "last_extraction_time": "2025-11-01T15:04:14.627425"
   },
   "per_report_results": [
     {
       "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
       "title": "The Spy Kittens Are Back: Rocket Kitten 2",
       "ttps_count": 5,
-      "high_confidence_count": 0,
-      "processing_time_ms": 5298.737,
+      "high_confidence_count": 3,
+      "processing_time_ms": 5815.305,
       "extraction": {
         "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
         "source_report": {
@@ -36,21 +36,62 @@
         },
         "extracted_ttps": [
           {
-            "ttp_id": "a61125cf-1b35-4c29-bbfe-75445bed3c96",
+            "ttp_id": "1c52c857-d2c4-4f2b-9cd2-0dc2cbdccadf",
             "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
-            "technique_name": "Scheduled Task/Job: At",
-            "attack_id": "UNMAPPED",
-            "tactic": "Execution",
-            "description": "Implied use of the 'at' command for task scheduling, potentially for persistence or execution of malicious code.",
-            "confidence_score": 0.7,
+            "technique_name": "Phishing",
+            "attack_id": "T1566.001",
+            "tactic": "Initial Access",
+            "description": "The report mentions a URL (http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media) which could be used in a phishing campaign to lure victims to click on a malicious link.",
+            "confidence_score": 0.8,
             "confidence_level": "medium",
             "confidence_breakdown": {
               "base": 0.6,
               "method_bonus": 0.1,
+              "mapping_bonus": 0.1,
+              "entity_bonus": 0
+            },
+            "evidence_text": "The report mentions a URL (http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media) which could be used in a phishing campaign to lure victims to click on a malicious link.",
+            "indicators_supporting": [
+              "http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media",
+              "gulfc.haifa.ac.il"
+            ],
+            "context": {
+              "threat_actor": null,
+              "malware_used": [],
+              "campaign": "The Spy Kittens Are Back: Rocket Kitten 2"
+            },
+            "extraction_method": "gemini_llm",
+            "extraction_source": "unknown",
+            "mapped_by": "gemini-2.0-flash-exp_nlp_hybrid",
+            "extracted_timestamp": "2025-11-01T15:04:14.627425",
+            "tools": [],
+            "related_entities": {
+              "malware": [],
+              "tools": [
+                "at"
+              ],
+              "threat_actors": []
+            },
+            "correlated_iocs": {},
+            "subtechnique": true,
+            "mapping_source": "attack_mapper"
+          },
+          {
+            "ttp_id": "95b115a6-70be-455e-80a5-192d5f4e0083",
+            "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
+            "technique_name": "Scheduled Task/Job",
+            "attack_id": "UNMAPPED",
+            "tactic": "Persistence",
+            "description": "The tool 'at' is detected. The 'at' command is used to schedule tasks on Windows systems. Adversaries may abuse the 'at' command to schedule malicious tasks for persistence.",
+            "confidence_score": 0.8,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "base": 0.7,
+              "method_bonus": 0.1,
               "mapping_bonus": 0,
               "entity_bonus": 0
             },
-            "evidence_text": "Implied use of the 'at' command for task scheduling, potentially for persistence or execution of malicious code.",
+            "evidence_text": "The tool 'at' is detected. The 'at' command is used to schedule tasks on Windows systems. Adversaries may abuse the 'at' command to schedule malicious tasks for persistence.",
             "indicators_supporting": [],
             "context": {
               "threat_actor": null,
@@ -59,8 +100,8 @@
             },
             "extraction_method": "gemini_llm",
             "extraction_source": "unknown",
-            "mapped_by": "gemini-2.0-flash-lite_nlp_hybrid",
-            "extracted_timestamp": "2025-11-01T14:58:56.816678",
+            "mapped_by": "gemini-2.0-flash-exp_nlp_hybrid",
+            "extracted_timestamp": "2025-11-01T15:04:14.627425",
             "tools": [
               "at"
             ],
@@ -76,12 +117,97 @@
             "mapping_source": "none"
           },
           {
-            "ttp_id": "e53fb5e8-0274-4625-b608-aa92eb3375f6",
+            "ttp_id": "9a5cfccc-5583-4d50-b143-4353e65e3841",
+            "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
+            "technique_name": "Command and Control",
+            "attack_id": "UNMAPPED",
+            "tactic": "Command and Control",
+            "description": "The report lists several IP addresses (84.11.146.62, 107.6.172.54, 107.6.181.116) and domains (gulfc.haifa.ac.il, www.iabg.de) that could be used for command and control communication.",
+            "confidence_score": 0.8,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "base": 0.7,
+              "method_bonus": 0.1,
+              "mapping_bonus": 0,
+              "entity_bonus": 0
+            },
+            "evidence_text": "The report lists several IP addresses (84.11.146.62, 107.6.172.54, 107.6.181.116) and domains (gulfc.haifa.ac.il, www.iabg.de) that could be used for command and control communication.",
+            "indicators_supporting": [
+              "84.11.146.62",
+              "107.6.172.54",
+              "107.6.181.116",
+              "gulfc.haifa.ac.il",
+              "www.iabg.de"
+            ],
+            "context": {
+              "threat_actor": null,
+              "malware_used": [],
+              "campaign": "The Spy Kittens Are Back: Rocket Kitten 2"
+            },
+            "extraction_method": "gemini_llm",
+            "extraction_source": "unknown",
+            "mapped_by": "gemini-2.0-flash-exp_nlp_hybrid",
+            "extracted_timestamp": "2025-11-01T15:04:14.627425",
+            "tools": [],
+            "related_entities": {
+              "malware": [],
+              "tools": [
+                "at"
+              ],
+              "threat_actors": []
+            },
+            "correlated_iocs": {},
+            "subtechnique": false,
+            "mapping_source": "none"
+          },
+          {
+            "ttp_id": "8716ecc0-0f21-4988-a2a3-08eca529fbcc",
             "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
             "technique_name": "Drive-by Compromise",
             "attack_id": "UNMAPPED",
             "tactic": "Initial Access",
-            "description": "Implied through the presence of a compromised website, suggesting potential for drive-by downloads or watering hole attacks.",
+            "description": "The report indicates the use of a URL (http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media) which could be used to deliver a malicious payload or redirect to a compromised website, potentially leading to a drive-by compromise.",
+            "confidence_score": 0.7,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "base": 0.6,
+              "method_bonus": 0.1,
+              "mapping_bonus": 0,
+              "entity_bonus": 0
+            },
+            "evidence_text": "The report indicates the use of a URL (http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media) which could be used to deliver a malicious payload or redirect to a compromised website, potentially leading to a drive-by compromise.",
+            "indicators_supporting": [
+              "http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media",
+              "gulfc.haifa.ac.il"
+            ],
+            "context": {
+              "threat_actor": null,
+              "malware_used": [],
+              "campaign": "The Spy Kittens Are Back: Rocket Kitten 2"
+            },
+            "extraction_method": "gemini_llm",
+            "extraction_source": "unknown",
+            "mapped_by": "gemini-2.0-flash-exp_nlp_hybrid",
+            "extracted_timestamp": "2025-11-01T15:04:14.627425",
+            "tools": [],
+            "related_entities": {
+              "malware": [],
+              "tools": [
+                "at"
+              ],
+              "threat_actors": []
+            },
+            "correlated_iocs": {},
+            "subtechnique": false,
+            "mapping_source": "none"
+          },
+          {
+            "ttp_id": "6e29b8e0-9c3b-4f04-8d7f-2410baaa556a",
+            "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
+            "technique_name": "Scheduled Task/Job",
+            "attack_id": "UNMAPPED",
+            "tactic": "Privilege Escalation",
+            "description": "The tool 'at' is detected. The 'at' command is used to schedule tasks on Windows systems. Adversaries may abuse the 'at' command to schedule malicious tasks with elevated privileges for privilege escalation.",
             "confidence_score": 0.6,
             "confidence_level": "medium",
             "confidence_breakdown": {
@@ -90,12 +216,8 @@
               "mapping_bonus": 0,
               "entity_bonus": 0
             },
-            "evidence_text": "Implied through the presence of a compromised website, suggesting potential for drive-by downloads or watering hole attacks.",
-            "indicators_supporting": [
-              "http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media",
-              "gulfc.haifa.ac.il",
-              "www.iabg.de"
-            ],
+            "evidence_text": "The tool 'at' is detected. The 'at' command is used to schedule tasks on Windows systems. Adversaries may abuse the 'at' command to schedule malicious tasks with elevated privileges for privilege escalation.",
+            "indicators_supporting": [],
             "context": {
               "threat_actor": null,
               "malware_used": [],
@@ -103,9 +225,11 @@
             },
             "extraction_method": "gemini_llm",
             "extraction_source": "unknown",
-            "mapped_by": "gemini-2.0-flash-lite_nlp_hybrid",
-            "extracted_timestamp": "2025-11-01T14:58:56.816678",
-            "tools": [],
+            "mapped_by": "gemini-2.0-flash-exp_nlp_hybrid",
+            "extracted_timestamp": "2025-11-01T15:04:14.627425",
+            "tools": [
+              "at"
+            ],
             "related_entities": {
               "malware": [],
               "tools": [
@@ -116,132 +240,6 @@
             "correlated_iocs": {},
             "subtechnique": false,
             "mapping_source": "none"
-          },
-          {
-            "ttp_id": "9d770044-2627-4095-913d-22ccb6dfcc22",
-            "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
-            "technique_name": "Spearphishing Link",
-            "attack_id": "UNMAPPED",
-            "tactic": "Initial Access",
-            "description": "Implied through the presence of a compromised website, suggesting potential for spearphishing attacks.",
-            "confidence_score": 0.6,
-            "confidence_level": "medium",
-            "confidence_breakdown": {
-              "base": 0.5,
-              "method_bonus": 0.1,
-              "mapping_bonus": 0,
-              "entity_bonus": 0
-            },
-            "evidence_text": "Implied through the presence of a compromised website, suggesting potential for spearphishing attacks.",
-            "indicators_supporting": [
-              "http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media",
-              "gulfc.haifa.ac.il",
-              "www.iabg.de"
-            ],
-            "context": {
-              "threat_actor": null,
-              "malware_used": [],
-              "campaign": "The Spy Kittens Are Back: Rocket Kitten 2"
-            },
-            "extraction_method": "gemini_llm",
-            "extraction_source": "unknown",
-            "mapped_by": "gemini-2.0-flash-lite_nlp_hybrid",
-            "extracted_timestamp": "2025-11-01T14:58:56.816678",
-            "tools": [],
-            "related_entities": {
-              "malware": [],
-              "tools": [
-                "at"
-              ],
-              "threat_actors": []
-            },
-            "correlated_iocs": {},
-            "subtechnique": false,
-            "mapping_source": "none"
-          },
-          {
-            "ttp_id": "5c25a43c-34a7-4953-995a-bddbe13d2451",
-            "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
-            "technique_name": "Web Shell",
-            "attack_id": "UNMAPPED",
-            "tactic": "Persistence",
-            "description": "Implied through the presence of a compromised website, suggesting potential for web shell deployment.",
-            "confidence_score": 0.5,
-            "confidence_level": "low",
-            "confidence_breakdown": {
-              "base": 0.4,
-              "method_bonus": 0.1,
-              "mapping_bonus": 0,
-              "entity_bonus": 0
-            },
-            "evidence_text": "Implied through the presence of a compromised website, suggesting potential for web shell deployment.",
-            "indicators_supporting": [
-              "http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media",
-              "gulfc.haifa.ac.il",
-              "www.iabg.de"
-            ],
-            "context": {
-              "threat_actor": null,
-              "malware_used": [],
-              "campaign": "The Spy Kittens Are Back: Rocket Kitten 2"
-            },
-            "extraction_method": "gemini_llm",
-            "extraction_source": "unknown",
-            "mapped_by": "gemini-2.0-flash-lite_nlp_hybrid",
-            "extracted_timestamp": "2025-11-01T14:58:56.816678",
-            "tools": [],
-            "related_entities": {
-              "malware": [],
-              "tools": [
-                "at"
-              ],
-              "threat_actors": []
-            },
-            "correlated_iocs": {},
-            "subtechnique": false,
-            "mapping_source": "none"
-          },
-          {
-            "ttp_id": "d28ad1c0-fd97-4241-92f8-10b596e61f1b",
-            "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
-            "technique_name": "Command and Scripting Interpreter: PowerShell",
-            "attack_id": "T1059.001",
-            "tactic": "Execution",
-            "description": "Implied through the presence of a compromised website, suggesting potential for PowerShell usage.",
-            "confidence_score": 0.5,
-            "confidence_level": "low",
-            "confidence_breakdown": {
-              "base": 0.3,
-              "method_bonus": 0.1,
-              "mapping_bonus": 0.1,
-              "entity_bonus": 0
-            },
-            "evidence_text": "Implied through the presence of a compromised website, suggesting potential for PowerShell usage.",
-            "indicators_supporting": [
-              "http://gulfc.haifa.ac.il/index.php/the-ezri-center-in-the-media/291-the-ezri-center-in-the-media",
-              "gulfc.haifa.ac.il",
-              "www.iabg.de"
-            ],
-            "context": {
-              "threat_actor": null,
-              "malware_used": [],
-              "campaign": "The Spy Kittens Are Back: Rocket Kitten 2"
-            },
-            "extraction_method": "gemini_llm",
-            "extraction_source": "unknown",
-            "mapped_by": "gemini-2.0-flash-lite_nlp_hybrid",
-            "extracted_timestamp": "2025-11-01T14:58:56.816678",
-            "tools": [],
-            "related_entities": {
-              "malware": [],
-              "tools": [
-                "at"
-              ],
-              "threat_actors": []
-            },
-            "correlated_iocs": {},
-            "subtechnique": true,
-            "mapping_source": "attack_mapper"
           }
         ],
         "nlp_analysis": {
@@ -273,16 +271,16 @@
           "context": ""
         },
         "metadata": {
-          "extraction_timestamp": "2025-11-01T14:58:56.816678",
+          "extraction_timestamp": "2025-11-01T15:04:14.627425",
           "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.0-flash-lite",
-          "total_ttps_found": 6,
+          "llm_model": "gemini-2.0-flash-exp",
+          "total_ttps_found": 5,
           "nlp_ttps": 0,
-          "gemini_ttps": 6,
+          "gemini_ttps": 5,
           "ttps_after_filtering": 5,
           "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 1.0,
-          "llm_processing_time_ms": 5297.737
+          "nlp_processing_time_ms": 0.651,
+          "llm_processing_time_ms": 5814.256
         }
       }
     }

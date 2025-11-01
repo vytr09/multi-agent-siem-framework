@@ -1,5 +1,5 @@
 """
-Gemini LLM Client for AttackGen Agent (google-genai) - FIXED VERSION
+Gemini LLM Client for AttackGen Agent
 Handles communication with Google's Gemini API for attack command generation.
 """
 
