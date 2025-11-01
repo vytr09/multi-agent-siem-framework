@@ -1,32 +1,32 @@
 {
-  "test_timestamp": "2025-10-17T03:34:17.025854",
-  "total_reports": 11,
-  "total_ttps": 1,
-  "total_processing_time_seconds": 21.986467000000008,
+  "test_timestamp": "2025-11-01T14:10:01.999691",
+  "total_reports": 1,
+  "total_ttps": 2,
+  "total_processing_time_seconds": 0.310063,
   "agent_statistics": {
-    "total_reports_processed": 11,
-    "total_ttps_extracted": 1,
-    "nlp_entities_extracted": 20,
-    "nlp_ttp_indicators_found": 1,
-    "gemini_ttps_extracted": 0,
+    "total_reports_processed": 1,
+    "total_ttps_extracted": 2,
+    "nlp_entities_extracted": 1,
+    "nlp_ttp_indicators_found": 0,
+    "gemini_ttps_extracted": 2,
     "extraction_errors": 0,
-    "gemini_api_calls": 0,
-    "avg_confidence_score": 0.55,
+    "gemini_api_calls": 1,
+    "avg_confidence_score": 0.7,
     "high_confidence_ttps": 0,
-    "processing_time_ms": 241.80599999999998,
-    "nlp_processing_time_ms": 4.004,
-    "llm_processing_time_ms": 21965.413,
+    "processing_time_ms": 310.063,
+    "nlp_processing_time_ms": 0.0,
+    "llm_processing_time_ms": 310.063,
     "cache_hits": 0,
-    "cache_misses": 11,
-    "last_extraction_time": "2025-10-17T03:34:17.019860"
+    "cache_misses": 1,
+    "last_extraction_time": "2025-11-01T14:10:01.996586"
   },
   "per_report_results": [
     {
       "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
       "title": "The Spy Kittens Are Back: Rocket Kitten 2",
-      "ttps_count": 0,
+      "ttps_count": 2,
       "high_confidence_count": 0,
-      "processing_time_ms": 9855.569,
+      "processing_time_ms": 310.063,
       "extraction": {
         "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
         "source_report": {
@@ -34,7 +34,92 @@
           "source": "MISP",
           "confidence": 95
         },
-        "extracted_ttps": [],
+        "extracted_ttps": [
+          {
+            "ttp_id": "96c98920-87aa-4c7a-8d2c-23edab3d6bd4",
+            "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
+            "technique_name": "Registry Run Keys / Startup Folder",
+            "attack_id": "T1547.001",
+            "tactic": "Persistence",
+            "description": "Registry run keys modified for persistence across reboots",
+            "confidence_score": 0.7,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "base": 0.5,
+              "method_bonus": 0.1,
+              "mapping_bonus": 0.1,
+              "entity_bonus": 0
+            },
+            "evidence_text": "Registry run keys modified for persistence across reboots",
+            "indicators_supporting": [
+              "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+            ],
+            "context": {
+              "threat_actor": null,
+              "malware_used": [],
+              "campaign": "The Spy Kittens Are Back: Rocket Kitten 2"
+            },
+            "extraction_method": "gemini_llm",
+            "extraction_source": "unknown",
+            "mapped_by": "gemini-2.5-pro_nlp_hybrid",
+            "extracted_timestamp": "2025-11-01T14:10:01.996586",
+            "tools": [],
+            "related_entities": {
+              "malware": [],
+              "tools": [
+                "at"
+              ],
+              "threat_actors": []
+            },
+            "correlated_iocs": {},
+            "subtechnique": true,
+            "mapping_source": "attack_mapper"
+          },
+          {
+            "ttp_id": "d828772f-89ff-4477-a69c-70c85c1694b9",
+            "report_id": "5c9d8921-f85d-4697-a64a-7cfb2168e4a1",
+            "technique_name": "OS Credential Dumping",
+            "attack_id": "T1003",
+            "tactic": "Credential Access",
+            "description": "LSASS memory dumping using credential extraction tools",
+            "confidence_score": 0.7,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "base": 0.5,
+              "method_bonus": 0.1,
+              "mapping_bonus": 0.1,
+              "entity_bonus": 0
+            },
+            "evidence_text": "LSASS memory dumping using credential extraction tools",
+            "indicators_supporting": [
+              "mimikatz",
+              "lsass.exe",
+              "sekurlsa"
+            ],
+            "context": {
+              "threat_actor": null,
+              "malware_used": [],
+              "campaign": "The Spy Kittens Are Back: Rocket Kitten 2"
+            },
+            "extraction_method": "gemini_llm",
+            "extraction_source": "unknown",
+            "mapped_by": "gemini-2.5-pro_nlp_hybrid",
+            "extracted_timestamp": "2025-11-01T14:10:01.996586",
+            "tools": [
+              "Mimikatz"
+            ],
+            "related_entities": {
+              "malware": [],
+              "tools": [
+                "at"
+              ],
+              "threat_actors": []
+            },
+            "correlated_iocs": {},
+            "subtechnique": false,
+            "mapping_source": "attack_mapper"
+          }
+        ],
         "nlp_analysis": {
           "processed_text": {
             "cleaned_text": "The Spy Kittens Are Back: Rocket Kitten 2 Contains 15 attributes (14 IOCs)",
@@ -64,655 +149,16 @@
           "context": ""
         },
         "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:04.860069",
+          "extraction_timestamp": "2025-11-01T14:10:01.996586",
           "extraction_method": "Hybrid-NLP+Gemini",
           "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
+          "total_ttps_found": 2,
           "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 1.001,
-          "llm_processing_time_ms": 9853.566
-        }
-      }
-    },
-    {
-      "report_id": "97775569-d116-4ba8-9852-26f0d113d89c",
-      "title": "The Dukes: 7 Years of Russian Espionage",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 9788.257,
-      "extraction": {
-        "report_id": "97775569-d116-4ba8-9852-26f0d113d89c",
-        "source_report": {
-          "title": "The Dukes: 7 Years of Russian Espionage",
-          "source": "MISP",
-          "confidence": 100
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "The Dukes: 7 Years of Russian Espionage Contains 325 attributes (324 IOCs)",
-            "sentences": [
-              "The Dukes: 7 Years of Russian Espionage Contains 325 attributes (324 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": []
-          },
-          "entities": {
-            "malware": [],
-            "tools": [
-              "at"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": ""
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:14.654325",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 0.9990000000000001,
-          "llm_processing_time_ms": 9786.261
-        }
-      }
-    },
-    {
-      "report_id": "23254b26-9f85-4fe5-91e5-616667d0d499",
-      "title": "WitchCoven: Exploiting Web Analytics to Ensnare Victims",
-      "ttps_count": 1,
-      "high_confidence_count": 0,
-      "processing_time_ms": 255.94899999999998,
-      "extraction": {
-        "report_id": "23254b26-9f85-4fe5-91e5-616667d0d499",
-        "source_report": {
-          "title": "WitchCoven: Exploiting Web Analytics to Ensnare Victims",
-          "source": "MISP",
-          "confidence": 90
-        },
-        "extracted_ttps": [
-          {
-            "ttp_id": "e1357493-f7f9-4982-8fd5-cc46bc32b037",
-            "report_id": "23254b26-9f85-4fe5-91e5-616667d0d499",
-            "technique_name": "Exploit Public-Facing Application",
-            "attack_id": "UNMAPPED",
-            "tactic": "Initial Access",
-            "description": "Detected Exploit Public-Facing Application activity via NLP pattern matching",
-            "confidence_score": 0.55,
-            "confidence_level": "low",
-            "confidence_breakdown": {
-              "base": 0.5,
-              "method_bonus": 0.05,
-              "mapping_bonus": 0,
-              "entity_bonus": 0
-            },
-            "evidence_text": "Detected Exploit Public-Facing Application activity via NLP pattern matching",
-            "indicators_supporting": [],
-            "context": {
-              "threat_actor": null,
-              "malware_used": [],
-              "campaign": "WitchCoven: Exploiting Web Analytics to Ensnare Victims"
-            },
-            "extraction_method": "nlp",
-            "extraction_source": "nlp_indicators",
-            "mapped_by": "gemini-2.5-pro_nlp_hybrid",
-            "extracted_timestamp": "2025-10-17T03:34:14.912283",
-            "tools": [],
-            "related_entities": {
-              "malware": [],
-              "tools": [
-                "at"
-              ],
-              "threat_actors": []
-            },
-            "correlated_iocs": {},
-            "subtechnique": false,
-            "mapping_source": "none"
-          }
-        ],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "WitchCoven: Exploiting Web Analytics to Ensnare Victims Contains 8 attributes (5 IOCs)",
-            "sentences": [
-              "WitchCoven: Exploiting Web Analytics to Ensnare Victims Contains 8 attributes (5 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": []
-          },
-          "entities": {
-            "malware": [],
-            "tools": [
-              "at"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {
-            "initial_access": [
-              "Exploit Public-Facing Application"
-            ]
-          },
-          "context": ""
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:14.912283",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 1,
-          "nlp_ttps": 1,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 1,
+          "gemini_ttps": 2,
+          "ttps_after_filtering": 2,
           "min_confidence_threshold": 0.5,
           "nlp_processing_time_ms": 0.0,
-          "llm_processing_time_ms": 254.946
-        }
-      }
-    },
-    {
-      "report_id": "5e3581b6-31c7-425c-bf44-955d93ae6c12",
-      "title": "APT28 Under the Scope - A Journey into Exfiltrating Intelligence and Government Information",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 239.284,
-      "extraction": {
-        "report_id": "5e3581b6-31c7-425c-bf44-955d93ae6c12",
-        "source_report": {
-          "title": "APT28 Under the Scope - A Journey into Exfiltrating Intelligence and Government Information",
-          "source": "MISP",
-          "confidence": 95
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "APT28 Under the Scope - A Journey into Exfiltrating Intelligence and Government Information Contains 11 attributes (5 IOCs)",
-            "sentences": [
-              "APT28 Under the Scope - A Journey into Exfiltrating Intelligence and Government Information Contains 11 attributes (5 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": []
-          },
-          "entities": {
-            "malware": [
-              "APT",
-              "rat"
-            ],
-            "tools": [
-              "Sc",
-              "at"
-            ],
-            "threat_actors": [
-              "APT28"
-            ],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": ""
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:15.154459",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 1.003,
-          "llm_processing_time_ms": 238.281
-        }
-      }
-    },
-    {
-      "report_id": "3ae194ba-3979-4ff9-9aa2-ffd9f377883c",
-      "title": "Remtasu obtaining Facebook accounts",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 233.94400000000002,
-      "extraction": {
-        "report_id": "3ae194ba-3979-4ff9-9aa2-ffd9f377883c",
-        "source_report": {
-          "title": "Remtasu obtaining Facebook accounts",
-          "source": "MISP",
-          "confidence": 85
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "Remtasu obtaining Facebook accounts Contains 2 attributes (2 IOCs)",
-            "sentences": [
-              "Remtasu obtaining Facebook accounts Contains 2 attributes (2 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": []
-          },
-          "entities": {
-            "malware": [],
-            "tools": [
-              "at"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": ""
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:15.395968",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 0.0,
-          "llm_processing_time_ms": 231.87199999999999
-        }
-      }
-    },
-    {
-      "report_id": "3e0d596d-9da7-40d8-a8e0-f42bbe35e72d",
-      "title": "Bookworm Trojan: A Model of Modular Architecture",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 242.554,
-      "extraction": {
-        "report_id": "3e0d596d-9da7-40d8-a8e0-f42bbe35e72d",
-        "source_report": {
-          "title": "Bookworm Trojan: A Model of Modular Architecture",
-          "source": "MISP",
-          "confidence": 100
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "Bookworm Trojan: A Model of Modular Architecture Contains 44 attributes (44 IOCs)",
-            "sentences": [
-              "Bookworm Trojan: A Model of Modular Architecture Contains 44 attributes (44 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": [
-              "trojan"
-            ]
-          },
-          "entities": {
-            "malware": [
-              "Trojan"
-            ],
-            "tools": [
-              "at"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": "\n**Key Security Terms:** trojan"
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:15.641416",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 0.0,
-          "llm_processing_time_ms": 241.553
-        }
-      }
-    },
-    {
-      "report_id": "6079887d-86b2-4ac3-a07b-04243172d7c1",
-      "title": "New wave of cyberattacks against Ukrainian power industry",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 319.364,
-      "extraction": {
-        "report_id": "6079887d-86b2-4ac3-a07b-04243172d7c1",
-        "source_report": {
-          "title": "New wave of cyberattacks against Ukrainian power industry",
-          "source": "MISP",
-          "confidence": 85
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "New wave of cyberattacks against Ukrainian power industry Contains 5 attributes (5 IOCs)",
-            "sentences": [
-              "New wave of cyberattacks against Ukrainian power industry Contains 5 attributes (5 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": []
-          },
-          "entities": {
-            "malware": [
-              "rat"
-            ],
-            "tools": [
-              "at"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": ""
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:15.965778",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 0.0,
-          "llm_processing_time_ms": 318.364
-        }
-      }
-    },
-    {
-      "report_id": "2b449fc2-51a4-4774-8f52-06cb0108987b",
-      "title": "Attack Campaign on the Government of Thailand Delivers Bookworm Trojan",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 238.249,
-      "extraction": {
-        "report_id": "2b449fc2-51a4-4774-8f52-06cb0108987b",
-        "source_report": {
-          "title": "Attack Campaign on the Government of Thailand Delivers Bookworm Trojan",
-          "source": "MISP",
-          "confidence": 100
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "Attack Campaign on the Government of Thailand Delivers Bookworm Trojan Contains 92 attributes (88 IOCs)",
-            "sentences": [
-              "Attack Campaign on the Government of Thailand Delivers Bookworm Trojan Contains 92 attributes (88 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": [
-              "trojan"
-            ]
-          },
-          "entities": {
-            "malware": [
-              "Trojan"
-            ],
-            "tools": [
-              "At"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": "\n**Key Security Terms:** trojan"
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:16.206028",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 0.0,
-          "llm_processing_time_ms": 237.25
-        }
-      }
-    },
-    {
-      "report_id": "ec771639-8024-4970-9e50-cbcd6b8bef4c",
-      "title": "BlackEnergy by the SSHBearDoor : attacks against Ukrainian news media and electric industry",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 326.015,
-      "extraction": {
-        "report_id": "ec771639-8024-4970-9e50-cbcd6b8bef4c",
-        "source_report": {
-          "title": "BlackEnergy by the SSHBearDoor : attacks against Ukrainian news media and electric industry",
-          "source": "MISP",
-          "confidence": 100
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "BlackEnergy by the SSHBearDoor : attacks against Ukrainian news media and electric industry Contains 38 attributes (38 IOCs)",
-            "sentences": [
-              "BlackEnergy by the SSHBearDoor : attacks against Ukrainian news media and electric industry Contains 38 attributes (38 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": []
-          },
-          "entities": {
-            "malware": [],
-            "tools": [
-              "at"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": ""
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:16.534043",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 0.0,
-          "llm_processing_time_ms": 325.014
-        }
-      }
-    },
-    {
-      "report_id": "cf637025-8990-4cdc-8c48-84b5c97508f9",
-      "title": "In Pursuit of Optical Fibers and Troop Intel: Targeted Attack Distributes PlugX in Russia",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 237.50099999999998,
-      "extraction": {
-        "report_id": "cf637025-8990-4cdc-8c48-84b5c97508f9",
-        "source_report": {
-          "title": "In Pursuit of Optical Fibers and Troop Intel: Targeted Attack Distributes PlugX in Russia",
-          "source": "MISP",
-          "confidence": 100
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "In Pursuit of Optical Fibers and Troop Intel: Targeted Attack Distributes PlugX in Russia Contains 79 attributes (71 IOCs)",
-            "sentences": [
-              "In Pursuit of Optical Fibers and Troop Intel: Targeted Attack Distributes PlugX in Russia Contains 79 attributes (71 IOCs)"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [],
-            "security_keywords": []
-          },
-          "entities": {
-            "malware": [],
-            "tools": [
-              "At"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": ""
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:16.774540",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 0.0,
-          "llm_processing_time_ms": 237.50099999999998
-        }
-      }
-    },
-    {
-      "report_id": "f2f17c6b-2c37-4d8e-af28-df89c6ac57a5",
-      "title": "CYBERWAR-fd_2_.pdf",
-      "ttps_count": 0,
-      "high_confidence_count": 0,
-      "processing_time_ms": 241.80599999999998,
-      "extraction": {
-        "report_id": "f2f17c6b-2c37-4d8e-af28-df89c6ac57a5",
-        "source_report": {
-          "title": "CYBERWAR-fd_2_.pdf",
-          "source": "CYBERWAR-fd_2_",
-          "confidence": 50
-        },
-        "extracted_ttps": [],
-        "nlp_analysis": {
-          "processed_text": {
-            "cleaned_text": "1 Russian Invasion of Georgia Russian Cyberwar on Georgia 10 November  2008 Regular updates can be found on the Georgia Update website: www.georgiaupdate.gov.ge 1. INTRODUCTION ................................................... ...........................................2 2. BACKGROUND ON CYBERWARFARE ................................................... ....2 3. RUSSIA S ONLINE WAR ON GEORGIA: FIRST STRIKE ..............................3 4. CYBER BLOCKADE ................................................... ......................................5 5. SITES PROVIDING DDOS ATTACK TOOLS .................................................5 6. PART OF THE INFORMATION WAR ................................................... ..........7 7. RUSSIAN BUSINESS NETWORK ................................................... ...................8 8. THE 27 AUGUST ATTACK ................................................... ............................9 CONCLUSION......",
-            "sentences": [
-              "1 Russian Invasion of Georgia Russian Cyberwar on Georgia 10 November  2008 Regular updates can be found on the Georgia Update website: www.georgiaupdate.gov.ge 1",
-              "INTRODUCTION ..................................................",
-              "...........................................2 2",
-              "BACKGROUND ON CYBERWARFARE ..................................................",
-              "....2 3",
-              "RUSSIA S ONLINE WAR ON GEORGIA: FIRST STRIKE ..............................3 4",
-              "CYBER BLOCKADE ..................................................",
-              "......................................5 5",
-              "SITES PROVIDING DDOS ATTACK TOOLS .................................................5 6",
-              "PART OF THE INFORMATION WAR ..................................................",
-              "..........7 7",
-              "RUSSIAN BUSINESS NETWORK ..................................................",
-              "...................8 8",
-              "THE 27 AUGUST ATTACK ..................................................",
-              "............................9 CONCLUSION......"
-            ],
-            "technical_terms": [],
-            "file_paths": [],
-            "registry_keys": [],
-            "commands": [],
-            "network_artifacts": [
-              "www.georgiaupdate.gov.ge"
-            ],
-            "security_keywords": []
-          },
-          "entities": {
-            "malware": [],
-            "tools": [
-              "NET",
-              "Reg",
-              "at"
-            ],
-            "threat_actors": [],
-            "attack_techniques": [],
-            "ips": [],
-            "domains": [
-              "www.georgiaupdate.gov.ge"
-            ],
-            "hashes": {},
-            "file_names": []
-          },
-          "ttp_indicators": {},
-          "context": "\n**Network Indicators:**\n- www.georgiaupdate.gov.ge"
-        },
-        "metadata": {
-          "extraction_timestamp": "2025-10-17T03:34:17.019860",
-          "extraction_method": "Hybrid-NLP+Gemini",
-          "llm_model": "gemini-2.5-pro",
-          "total_ttps_found": 0,
-          "nlp_ttps": 0,
-          "gemini_ttps": 0,
-          "ttps_after_filtering": 0,
-          "min_confidence_threshold": 0.5,
-          "nlp_processing_time_ms": 1.001,
-          "llm_processing_time_ms": 240.80499999999998
+          "llm_processing_time_ms": 310.063
         }
       }
     }

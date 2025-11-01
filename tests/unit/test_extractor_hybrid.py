@@ -224,7 +224,7 @@ async def test_hybrid_with_mock():
         "llm": {
             "api_key": os.getenv("GEMINI_API_KEY"),
             "use_mock": False,  # Set to True for testing without API
-            "model": "gemini-2.5-pro",
+            "model": "gemini-2.0-flash-lite",
             "temperature": 0.3,
             "max_tokens": 1000
         },
