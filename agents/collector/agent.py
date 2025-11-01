@@ -307,18 +307,18 @@ class CollectorAgent(BaseAgent):
         for report in raw_reports:
             try:
                 ## PDF events from FileDatasetLoader have 'content' and 'metadata'
-                if raw.get("content") is not None:
-                    normalized = PDFDatasetNormalizer().normalize_event(raw)
+                if report.get("content") is not None:
+                    normalized = PDFDatasetNormalizer().normalize_event(report)
                 else:
                     # All other raw events go to the MISP normalizer
-                    normalized = self.misp_normalizer.normalize_event(raw)
+                    normalized = self.misp_normalizer.normalize_event(report)
                 
                 if normalized:
                     normalized_reports.append(normalized)
                     
             except Exception as e:
                 self.logger.error(f"Failed to normalize report: {e}", 
-                                report=raw.get("metadata", raw.get("Event", {})).get("id", "unknown"))
+                                report=report.get("metadata", report.get("Event", {})).get("id", "unknown"))
                 self.stats["normalization_errors"] += 1
                 continue
         
