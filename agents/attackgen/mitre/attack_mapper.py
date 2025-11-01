@@ -5,6 +5,7 @@ Maps TTPs to techniques and provides attack framework context.
 """
 
 import json
+import asyncio
 import aiohttp
 from typing import Dict, Any, List, Optional
 from pathlib import Path

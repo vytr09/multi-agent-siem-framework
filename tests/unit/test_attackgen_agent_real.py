@@ -5,20 +5,20 @@ Tests ONLY with real AttackGen Agent and real extracted TTP data
 """
 
 import pytest
-import asyncio
 import os
 import json
 from pathlib import Path
 from dotenv import load_dotenv
+import sys
 
 # Load .env file
 load_dotenv()
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import AttackGen Agent components - NO FALLBACK
 from agents.attackgen.agent import AttackGenAgent
 from agents.attackgen.config import get_attackgen_config
 from agents.base.agent import AgentStatus
-
 
 # ================================
 # TEST CLASS - NO MOCK

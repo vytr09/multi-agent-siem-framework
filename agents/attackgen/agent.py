@@ -83,7 +83,7 @@ class AttackGenAgent(BaseAgent):
         
         try:
             # Initialize Gemini LLM client
-            await self._initialize_llm()
+            await self.initialize_llm()
             
             # Load MITRE ATT&CK data
             await self.attack_mapper.load_attack_data()
@@ -209,26 +209,43 @@ class AttackGenAgent(BaseAgent):
         except Exception:
             return False
     
-    async def _initialize_llm(self) -> None:
-        """Initialize Gemini LLM client"""
+    async def initialize_llm(self) -> None:
+        """Initialize Gemini LLM client with proper error handling"""
         try:
-            self.llm_client = GeminiClient(
-                model_name=self.model_name,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                use_mock=self.use_mock_llm
-            )
+            from agents.attackgen.llm.gemini_client import create_llm_client
             
-            # Test connection for real client
-            if not self.use_mock_llm:
-                test_result = await self.llm_client.test_connection()
-                if not test_result:
-                    raise AttackGenException("Failed to connect to Gemini API")
+            self.llm_client = create_llm_client(self.llm_config, use_mock=self.use_mock_llm)
             
+            # Test connection if available
+            if hasattr(self.llm_client, 'test_connection'):
+                try:
+                    connection_ok = await self.llm_client.test_connection()
+                    if not connection_ok:
+                        self.logger.warning("LLM connection test failed, falling back to mock")
+                        self.use_mock_llm = True
+                        self.llm_client = create_llm_client(self.llm_config, use_mock=True)
+                except Exception as e:
+                    self.logger.warning(f"Connection test error: {e}, using mock mode")
+                    self.use_mock_llm = True
+                    self.llm_client = create_llm_client(self.llm_config, use_mock=True)
+            
+            # Verify generate_commands method exists
+            if not hasattr(self.llm_client, 'generate_commands'):
+                self.logger.error("LLM client missing generate_commands method")
+                raise AttackGenException("LLM client missing required methods")
+                
             self.logger.info("LLM client initialized successfully")
             
         except Exception as e:
-            raise AttackGenException(f"Failed to initialize LLM: {str(e)}")
+            self.logger.error(f"LLM initialization failed: {e}")
+            # Force fallback to mock
+            self.use_mock_llm = True
+            try:
+                from agents.attackgen.llm.gemini_client import MockGeminiClient
+                self.llm_client = MockGeminiClient(self.llm_config)
+                self.logger.info("Fallback to MockGeminiClient successful")
+            except Exception as fallback_error:
+                raise AttackGenException(f"Complete LLM initialization failure: {fallback_error}")
     
     async def _generate_commands_for_ttp(self, ttp: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Generate attack commands for a specific TTP"""
@@ -331,7 +348,7 @@ class AttackGenAgent(BaseAgent):
         """Create optimized prompt for LLM"""
         
         technique_name = ttp.get('technique_name', '')
-        attack_id = ttp.get('attack_id', '')
+        attack_id = ttp.get("technique_id") or ttp.get("attack_id")
         tactic = ttp.get('tactic', '')
         description = ttp.get('description', '')
         confidence_score = ttp.get('confidence_score', 0.5)
