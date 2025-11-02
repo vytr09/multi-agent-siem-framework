@@ -22,7 +22,7 @@ class GeminiClient:
 
     def __init__(
         self,
-        model_name: str = "gemini-2.0-flash-lite",  # Updated to valid model
+        model_name: str = "gemini-2.0-flash-lite",
         temperature: float = 0.7,
         max_tokens: int = 2000,
         use_mock: bool = False,
@@ -42,11 +42,11 @@ class GeminiClient:
         """Initialize google-genai client instance."""
         try:
             api_key = self._get_api_key()
-            print(f"🔍 Debug: Initializing Gemini client...")
+            print(f"[DEBUG] Initializing Gemini client...")
             self.client = genai.Client(api_key=api_key)
-            print(f"🔍 Debug: Client initialized successfully")
+            print(f"[DEBUG] Client initialized successfully")
         except Exception as e:
-            print(f"🔍 Debug: Initialization failed: {type(e).__name__}: {str(e)}")
+            print(f"[DEBUG] Initialization failed: {type(e).__name__}: {str(e)}")
             import traceback
             traceback.print_exc()
             raise AttackGenException(f"Failed to initialize Gemini client: {str(e)}")
@@ -90,17 +90,17 @@ class GeminiClient:
             return True
         
         if not self.client:
-            print("🔍 Debug: Client is None")
+            print("[DEBUG] Client is None")
             return False
             
         try:
-            print("🔍 Debug: Testing connection with simple prompt...")
+            print("[DEBUG] Testing connection with simple prompt...")
             txt = await self.generate_text("Test")
             success = txt is not None and len(txt) > 0
-            print(f"🔍 Debug: Connection test {'passed' if success else 'failed'}")
+            print(f"[DEBUG] Connection test {'passed' if success else 'failed'}")
             return success
         except Exception as e:
-            print(f"🔍 Debug: Connection test failed: {type(e).__name__}: {str(e)}")
+            print(f"[DEBUG] Connection test failed: {type(e).__name__}: {str(e)}")
             import traceback
             traceback.print_exc()
             return False
@@ -113,7 +113,7 @@ class GeminiClient:
         try:
             return await self.generate(prompt)
         except Exception as e:
-            print(f"🔍 Debug: generate_commands failed: {e}")
+            print(f"[DEBUG] generate_commands failed: {e}")
             # Fallback to a safe mock response to avoid pipeline failure
             mock_response = {
                 "commands": [
@@ -173,7 +173,7 @@ class GeminiClient:
             return ""
             
         except Exception as e:
-            print(f"🔍 Debug: generate_text error: {type(e).__name__}: {str(e)}")
+            print(f"[DEBUG] generate_text error: {type(e).__name__}: {str(e)}")
             import traceback
             traceback.print_exc()
             raise AttackGenException(f"Text generation failed: {str(e)}")
@@ -221,13 +221,13 @@ class GeminiClient:
 
             # If no text returned, provide a safe mock JSON to keep pipeline running
             if not text:
-                print("🔍 Debug: No text in response, using mock")
+                print("[DEBUG] No text in response, using mock")
                 return self._get_mock_response()
 
             return text
             
         except Exception as e:
-            print(f"🔍 Debug: generate error: {type(e).__name__}: {str(e)}")
+            print(f"[DEBUG] generate error: {type(e).__name__}: {str(e)}")
             import traceback
             traceback.print_exc()
             # Last-resort fallback to avoid breaking the pipeline
@@ -252,7 +252,7 @@ class GeminiClient:
                 enhanced_command.update(enhanced_data)
             return enhanced_command
         except Exception as e:
-            print(f"🔍 Debug: enhance_command failed: {e}")
+            print(f"[DEBUG] enhance_command failed: {e}")
             return base_command
 
     def _get_mock_response(self) -> str:

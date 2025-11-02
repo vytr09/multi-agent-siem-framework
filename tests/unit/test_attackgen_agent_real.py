@@ -55,7 +55,7 @@ class TestRealAttackGenAgent:
         if not ttp_file.exists():
             raise FileNotFoundError(f"Real TTP file not found: {ttp_file.absolute()}")
         
-        print(f"📄 Loading TTPs from {ttp_file}")
+        print(f"[INFO] Loading TTPs from {ttp_file}")
         
         with open(ttp_file, 'r', encoding='utf-8') as f:
             extractor_data = json.load(f)
@@ -94,18 +94,18 @@ class TestRealAttackGenAgent:
         if not real_ttps:
             raise ValueError("No valid TTPs found in extraction results")
         
-        print(f"✅ Successfully loaded {len(real_ttps)} TTPs")
+        print(f"[SUCCESS] Successfully loaded {len(real_ttps)} TTPs")
         
         # Show sample of loaded TTPs
         for i, ttp in enumerate(real_ttps[:3]):
-            print(f"   TTP {i+1}: {ttp['attack_id']} - {ttp['technique_name']} (confidence: {ttp['confidence_score']:.2f})")
+            print(f"         TTP {i+1}: {ttp['attack_id']} - {ttp['technique_name']} (confidence: {ttp['confidence_score']:.2f})")
         
         # Return subset for testing (limit to avoid overwhelming)
         return real_ttps[:6]  # Use first 6 real TTPs
     
     def test_environment_requirements(self):
         """Test 1: Verify environment requirements"""
-        print("🔍 Testing environment requirements...")
+        print("[TEST] Testing environment requirements...")
         
         # MUST have .env file
         env_file = Path('.env')
@@ -116,30 +116,26 @@ class TestRealAttackGenAgent:
         assert api_key is not None, "GEMINI_API_KEY environment variable required"
         assert len(api_key) > 10, f"GEMINI_API_KEY seems invalid (length: {len(api_key)})"
         
-        print(f"✅ GEMINI_API_KEY loaded (length: {len(api_key)})")
+        print(f"[SUCCESS] GEMINI_API_KEY loaded (length: {len(api_key)})")
         
         # MUST have TTP data file
         ttp_file = Path('data/extracted/ttps_extracted.json')
         assert ttp_file.exists(), f"Real TTP data file required: {ttp_file.absolute()}"
         
-        print(f"✅ Real TTP data file found: {ttp_file}")
+        print(f"[SUCCESS] Real TTP data file found: {ttp_file}")
         
-        # Create required directories
-        for dir_name in ['logs', 'test_results']:
-            Path(dir_name).mkdir(exist_ok=True)
-        
-        print("✅ Environment requirements verified")
+        print("[SUCCESS] Environment requirements verified")
     
     def test_real_agent_import(self):
         """Test 2: Verify AttackGen Agent can be imported"""
-        print("🔍 Testing AttackGen Agent imports...")
+        print("[TEST] Testing AttackGen Agent imports...")
         
         # Must be able to import ALL components
         from agents.attackgen.agent import AttackGenAgent
         from agents.attackgen.config import get_attackgen_config
         from agents.base.agent import AgentStatus
         
-        print("✅ AttackGenAgent imported successfully")
+        print("[SUCCESS] AttackGenAgent imported successfully")
         
         # Configuration must be valid
         config = get_attackgen_config()
@@ -147,39 +143,39 @@ class TestRealAttackGenAgent:
         assert 'llm' in config, "Config must have 'llm' section"
         assert 'platforms' in config, "Config must have 'platforms' section"
         
-        print("✅ Configuration structure validated")
+        print("[SUCCESS] Configuration structure validated")
     
     @pytest.mark.asyncio
     async def test_real_agent_workflow(self, real_agent, real_extracted_ttps):
         """Test 3: Complete AttackGen Agent workflow"""
-        print("🚀 Testing AttackGen Agent workflow...")
+        print("[TEST] Testing AttackGen Agent workflow...")
         
         # Start agent
-        print("🔄 Starting AttackGen agent...")
+        print("[PROGRESS] Starting AttackGen agent...")
         await real_agent.start()
         
         # MUST be running
         assert real_agent.status == AgentStatus.RUNNING, f"Agent status: {real_agent.status}"
-        print("✅ Agent started successfully")
+        print("[SUCCESS] Agent started successfully")
         
         # Prepare input data
         input_data = {'extracted_ttps': real_extracted_ttps}
-        print(f"📝 Processing {len(real_extracted_ttps)} TTPs...")
+        print(f"[INFO] Processing {len(real_extracted_ttps)} TTPs...")
         
         # Validate input
         is_valid = real_agent.validate_input(input_data)
         assert is_valid == True, "Input validation failed"
-        print("✅ Input validation passed")
+        print("[SUCCESS] Input validation passed")
         
         # Execute attack generation
-        print("⚡ Executing attack generation with Gemini API...")
+        print("[PROGRESS] Executing attack generation with Gemini API...")
         result = await real_agent.execute(input_data)
         
         # Verify results
         assert result['status'] == 'success', f"Execution failed: {result.get('status')}"
         assert len(result['attack_commands']) > 0, "No attack commands generated"
         
-        print(f"✅ Generated {len(result['attack_commands'])} attack commands")
+        print(f"[SUCCESS] Generated {len(result['attack_commands'])} attack commands")
         
         # Verify command structure
         commands = result['attack_commands']
@@ -191,7 +187,7 @@ class TestRealAttackGenAgent:
             assert 'technique_name' in cmd, f"Command {i}: missing technique_name"
             assert len(cmd['command'].strip()) > 0, f"Command {i}: empty command"
         
-        print("✅ All command structures validated")
+        print("[SUCCESS] All command structures validated")
         
         # Get statistics
         stats = await real_agent.get_statistics()
@@ -201,24 +197,24 @@ class TestRealAttackGenAgent:
         commands_generated = len(commands)
         processing_time = result['generation_summary']['processing_time_ms']
         
-        print(f"✅ Statistics: {ttps_processed} TTPs processed")
+        print(f"[SUCCESS] Statistics: {ttps_processed} TTPs processed")
         
         # Show detailed results
-        print("📊 WORKFLOW RESULTS:")
-        print(f"   📈 TTPs processed: {result['generation_summary']['ttps_processed']}")
-        print(f"   ⚡ Commands generated: {result['generation_summary']['commands_generated']}")
-        print(f"   🕒 Processing time: {processing_time:.2f}ms")
-        print(f"   🎯 Success rate: {(commands_generated/ttps_processed)*100:.1f}%")
+        print("[RESULTS] WORKFLOW RESULTS:")
+        print(f"          TTPs processed: {result['generation_summary']['ttps_processed']}")
+        print(f"          Commands generated: {result['generation_summary']['commands_generated']}")
+        print(f"          Processing time: {processing_time:.2f}ms")
+        print(f"          Success rate: {(commands_generated/ttps_processed)*100:.1f}%")
         
         # Show sample commands
-        print("📋 Sample generated commands:")
+        print("[RESULTS] Sample generated commands:")
         for i, cmd in enumerate(commands[:3]):
-            print(f"   Command {i+1}: {cmd['mitre_attack_id']} - {cmd['name'][:50]}...")
-            print(f"      Platform: {cmd['platform']}")
-            print(f"      Command: {cmd['command'][:60]}...")
+            print(f"          Command {i+1}: {cmd['mitre_attack_id']} - {cmd['name'][:50]}...")
+            print(f"             Platform: {cmd['platform']}")
+            print(f"             Command: {cmd['command'][:60]}...")
         
         # Save results
-        results_file = Path('test_results/real_attackgen_results.json')
+        results_file = Path('data/attackgen/real_attackgen_results.json')
         results_file.parent.mkdir(exist_ok=True)
         
         with open(results_file, 'w', encoding='utf-8') as f:
@@ -230,13 +226,13 @@ class TestRealAttackGenAgent:
                 'execution_result': result
             }, f, indent=2, ensure_ascii=False)
         
-        print(f"📄 test results saved to {results_file}")
-        print("🎉 AttackGen Agent workflow test PASSED!")
+        print(f"[INFO] Test results saved to {results_file}")
+        print("[SUCCESS] AttackGen Agent workflow test PASSED!")
     
     @pytest.mark.asyncio
     async def test_real_api_integration(self, real_agent):
         """Test 4: Verify Gemini API integration"""
-        print("🔍 Testing Gemini API integration...")
+        print("[TEST] Testing Gemini API integration...")
         
         # Start agent to initialize LLM
         await real_agent.start()
@@ -248,9 +244,9 @@ class TestRealAttackGenAgent:
         if hasattr(real_agent.llm_client, 'test_connection'):
             connected = await real_agent.llm_client.test_connection()
             assert connected == True, "Failed to connect to Gemini API"
-            print("✅ Gemini API connection verified")
+            print("[SUCCESS] Gemini API connection verified")
         
-        print("✅ API integration validated")
+        print("[SUCCESS] API integration validated")
 
 
 # ================================
@@ -279,17 +275,17 @@ if __name__ == "__main__":
     
     if len(sys.argv) > 1 and sys.argv[1] == '--check':
         # Just check requirements
-        print("🔍 Checking test requirements...")
+        print("[TEST] Checking test requirements...")
         test_class = TestRealAttackGenAgent()
         test_class.test_environment_requirements()
         test_class.test_real_agent_import()
-        print("🏁 test requirements check complete!")
+        print("[DONE] Test requirements check complete!")
     else:
         # Run all tests
         import pytest
         
-        print("🚀 Running AttackGen Agent tests...")
-        print("⚠️  This will use Gemini API and may take time...")
+        print("[TEST] Running AttackGen Agent tests...")
+        print("[WARNING] This will use Gemini API and may take time...")
         
         pytest.main([
             __file__,
