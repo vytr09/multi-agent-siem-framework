@@ -1,0 +1,259 @@
+# Benchmark Configuration
+# Multi-Agent SIEM Framework
+
+# ========================================
+# LLM Judge Configuration
+# ========================================
+llm_judge:
+  enabled: true
+  
+  # API Configuration
+  api_key: "${GEMINI_API_KEY}"  # Or set directly
+  model: "gemini-2.0-flash-lite"
+  temperature: 0.3
+  max_tokens: 2000
+  timeout: 30
+  
+  # Judge Persona
+  persona: "expert cybersecurity researcher and red team operator with deep knowledge of MITRE ATT&CK framework and detection engineering"
+  
+  # Features
+  detailed_feedback: true
+  confidence_scores: true
+  enable_comparison: true
+  
+  # Rate Limiting
+  max_requests_per_minute: 60
+  retry_attempts: 3
+  retry_delay: 2
+
+# ========================================
+# AttackGen Benchmark Configuration
+# ========================================
+attackgen_benchmark:
+  enabled: true
+  
+  # Evaluation Settings
+  use_llm_evaluation: true
+  use_rule_based_evaluation: true
+  
+  # Scoring
+  min_passing_score: 0.6
+  high_quality_threshold: 0.85
+  
+  # Metrics Configuration
+  metrics:
+    # Correctness Category
+    technical_correctness:
+      weight: 2.0
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+      
+    attack_alignment:
+      weight: 1.5
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+      
+    platform_compatibility:
+      weight: 1.5
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+    
+    # Realism Category
+    operational_realism:
+      weight: 2.0
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+      
+    threat_actor_alignment:
+      weight: 1.0
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+    
+    # Safety Category
+    testing_safety:
+      weight: 2.5
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+      
+    controlled_impact:
+      weight: 1.5
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+    
+    # Detectability Category
+    detection_value:
+      weight: 1.5
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+      
+    artifact_generation:
+      weight: 1.0
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+    
+    # Effectiveness Category
+    completeness:
+      weight: 1.5
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+      
+    documentation_quality:
+      weight: 1.0
+      min_score: 0.0
+      max_score: 10.0
+      enabled: true
+  
+  # Analysis Settings
+  top_performers_count: 10
+  bottom_performers_count: 5
+  enable_comparative_analysis: true
+  
+  # Export Settings
+  export_format: "json"
+  export_detailed_results: true
+  export_statistics: true
+
+# ========================================
+# RuleGen Benchmark Configuration (TODO)
+# ========================================
+rulegen_benchmark:
+  enabled: false  # To be implemented
+  
+  # Placeholder settings
+  use_llm_evaluation: true
+  use_rule_based_evaluation: true
+  
+  metrics:
+    rule_correctness:
+      weight: 2.0
+    detection_effectiveness:
+      weight: 2.0
+    false_positive_resilience:
+      weight: 1.5
+
+# ========================================
+# General Benchmark Settings
+# ========================================
+general:
+  # Parallel Processing
+  max_concurrent_evaluations: 3
+  batch_size: 5
+  
+  # Caching
+  enable_caching: true
+  cache_ttl: 3600  # 1 hour
+  
+  # Logging
+  log_level: "INFO"
+  log_file: "logs/benchmark.log"
+  log_format: "json"
+  
+  # Output
+  output_directory: "data/benchmark_results"
+  create_timestamp_subdirs: true
+  
+  # Statistics
+  calculate_statistics: true
+  generate_summary_report: true
+  export_csv: true
+  
+  # Visualization (Future)
+  generate_plots: false
+  plot_format: "png"
+
+# ========================================
+# Comparison Settings
+# ========================================
+comparison:
+  enabled: true
+  
+  # Comparison criteria
+  criteria:
+    - "overall quality"
+    - "technical correctness"
+    - "operational realism"
+    - "testing safety"
+  
+  # Threshold for significant difference
+  significant_difference_threshold: 0.1
+
+# ========================================
+# Regression Testing
+# ========================================
+regression:
+  enabled: false
+  
+  # Baseline
+  baseline_file: "baselines/attackgen_baseline.json"
+  alert_on_degradation: true
+  degradation_threshold: 0.05
+  
+  # Historical Tracking
+  track_history: true
+  history_file: "history/benchmark_history.json"
+
+# ========================================
+# Alerting
+# ========================================
+alerting:
+  enabled: false
+  
+  # Alert on low scores
+  low_score_threshold: 0.5
+  alert_channels:
+    - email
+    - slack
+  
+  # Email Settings
+  email:
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    from_address: "benchmark@example.com"
+    to_addresses:
+      - "team@example.com"
+  
+  # Slack Settings
+  slack:
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    channel: "#siem-benchmarks"
+
+# ========================================
+# Advanced Settings
+# ========================================
+advanced:
+  # Multi-model Ensemble (Future)
+  ensemble_evaluation:
+    enabled: false
+    models:
+      - "gemini-2.0-flash-lite"
+      - "gemini-2.5-pro"
+    aggregation_method: "weighted_average"
+  
+  # Ground Truth Comparison
+  ground_truth:
+    enabled: false
+    dataset_path: "datasets/ground_truth.json"
+    calculate_accuracy: true
+  
+  # Custom Metrics
+  custom_metrics:
+    enabled: false
+    metrics_file: "config/custom_metrics.yaml"
+  
+  # Debug Mode
+  debug:
+    enabled: false
+    save_prompts: true
+    save_responses: true
+    verbose_logging: true
