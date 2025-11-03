@@ -368,7 +368,7 @@ import json
 import os
 
 # Now imports should work
-from agents.rulegen.rulegen_agent_with_llm import RuleGenerationAgentWithLLM
+from agents.rulegen.agent import RuleGenerationAgentWithLLM
 
 
 async def test_llm_rule_generation():
