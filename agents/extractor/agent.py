@@ -55,7 +55,7 @@ class ExtractorAgent(BaseAgent):
         # Configuration
         self.llm_config = config.get("llm", {})
         self.use_mock_llm = self.llm_config.get("use_mock", False)
-        self.model_name = self.llm_config.get("model", "gemini-2.5-pro")
+        self.model_name = self.llm_config.get("model", "gemini-2.0-flash-lite")
         self.max_tokens = self.llm_config.get("max_tokens", 1000)
         self.temperature = self.llm_config.get("temperature", 0.3)
         

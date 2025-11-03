@@ -32,7 +32,7 @@ class MockGeminiClient:
     """Mock Gemini client for testing (no API calls)"""
     
     def __init__(self, config: Dict[str, Any]):
-        self.model = config.get("model", "gemini-2.0-flash-exp")
+        self.model = config.get("model", "gemini-2.0-flash-lite")
         self.api_key = config.get("api_key", "mock-key")
         
         # Template TTPs for testing
@@ -98,7 +98,7 @@ class GeminiClient:
             if not self.api_key:
                 raise ValueError("Gemini API key not provided in config or GEMINI_API_KEY environment variable")
         
-        self.model_name = config.get("model", "gemini-2.0-flash-exp")
+        self.model_name = config.get("model", "gemini-2.0-flash-lite")
         self.temperature = config.get("temperature", 0.3)
         self.max_tokens = config.get("max_tokens", 1000)
         self.top_p = config.get("top_p", 0.95)
@@ -240,7 +240,7 @@ def create_llm_client(config: Dict[str, Any], use_mock: bool = True):
     Args:
         config: LLM configuration dictionary with:
             - api_key: Gemini API key (optional if GEMINI_API_KEY env var is set)
-            - model: Model name (default: gemini-2.0-flash-exp)
+            - model: Model name (default: gemini-2.0-flash-lite)
             - temperature: Generation temperature (default: 0.3)
             - max_tokens: Maximum output tokens (default: 1000)
             - top_p: Top-p sampling (default: 0.95)

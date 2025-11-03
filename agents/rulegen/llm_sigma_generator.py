@@ -24,7 +24,7 @@ class LLMSigmaGenerator:
         Args:
             config: Configuration dict with:
                 - api_key: Gemini API key
-                - model: Model name (default: gemini-2.0-flash-exp)
+                - model: Model name (default: gemini-2.0-flash-lite)
                 - temperature: Generation temperature
                 - max_retries: Max retry attempts
         """
@@ -44,7 +44,7 @@ class LLMSigmaGenerator:
             raise ValueError(f"Failed to initialize Gemini client: {str(e)}")
         
         # Model configuration
-        self.model_name = self.config.get('model', 'gemini-2.0-flash-exp')
+        self.model_name = self.config.get('model', 'gemini-2.0-flash-lite')
         self.temperature = self.config.get('temperature', 0.3)
         self.max_retries = self.config.get('max_retries', 3)
         
@@ -483,7 +483,7 @@ if __name__ == "__main__":
     async def test():
         config = {
             'api_key': os.getenv('GEMINI_API_KEY'),
-            'model': 'gemini-2.0-flash-exp',
+            'model': 'gemini-2.0-flash-lite',
             'temperature': 0.3
         }
         
