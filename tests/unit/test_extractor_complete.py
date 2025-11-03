@@ -34,31 +34,36 @@ async def main():
     }
     
     # 2. Load test data
-    print("\n📥 Loading test data...")
+    print("\n[STEP] Loading test data...")
+
     data_file = Path("data/normalized/cti_reports_20251004_212903.json")
     
     if not data_file.exists():
-        print(f"❌ Test data not found: {data_file}")
+        print(f"[ERROR] Test data not found: {data_file}")
+
         return False
     
     with open(data_file, 'r') as f:
         reports = json.load(f)
     
-    print(f"✅ Loaded {len(reports)} reports")
-    
+    print(f"[OK] Loaded {len(reports)} reports")
+
     # 3. Initialize agent
-    print("\n🚀 Initializing Extractor Agent...")
+    print("\n[INIT] Initializing Extractor Agent...")
+
     agent = ExtractorAgent("test-extractor", config)
     await agent.start()
     
-    print(f"✅ Agent started - Status: {agent.status.value}")
-    
+    print(f"[OK] Agent started - Status: {agent.status.value}")
+
     # 4. Execute extraction
-    print(f"\n⚙️  Extracting TTPs...")
+    print(f"\n[RUN] Extracting TTPs...")
+
     result = await agent.execute({"normalized_reports": reports})
     
     # 5. Display results
-    print(f"\n📊 EXTRACTION RESULTS")
+    print(f"\n[RESULTS] EXTRACTION RESULTS")
+
     print("-" * 70)
     summary = result['extraction_summary']
     print(f"Status: {result['status']}")
@@ -68,7 +73,8 @@ async def main():
     print(f"Processing time: {summary['processing_time_ms']:.0f}ms")
     
     # 6. Show sample TTPs
-    print(f"\n🔍 SAMPLE EXTRACTED TTPs (first report):")
+    print(f"\n[DETAIL] SAMPLE EXTRACTED TTPs (first report):")
+
     print("-" * 70)
     first_result = result['extraction_results'][0]
     for i, ttp in enumerate(first_result['extracted_ttps'][:5], 1):
@@ -78,7 +84,8 @@ async def main():
         print(f"   Description: {ttp['description'][:80]}...")
     
     # 7. Test health check
-    print(f"\n💚 HEALTH CHECK")
+    print(f"\n[HEALTH] HEALTH CHECK")
+
     print("-" * 70)
     health = await agent.health_check()
     print(f"Status: {health['status']['current']}")
@@ -88,7 +95,8 @@ async def main():
     print(f"Cache Hit Rate: {health['performance']['cache_hit_rate']:.1f}%")
     
     # 8. Test pause/resume
-    print(f"\n⏸️  Testing Pause/Resume...")
+    print(f"\n[PAUSE] Testing Pause/Resume...")
+
     await agent.pause()
     print(f"Paused - Can execute: {agent._can_execute}")
     
@@ -96,20 +104,22 @@ async def main():
     print(f"Resumed - Can execute: {agent._can_execute}")
     
     # 9. Save results
-    print(f"\n💾 Saving extraction results...")
+    print(f"\n[SAVE] Saving extraction results...")
+
     output_file = Path("data/extracted/ttps_extracted.json")
     output_file.parent.mkdir(exist_ok=True, parents=True)
     
     with open(output_file, 'w') as f:
         json.dump(result, f, indent=2, default=str)
     
-    print(f"✅ Results saved to: {output_file}")
-    
+    print(f"[OK] Results saved to: {output_file}")
+
     # 10. Stop agent
     await agent.stop()
-    print(f"\n✅ Agent stopped - Status: {agent.status.value}")
-    
-    print(f"\n🎉 EXTRACTOR AGENT TEST COMPLETED SUCCESSFULLY!")
+    print(f"\n[OK] Agent stopped - Status: {agent.status.value}")
+
+    print(f"\n[DONE] EXTRACTOR AGENT TEST COMPLETED SUCCESSFULLY!")
+
     return True
 
 if __name__ == "__main__":

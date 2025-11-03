@@ -23,20 +23,20 @@
 #     """Generate Sigma rules using LLM"""
     
 #     print("\n" + "="*80)
-#     print("🤖 SIGMA RULE GENERATION WITH LLM (GEMINI)")
+#     print("[INFO] SIGMA RULE GENERATION WITH LLM (GEMINI)")
 #     print("="*80)
     
 #     # Check API key
 #     api_key = os.getenv('GEMINI_API_KEY')
 #     if not api_key:
-#         print("\n❌ ERROR: GEMINI_API_KEY not found!")
+#         print("\n[ERROR] GEMINI_API_KEY not found!")
 #         print("\nPlease set your Gemini API key:")
 #         print("  Windows: set GEMINI_API_KEY=your-api-key")
 #         print("  Linux/Mac: export GEMINI_API_KEY=your-api-key")
 #         print("\nOr add to .env file")
 #         return
     
-#     print(f"✓ API Key found: {api_key[:10]}...")
+#     print(f"[OK] API Key found: {api_key[:10]}...")
     
 #     # Paths
 #     project_root = Path(__file__).resolve().parents[2]
@@ -45,10 +45,10 @@
     
 #     # Check input file
 #     if not data_path.exists():
-#         print(f"\n❌ Input file not found: {data_path}")
+#         print(f"\n[ERROR] Input file not found: {data_path}")
 #         return
     
-#     print(f"\n📂 Loading extraction data from: {data_path}")
+#     print(f"\n[LOAD] Loading extraction data from: {data_path}")
     
 #     with open(data_path, 'r', encoding='utf-8') as f:
 #         extraction_data = json.load(f)
@@ -56,7 +56,7 @@
 #     hybrid_data = extraction_data.get('hybrid', {})
     
 #     if not hybrid_data:
-#         print("❌ No hybrid extraction data found")
+#         print("[ERROR] No hybrid extraction data found")
 #         return
     
 #     # Extract TTPs
@@ -66,13 +66,13 @@
 #             if ttp.get('confidence_score', 0) >= 0.7:
 #                 ttps.append(ttp)
     
-#     print(f"✓ Found {len(ttps)} TTPs to process")
+#     print(f"[OK] Found {len(ttps)} TTPs to process")
     
 #     for idx, ttp in enumerate(ttps, 1):
 #         print(f"  {idx}. {ttp['attack_id']}: {ttp['technique_name']}")
     
 #     # Initialize LLM generator
-#     print("\n🔧 Initializing LLM generator...")
+#     print("\n[INIT] Initializing LLM generator...")
     
 #     llm_config = {
 #         'api_key': api_key,
@@ -84,23 +84,23 @@
 #     try:
 #         llm_generator = LLMSigmaGenerator(llm_config)
 #     except Exception as e:
-#         print(f"❌ Failed to initialize LLM: {e}")
+#         print(f"[ERROR] Failed to initialize LLM: {e}")
 #         return
     
 #     # Initialize optimizer
 #     optimizer = RuleOptimizer({})
     
 #     # Initialize platform converters
-#     print("\n🔧 Initializing platform converters...")
+#     print("\n[INIT] Initializing platform converters...")
 #     splunk_converter = SplunkConverter({})
 #     es_converter = ElasticsearchConverter({})
     
-#     print("✓ Splunk converter ready")
-#     print("✓ Elasticsearch converter ready")
+#     print("[OK] Splunk converter ready")
+#     print("[OK] Elasticsearch converter ready")
     
 #     # Generate rules
 #     print("\n" + "="*80)
-#     print("🚀 GENERATING RULES WITH LLM")
+#     print("[RUN] GENERATING RULES WITH LLM")
 #     print("="*80)
     
 #     start_time = datetime.now()
@@ -113,23 +113,23 @@
         
 #         try:
 #             # Step 1: Generate Sigma rule with LLM
-#             print("\n🤖 Generating Sigma rule with LLM...")
+#             print("\n[RUN] Generating Sigma rule with LLM...")
 #             sigma_rule = await llm_generator.generate_sigma_rule(ttp)
             
-#             print(f"✓ Generated: {sigma_rule.get('title')}")
-#             print(f"  • Level: {sigma_rule.get('level')}")
-#             print(f"  • Detection selections: {len([k for k in sigma_rule.get('detection', {}).keys() if k.startswith('selection')])}")
+#             print(f"[OK] Generated: {sigma_rule.get('title')}")
+#             print(f"  - Level: {sigma_rule.get('level')}")
+#             print(f"  - Detection selections: {len([k for k in sigma_rule.get('detection', {}).keys() if k.startswith('selection')])}")
             
 #             # Step 2: Optimize
-#             print("\n⚙️  Optimizing Sigma rule...")
+#             print("\n[OPT] Optimizing Sigma rule...")
 #             sigma_rule = optimizer.optimize(sigma_rule)
-#             print("✓ Optimization complete")
+#             print("[OK] Optimization complete")
             
 #             # Step 3: Convert to platforms
 #             platform_rules = {}
             
 #             # Splunk
-#             print("\n🔄 Converting to Splunk...")
+#             print("\n[CONVERT] Converting to Splunk...")
 #             try:
 #                 splunk_rule = await splunk_converter.convert(sigma_rule)
 #                 is_valid = await splunk_converter.validate(splunk_rule)
@@ -140,13 +140,13 @@
 #                     'syntax': 'SPL',
 #                     'validated': is_valid
 #                 }
-#                 print(f"✓ Splunk rule generated (validated: {is_valid})")
+#                 print(f"[OK] Splunk rule generated (validated: {is_valid})")
 #             except Exception as e:
-#                 print(f"❌ Splunk conversion failed: {e}")
+#                 print(f"[ERROR] Splunk conversion failed: {e}")
 #                 platform_rules['splunk'] = {'status': 'failed', 'error': str(e)}
             
 #             # Elasticsearch
-#             print("🔄 Converting to Elasticsearch...")
+#             print("[CONVERT] Converting to Elasticsearch...")
 #             try:
 #                 es_rule = await es_converter.convert(sigma_rule)
 #                 is_valid = await es_converter.validate(es_rule)
@@ -157,9 +157,9 @@
 #                     'syntax': 'KQL',
 #                     'validated': is_valid
 #                 }
-#                 print(f"✓ Elasticsearch rule generated (validated: {is_valid})")
+#                 print(f"[OK] Elasticsearch rule generated (validated: {is_valid})")
 #             except Exception as e:
-#                 print(f"❌ Elasticsearch conversion failed: {e}")
+#                 print(f"[ERROR] Elasticsearch conversion failed: {e}")
 #                 platform_rules['elasticsearch'] = {'status': 'failed', 'error': str(e)}
             
 #             # Build result
@@ -193,10 +193,10 @@
             
 #             results.append(result)
             
-#             print(f"\n✅ Rule {idx}/{len(ttps)} completed successfully")
+#             print(f"\n[OK] Rule {idx}/{len(ttps)} completed successfully")
             
 #         except Exception as e:
-#             print(f"\n❌ Error processing TTP: {e}")
+#             print(f"\n[ERROR] Error processing TTP: {e}")
 #             import traceback
 #             traceback.print_exc()
             
@@ -266,14 +266,14 @@
 #     main_output = output_dir / "rulegen_llm_output.json"
     
 #     print("\n" + "="*80)
-#     print("💾 SAVING OUTPUT FILES")
+#     print("[SAVE] SAVING OUTPUT FILES")
 #     print("="*80)
     
 #     with open(main_output, 'w', encoding='utf-8') as f:
 #         json.dump(output, f, indent=2, ensure_ascii=False)
     
 #     file_size = main_output.stat().st_size / 1024
-#     print(f"✓ Main output: {main_output.name} ({file_size:.2f} KB)")
+#     print(f"[OK] Main output: {main_output.name} ({file_size:.2f} KB)")
     
 #     # Save individual Sigma rules
 #     sigma_dir = output_dir / "sigma_rules_llm"
@@ -288,7 +288,7 @@
 #             with open(rule_path, 'w', encoding='utf-8') as f:
 #                 json.dump(sigma_rule, f, indent=2, ensure_ascii=False)
             
-#             print(f"✓ Sigma rule: {attack_id}_llm_generated.json")
+#             print(f"[OK] Sigma rule: {attack_id}_llm_generated.json")
     
 #     # Save platform-specific rules
 #     for platform in ['splunk', 'elasticsearch']:
@@ -356,7 +356,6 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# ✅ ĐÚNG - Add project root to path
 project_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_root))
 
@@ -375,18 +374,18 @@ async def test_llm_rule_generation():
     """Test RuleGen agent with LLM-based Sigma generation"""
     
     print("\n" + "="*80)
-    print("🧪 TESTING RULEGEN AGENT WITH LLM")
+    print("[TEST] TESTING RULEGEN AGENT WITH LLM")
     print("="*80)
     
     # Load extraction data
     data_path = project_root / "data" / "extracted" / "hybrid_extraction_results.json"
     
     if not data_path.exists():
-        print(f"❌ Data file not found: {data_path}")
+        print(f"[ERROR] Data file not found: {data_path}")
         print(f"   Please run the extractor agent first to generate extraction data")
         return
     
-    print(f"\n📂 Loading extraction data from: {data_path}")
+    print(f"\n[LOAD] Loading extraction data from: {data_path}")
     
     with open(data_path, 'r', encoding='utf-8') as f:
         extraction_data = json.load(f)
@@ -395,7 +394,7 @@ async def test_llm_rule_generation():
     hybrid_data = extraction_data.get('hybrid', {})
     
     if not hybrid_data:
-        print("❌ No hybrid extraction data found")
+        print("[ERROR] No hybrid extraction data found")
         return
     
     # Configure agent with LLM
@@ -419,16 +418,16 @@ async def test_llm_rule_generation():
     
     # Check API key
     if not config['llm']['api_key']:
-        print("\n⚠️  Warning: GEMINI_API_KEY not found in environment")
+        print("\n[WARN] GEMINI_API_KEY not found in environment")
         print("   LLM generation will fall back to manual generation")
     
     # Initialize agent
-    print("\n🔧 Initializing RuleGen Agent...")
+    print("\n[INIT] Initializing RuleGen Agent...")
     agent = RuleGenerationAgentWithLLM(config)
     await agent.initialize()
     
     # Process extraction data
-    print("\n🚀 Starting rule generation...")
+    print("\n[RUN] Starting rule generation...")
     result = await agent.process(hybrid_data)
     
     # Save output
@@ -444,26 +443,27 @@ async def test_llm_rule_generation():
     
     # Print summary
     print("\n" + "="*80)
-    print("✅ RULE GENERATION COMPLETE")
+    print("[DONE] RULE GENERATION COMPLETE")
     print("="*80)
-    print(f"\n📁 Output saved to: {output_path}")
-    print(f"📊 File size: {file_size:.2f} KB")
-    
+    print(f"\n[FILE] Output saved to: {output_path}")
+    print(f"[INFO] File size: {file_size:.2f} KB")
+
     summary = result.get('summary', {})
-    print(f"\n📈 Summary:")
-    print(f"  • TTPs processed: {summary.get('total_ttps_processed', 0)}")
-    print(f"  • Rules generated: {summary.get('total_rules_generated', 0)}")
-    print(f"  • Successful: {summary.get('successful', 0)}")
-    print(f"  • Failed: {summary.get('failed', 0)}")
-    print(f"  • LLM generations: {summary.get('llm_generations', 0)}")
-    print(f"  • Fallback generations: {summary.get('fallback_generations', 0)}")
-    print(f"  • Processing time: {summary.get('processing_time', 0):.2f}s")
+    print(f"\n[SUMMARY] Summary:")
+    print(f"  - TTPs processed: {summary.get('total_ttps_processed', 0)}")
+    print(f"  - Rules generated: {summary.get('total_rules_generated', 0)}")
+    print(f"  - Successful: {summary.get('successful', 0)}")
+    print(f"  - Failed: {summary.get('failed', 0)}")
+    print(f"  - LLM generations: {summary.get('llm_generations', 0)}")
+    print(f"  - Fallback generations: {summary.get('fallback_generations', 0)}")
+    print(f"  - Processing time: {summary.get('processing_time', 0):.2f}s")
     
     # Platform statistics
     platform_stats = result.get('platform_statistics', {})
     if platform_stats:
-        print(f"\n🔧 Platform Statistics:")
+        print(f"\n[INFO] Platform Statistics:")
         for platform, stats in platform_stats.items():
+            print(f"  - {platform.upper()}:")
             print(f"  {platform.upper()}:")
             print(f"    - Total: {stats.get('total', 0)}")
             print(f"    - Successful: {stats.get('successful', 0)}")
@@ -473,13 +473,13 @@ async def test_llm_rule_generation():
     # Show errors if any
     errors = result.get('errors')
     if errors:
-        print(f"\n⚠️  Errors encountered: {len(errors)}")
+        print(f"\n[WARN] Errors encountered: {len(errors)}")
         for error in errors[:3]:  # Show first 3 errors
-            print(f"  • {error.get('attack_id', 'UNKNOWN')}: {error.get('error', 'Unknown error')}")
+            print(f"  - {error.get('attack_id', 'UNKNOWN')}: {error.get('error', 'Unknown error')}")
     
     await agent.shutdown()
     
-    print("\n✨ Test completed successfully!")
+    print("\n[OK] Test completed successfully!")
 
 
 if __name__ == "__main__":

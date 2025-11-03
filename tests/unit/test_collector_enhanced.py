@@ -63,9 +63,9 @@ async def test_full_collection():
     raw = result["collection_summary"]["raw_reports_collected"]
     norm = result["collection_summary"]["normalized_reports"]
     indicators = result["collection_summary"]["total_indicators"]
-    print(f"🧮 Raw fetched: {raw}")
-    print(f"🔄 Normalized: {norm}")
-    print(f"🎯 Total indicators: {indicators}")
+    print(f"[INFO] Raw fetched: {raw}")
+    print(f"[INFO] Normalized: {norm}")
+    print(f"[INFO] Total indicators: {indicators}")
     assert raw == norm, "Every raw report must normalize successfully"
     assert norm == 11, "Expected 10 MISP + 1 PDF = 11 reports"
 
@@ -74,11 +74,11 @@ async def test_full_collection():
     Path("data/normalized").mkdir(exist_ok=True)
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(result["normalized_reports"], f, indent=2, ensure_ascii=False)
-    print(f"✅ Full pipeline output saved: {out_file}")
+    print(f"[OK] Full pipeline output saved: {out_file}")
 
     # 6. Display sample
     sample = result["normalized_reports"][0]
-    print("📄 Sample normalized report keys:", list(sample.keys()))
+    print("[INFO] Sample normalized report keys:", list(sample.keys()))
     print("   Title:", sample.get("title"))
     print("   Source:", sample.get("source"))
 

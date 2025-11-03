@@ -43,7 +43,7 @@ from agents.extractor.agent import ExtractorAgent
 #     try:
 #         print("\n1. Initializing Hybrid Agent...")
 #         await agent.start()
-#         print("   ✓ Agent initialized (NLP + Gemini enabled)")
+#         print("   [OK] Agent initialized (NLP + Gemini enabled)")
         
 #         # Load test data
 #         with open("data/normalized/full_pipeline.json", encoding='utf-8') as f:
@@ -156,7 +156,7 @@ from agents.extractor.agent import ExtractorAgent
 #         with open(output_path, "w", encoding='utf-8') as f:
 #             json.dump(result, f, indent=2, ensure_ascii=False)
         
-#         print(f"\n✓ Results saved to {output_path}")
+#         print(f"\n[OK] Results saved to {output_path}")
         
 #         # Health check
 #         health = await agent.health_check()
@@ -164,14 +164,14 @@ from agents.extractor.agent import ExtractorAgent
 #         print(f"  Health Score: {health.get('health', {}).get('score')}")
         
 #         await agent.shutdown()
-#         print("\n✓ Agent shutdown complete")
+#         print("\n[OK] Agent shutdown complete")
         
 #         print("\n" + "=" * 80)
 #         print("HYBRID TEST COMPLETED SUCCESSFULLY")
 #         print("=" * 80)
         
 #     except Exception as e:
-#         print(f"\n✗ Test failed: {e}")
+#         print(f"\n[ERROR] Test failed: {e}")
 #         import traceback
 #         traceback.print_exc()
 #         return False
@@ -242,7 +242,7 @@ async def test_hybrid_with_mock():
         print("INITIALIZING AGENT")
         print("=" * 80)
         await agent.start()
-        print("✓ Agent initialized (NLP + Gemini enabled)")
+        print("[OK] Agent initialized (NLP + Gemini enabled)")
         
         # Storage for all results
         all_extraction_results = []
@@ -255,9 +255,9 @@ async def test_hybrid_with_mock():
         print("=" * 80)
         
         for idx, test_report in enumerate(reports_to_process, 1):
-            print(f"\n{'─' * 80}")
+            print(f"\n{'-' * 80}")
             print(f"REPORT {idx}/{len(reports_to_process)}")
-            print(f"{'─' * 80}")
+            print(f"{'-' * 80}")
             
             print(f"Title: {test_report['title']}")
             print(f"Report ID: {test_report['report_id']}")
@@ -287,7 +287,7 @@ async def test_hybrid_with_mock():
                 ttps = extraction.get("extracted_ttps", [])
                 total_ttps += len(ttps)
                 
-                print(f"\n✓ Extracted {len(ttps)} TTPs")
+                print(f"\n[OK] Extracted {len(ttps)} TTPs")
                 print(f"  Processing Time: {summary.get('processing_time_ms'):.0f}ms")
                 print(f"  High Confidence: {summary.get('high_confidence_ttps', 0)}")
                 print(f"  Gemini API Calls: {summary.get('gemini_api_calls', 0)}")
@@ -319,7 +319,7 @@ async def test_hybrid_with_mock():
                     "extraction": extraction
                 })
             else:
-                print(f"\n✗ No extraction results")
+                print(f"\n[WARN] No extraction results")
         
         # Final Summary
         print("\n" + "=" * 80)
@@ -375,7 +375,7 @@ async def test_hybrid_with_mock():
         with open(output_path, "w", encoding='utf-8') as f:
             json.dump(final_output, f, indent=2, ensure_ascii=False)
         
-        print(f"\n✓ All results saved to {output_path}")
+        print(f"\n[OK] All results saved to {output_path}")
         
         # Health check
         health = await agent.health_check()
@@ -383,14 +383,14 @@ async def test_hybrid_with_mock():
         print(f"  Health Score: {health.get('health', {}).get('score'):.1f}")
         
         await agent.shutdown()
-        print("\n✓ Agent shutdown complete")
+        print("\n[OK] Agent shutdown complete")
         
         print("\n" + "=" * 80)
-        print("MULTI-REPORT TEST COMPLETED SUCCESSFULLY ✓")
+        print("[OK] MULTI-REPORT TEST COMPLETED SUCCESSFULLY")
         print("=" * 80)
         
     except Exception as e:
-        print(f"\n✗ Test failed: {e}")
+        print(f"\n[ERROR] Test failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -462,7 +462,7 @@ async def test_nlp_component():
     for key, value in stats.items():
         print(f"  {key}: {value}")
     
-    print("\n✓ NLP component test completed")
+    print("\n[OK] NLP component test completed")
 
 
 async def test_batch_hybrid():
@@ -517,10 +517,10 @@ async def test_batch_hybrid():
         print(f"  Gemini TTPs: {stats.get('gemini_ttps_extracted')}")
         
         await agent.shutdown()
-        print("\n✓ Batch test completed")
+        print("\n[OK] Batch test completed")
         
     except Exception as e:
-        print(f"\n✗ Batch test failed: {e}")
+        print(f"\n[ERROR] Batch test failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -535,7 +535,7 @@ async def main():
     # Check test data
     test_data_path = Path("data/normalized/full_pipeline.json")
     if not test_data_path.exists():
-        print(f"✗ Test data not found: {test_data_path}")
+        print(f"[ERROR] Test data not found: {test_data_path}")
         return
     
     print("HYBRID NLP + GEMINI EXTRACTOR TEST MENU")

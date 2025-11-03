@@ -36,13 +36,13 @@ async def test_nlp_only():
     
     result = await agent.execute({"normalized_reports": [report]})
     
-    print(f"\n📊 Results:")
+    print(f"\n[RESULTS] Results:")
     print(f"TTPs extracted: {result['extraction_summary']['total_ttps_extracted']}")
     print(f"Processing time: {result['extraction_summary']['processing_time_ms']:.0f}ms")
     
     # Show NLP analysis
     nlp_analysis = result['extraction_results'][0]['nlp_analysis']
-    print(f"\n🔍 NLP Analysis:")
+    print(f"\n[DETAIL] NLP Analysis:")
     print(f"Malware: {nlp_analysis['entities']['malware']}")
     print(f"Tools: {nlp_analysis['entities']['tools']}")
     print(f"Threat Actors: {nlp_analysis['entities']['threat_actors']}")
@@ -82,7 +82,7 @@ async def test_hybrid_mode():
     result = await agent.execute({"normalized_reports": [report]})
     
     summary = result['extraction_summary']
-    print(f"\n📊 Results:")
+    print(f"\n[RESULTS] Results:")
     print(f"TTPs extracted: {summary['total_ttps_extracted']}")
     print(f"Total processing: {summary['processing_time_ms']:.0f}ms")
     print(f"  - NLP time: {summary['nlp_processing_time_ms']:.0f}ms")
@@ -90,7 +90,7 @@ async def test_hybrid_mode():
     
     # Show extracted TTPs
     extraction = result['extraction_results'][0]
-    print(f"\n🎯 Sample TTPs (first 3):")
+    print(f"\n[DETAIL] Sample TTPs (first 3):")
     for i, ttp in enumerate(extraction['extracted_ttps'][:3], 1):
         print(f"\n{i}. {ttp['technique_name']} ({ttp['attack_id']})")
         print(f"   Tactic: {ttp['tactic']}")
@@ -100,8 +100,8 @@ async def test_hybrid_mode():
             print(f"   Related malware: {ttp['related_entities'].get('malware', [])[:2]}")
     
     # Show attack chain
-    print(f"\n⛓️  Attack Chain:")
-    print(f"   {' → '.join(extraction['attack_chain'][:8])}")
+    print(f"\n[CHAIN] Attack Chain:")
+    print(f"   {' -> '.join(extraction['attack_chain'][:8])}")
     
     await agent.stop()
     return result
@@ -146,7 +146,7 @@ async def test_performance_comparison():
     await hybrid_agent.stop()
     
     # Compare results
-    print("\n📊 Comparison Results:")
+    print("\n[RESULTS] Comparison Results:")
     print("\n" + "-" * 70)
     print(f"{'Metric':<30} {'NLP-Only':<20} {'Hybrid':<20}")
     print("-" * 70)
@@ -168,13 +168,13 @@ async def test_performance_comparison():
     
     print(f"{'Avg Confidence':<30} {nlp_avg_conf:<20.2f} {hybrid_avg_conf:<20.2f}")
     
-    print("\n💡 Insights:")
+    print(f"\n[INSIGHT] Insights:")
     if hybrid_summary['total_ttps_extracted'] > nlp_summary['total_ttps_extracted']:
-        print("   ✓ Hybrid extracted more TTPs (better coverage)")
+        print("   [OK] Hybrid extracted more TTPs (better coverage)")
     if hybrid_avg_conf > nlp_avg_conf:
-        print("   ✓ Hybrid has higher confidence scores (better quality)")
+        print("   [OK] Hybrid has higher confidence scores (better quality)")
     if nlp_summary['processing_time_ms'] < hybrid_summary['processing_time_ms']:
-        print("   ✓ NLP-only is faster (good for real-time)")
+        print("   [OK] NLP-only is faster (good for real-time)")
     
     return results
 
@@ -196,30 +196,30 @@ async def test_entity_extraction():
     text = report['description']
     entities = extractor.extract(text)
     
-    print("\n🔍 Extracted Entities:")
-    print(f"\n📦 Malware Families: {entities.malware_families}")
-    print(f"🔧 Tools: {entities.tools}")
-    print(f"👤 Threat Actors: {entities.threat_actors}")
-    print(f"🎯 ATT&CK Techniques: {entities.attack_techniques}")
+    print("\n[DETAIL] Extracted Entities:")
+    print(f"\n[INFO] Malware Families: {entities.malware_families}")
+    print(f"Tools: {entities.tools}")
+    print(f"Threat Actors: {entities.threat_actors}")
+    print(f"ATT&CK Techniques: {entities.attack_techniques}")
     
-    print(f"\n🌐 Network IOCs:")
+    print(f"\n[INFO] Network IOCs:")
     print(f"  IPs: {entities.ip_addresses}")
     print(f"  Domains: {entities.domains}")
     print(f"  URLs: {entities.urls[:3]}")
     
-    print(f"\n🔒 File Hashes:")
+    print(f"\n[INFO] File Hashes:")
     for hash_type, hashes in entities.file_hashes.items():
         print(f"  {hash_type.upper()}: {len(hashes)} found")
     
     # Identify tactics
     tactics = extractor.identify_tactics(text)
-    print(f"\n⚔️  Identified Tactics:")
+    print(f"\n[INFO] Identified Tactics:")
     for tactic, keywords in tactics.items():
         print(f"  {tactic}: {keywords[:3]}")
     
     # Entity summary
     summary = extractor.create_entity_summary(entities)
-    print(f"\n📝 Summary:")
+    print(f"\n[INFO] Summary:")
     print(f"  {summary}")
 
 async def main():
@@ -250,22 +250,22 @@ async def main():
         with open(output_file, 'w') as f:
             json.dump(results, f, indent=2, default=str)
         
-        print(f"\n💾 Results saved to: {output_file}")
+        print(f"\n[SAVE] Results saved to: {output_file}")
         
         print("\n" + "=" * 70)
-        print("🎉 ALL TESTS COMPLETED SUCCESSFULLY!")
+        print("[DONE] ALL TESTS COMPLETED SUCCESSFULLY!")
         print("=" * 70)
-        
-        print("\n📌 Key Takeaways:")
-        print("  ✓ NLP layer successfully extracts entities and IOCs")
-        print("  ✓ Hybrid mode combines NLP precision with LLM understanding")
-        print("  ✓ Both modes produce MITRE ATT&CK mapped TTPs")
-        print("  ✓ Entity correlation enhances TTP context")
-        
+
+        print("\n[INFO] Key Takeaways:")
+        print("  [OK] NLP layer successfully extracts entities and IOCs")
+        print("  [OK] Hybrid mode combines NLP precision with LLM understanding")
+        print("  [OK] Both modes produce MITRE ATT&CK mapped TTPs")
+        print("  [OK] Entity correlation enhances TTP context")
+
         return True
         
     except Exception as e:
-        print(f"\n❌ TEST FAILED: {e}")
+        print(f"\n[ERROR] TEST FAILED: {e}")
         import traceback
         traceback.print_exc()
         return False

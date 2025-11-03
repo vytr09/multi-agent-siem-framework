@@ -15,7 +15,7 @@ from core.config import get_config
 
 async def test_collector():
     """Test the Collector Agent functionality"""
-    print("🧪 Testing Collector Agent...")
+    print("[TEST] Testing Collector Agent...")
     
     try:
         # Configuration for testing
@@ -37,12 +37,12 @@ async def test_collector():
         collector = CollectorAgent("test_collector", collector_config)
         
         # Test agent lifecycle
-        print("✓ Testing agent startup...")
+        print("[INIT] Testing agent startup...")
         await collector.start()
         print(f"  - Status: {collector.status.value}")
         
         # Test collection
-        print("✓ Testing CTI collection...")
+        print("[RUN] Testing CTI collection...")
         result = await collector.execute({
             "sources": ["misp"],
             "max_reports": 5
@@ -62,20 +62,20 @@ async def test_collector():
             print(f"  - Indicators: {len(sample['indicators'])}")
         
         # Test statistics
-        print("✓ Testing statistics...")
+        print("[CHECK] Testing statistics...")
         stats = await collector.get_statistics()
         print(f"  - Total reports processed: {stats['statistics']['total_reports_normalized']}")
         
         # Test shutdown
-        print("✓ Testing agent shutdown...")
+        print("[STOP] Testing agent shutdown...")
         await collector.stop()
         print(f"  - Final status: {collector.status.value}")
         
-        print("\n🎉 Collector Agent test completed successfully!")
+        print("\n[OK] Collector Agent test completed successfully!")
         return True
         
     except Exception as e:
-        print(f"\n❌ Collector Agent test failed: {str(e)}")
+        print(f"\n[ERROR] Collector Agent test failed: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
