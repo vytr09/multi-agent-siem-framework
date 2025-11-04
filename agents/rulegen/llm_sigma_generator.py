@@ -7,8 +7,10 @@ import os
 import json
 import re
 from typing import Dict, List, Any, Optional
-from google import genai
-from google.genai import types
+# from google import genai
+# from google.genai import types
+import google.generativeai as genai
+from google.generativeai import types
 from datetime import datetime
 import uuid
 import asyncio
@@ -50,9 +52,9 @@ class LLMSigmaGenerator:
         
         print(f"✓ LLM Generator initialized with model: {self.model_name}")
     
-    def _get_generation_config(self) -> types.GenerateContentConfig:
+    def _get_generation_config(self) -> types.GenerationConfig:
         """Create generation configuration object"""
-        return types.GenerateContentConfig(
+        return types.GenerationConfig(
             temperature=self.temperature,
             top_p=0.95,
             top_k=40,
