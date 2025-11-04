@@ -7,8 +7,10 @@ import asyncio
 import json
 import os
 from typing import Dict, Any, List, Optional
-from google import genai
-from google.genai import types
+# from google import genai
+# from google.genai import types
+import google.generativeai as genai
+from google.generativeai import types
 
 
 class LLMJudge:
@@ -44,9 +46,9 @@ class LLMJudge:
         self.enable_detailed_feedback = config.get("detailed_feedback", True)
         self.enable_confidence_scores = config.get("confidence_scores", True)
     
-    def _get_generation_config(self) -> types.GenerateContentConfig:
+    def _get_generation_config(self) -> types.GenerationConfig:
         """Create generation configuration"""
-        return types.GenerateContentConfig(
+        return types.GenerationConfig(
             temperature=self.temperature,
             max_output_tokens=self.max_tokens,
             top_p=0.95,

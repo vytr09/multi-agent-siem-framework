@@ -14,6 +14,7 @@ from benchmark.benchmark_base import (
 from benchmark.llm_judge import LLMJudge
 
 from benchmark.attackgen_benchmark import AttackGenBenchmark
+from benchmark.rulegen_benchmark import RuleGenBenchmark  # ✅ Added
 
 # RuleGen benchmark is placeholder for now
 # from benchmark.rulegen_benchmark import RuleGenBenchmark
@@ -33,5 +34,5 @@ __all__ = [
     
     # Agent-specific benchmarks
     "AttackGenBenchmark",
-    # "RuleGenBenchmark",  # TODO
+    "RuleGenBenchmark",  # TODO
 ]
