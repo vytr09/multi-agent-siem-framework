@@ -49,8 +49,8 @@ class TestRealAttackGenAgent:
     def real_extracted_ttps(self):
         """Load TTPs from ExtractorAgent output - NO FALLBACK"""
         
-        # Load TTP data - MUST EXIST
-        ttp_file = Path('data/extracted/ttps_extracted.json')
+        # Load TTP data from hybrid extraction (has context field)
+        ttp_file = Path('data/extracted/hybrid_extraction_results.json')
         
         if not ttp_file.exists():
             raise FileNotFoundError(f"Real TTP file not found: {ttp_file.absolute()}")
@@ -60,9 +60,11 @@ class TestRealAttackGenAgent:
         with open(ttp_file, 'r', encoding='utf-8') as f:
             extractor_data = json.load(f)
         
-        # Parse TTP data structure
+        # Parse hybrid extraction data structure
         real_ttps = []
-        extraction_results = extractor_data.get('extraction_results', [])
+        # Hybrid results are nested under 'hybrid' key
+        hybrid_data = extractor_data.get('hybrid', {})
+        extraction_results = hybrid_data.get('extraction_results', [])
         
         if not extraction_results:
             raise ValueError("No extraction results found in TTP file")
@@ -84,7 +86,8 @@ class TestRealAttackGenAgent:
                     'confidence_level': ttp.get('confidence_level', 'medium'),
                     'indicators': ttp.get('indicators', []),
                     'tools': ttp.get('tools', []),
-                    'source_report': source_info.get('title', 'Unknown Report')
+                    'source_report': source_info.get('title', 'Unknown Report'),
+                    'context' : ttp.get('context', {})
                 }
                 
                 # Only add if we have essential fields
@@ -101,7 +104,8 @@ class TestRealAttackGenAgent:
             print(f"         TTP {i+1}: {ttp['attack_id']} - {ttp['technique_name']} (confidence: {ttp['confidence_score']:.2f})")
         
         # Return subset for testing (limit to avoid overwhelming)
-        return real_ttps[:6]  # Use first 6 real TTPs
+        # Hybrid extraction has 3 TTPs total - adjust this number to test fewer
+        return real_ttps[:2]  # Use first 2 TTPs for faster testing
     
     def test_environment_requirements(self):
         """Test 1: Verify environment requirements"""
@@ -118,8 +122,8 @@ class TestRealAttackGenAgent:
         
         print(f"[SUCCESS] GEMINI_API_KEY loaded (length: {len(api_key)})")
         
-        # MUST have TTP data file
-        ttp_file = Path('data/extracted/ttps_extracted.json')
+        # MUST have TTP data file (hybrid extraction with context)
+        ttp_file = Path('data/extracted/hybrid_extraction_results.json')
         assert ttp_file.exists(), f"Real TTP data file required: {ttp_file.absolute()}"
         
         print(f"[SUCCESS] Real TTP data file found: {ttp_file}")

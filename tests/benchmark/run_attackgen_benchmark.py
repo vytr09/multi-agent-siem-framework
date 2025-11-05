@@ -78,16 +78,16 @@ async def run_benchmark():
     # Load AttackGen results
     project_root = Path(__file__).resolve().parents[2]
     
-    # Use test sample by default (faster), or full results if specified
-    use_full_results = os.getenv("USE_FULL_RESULTS", "false").lower() == "true"
+    # Use real results by default (now small with hybrid extraction), or test sample if specified
+    use_test_sample = os.getenv("USE_TEST_SAMPLE", "false").lower() == "true"
     
-    if use_full_results:
-        results_path = project_root / "data" / "attackgen" / "real_attackgen_results.json"
-        print("\n[FILE] Using FULL results file (15 commands)")
-    else:
+    if use_test_sample:
         results_path = project_root / "data" / "attackgen" / "test_sample.json"
-        print("\n[FILE] Using TEST SAMPLE file (3 commands)")
-        print("   [TIP] Set USE_FULL_RESULTS=true to evaluate all commands")
+        print("\n[FILE] Using TEST SAMPLE file")
+    else:
+        results_path = project_root / "data" / "attackgen" / "real_attackgen_results.json"
+        print("\n[FILE] Using REAL results file (generated from hybrid extraction)")
+        print("   [TIP] Set USE_TEST_SAMPLE=true to use the minimal test sample instead")
     
     if not results_path.exists():
         print(f"\n[ERROR] AttackGen results not found at {results_path}")
