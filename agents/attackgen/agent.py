@@ -440,26 +440,19 @@ Generate commands for {technique_name} on {platform}:"""
             r'```json\s*\n(.*?)\n```',
             r'```\s*\n(.*?)\n```',
             r'```json(.*?)```',
-            r'```(.*?)```'
+            r'```(.*?)```',
+            r'\{.*\}'  # JSON object
         ]
         
         for pattern in patterns:
             match = re.search(pattern, response, re.DOTALL)
             if match:
-                return match.group(1).strip()
-        
-        # Try to find JSON object
-        json_pattern = r'\{.*\}'
-        match = re.search(json_pattern, response, re.DOTALL)
-        if match:
-            return match.group(0)
+                return match.group(1).strip() if match.lastindex else match.group(0)
         
         return response.strip()
     
     def _fix_command_structure(self, cmd: Dict[str, Any]) -> Dict[str, Any]:
         """Fix and validate command structure"""
-        
-        # Required fields with defaults
         required_fields = {
             'name': 'Generated Command',
             'command': 'echo "test command"',
@@ -474,7 +467,6 @@ Generate commands for {technique_name} on {platform}:"""
             if field not in cmd or cmd[field] is None:
                 cmd[field] = default
             elif field in ['indicators', 'prerequisites'] and isinstance(cmd[field], str):
-                # Convert string to list for array fields
                 cmd[field] = [cmd[field]]
         
         return cmd
@@ -514,7 +506,12 @@ Generate commands for {technique_name} on {platform}:"""
                 'agent_id': self.id,
                 'confidence_score': ttp.get('confidence_score', 0.5),
                 'safety_level': self.safety_level,
-                'validated': True
+                'validated': True,
+                'metadata': {
+                    'threat_actor': ttp.get('context', {}).get('threat_actor'),
+                    'campaign': ttp.get('context', {}).get('campaign'),
+                    'malware_used': ttp.get('context', {}).get('malware_used', [])
+                }
             }
             
             # Update statistics
@@ -530,7 +527,6 @@ Generate commands for {technique_name} on {platform}:"""
     
     async def get_statistics(self) -> Dict[str, Any]:
         """Get agent statistics"""
-        
         success_rate = (
             (self.stats['successful_generations'] / max(self.stats['total_ttps_processed'], 1)) * 100
         )
@@ -554,7 +550,7 @@ Generate commands for {technique_name} on {platform}:"""
             },
             'statistics': self.stats,
             'performance': {
-                'success_rate': success_rate,
+                'success_rate': round(success_rate, 2),
                 'avg_generation_time_ms': self.stats['avg_generation_time_ms']
             }
         }
