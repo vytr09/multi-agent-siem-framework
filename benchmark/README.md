@@ -1,14 +1,14 @@
-# 🎯 Benchmark Framework - Complete Guide
+# Benchmark Framework - Complete Guide
 
 LLM-as-Judge evaluation framework for Multi-Agent SIEM outputs, inspired by academic research (CyberPal paper).
 
 **Status:**
-- ✅ **AttackGen Benchmark** - Fully implemented
-- ✅ **RuleGen Benchmark** - Fully implemented
+- **AttackGen Benchmark** - Fully implemented
+- **RuleGen Benchmark** - Fully implemented
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 1. [Quick Start](#-quick-start)
 2. [Overview](#-overview)
@@ -22,7 +22,7 @@ LLM-as-Judge evaluation framework for Multi-Agent SIEM outputs, inspired by acad
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Setup
 
@@ -75,7 +75,7 @@ python test_rulegen_benchmark.py
 
 ---
 
-## 📊 Overview
+## Overview
 
 This benchmark framework evaluates agent-generated outputs across multiple dimensions:
 
@@ -96,17 +96,17 @@ This benchmark framework evaluates agent-generated outputs across multiple dimen
 
 ### Key Features
 
-✅ **Hybrid Evaluation**: Combines LLM-as-Judge with rule-based checks  
-✅ **Multi-Dimensional**: 11 metrics (AttackGen) + 15 metrics (RuleGen)  
-✅ **Detailed Feedback**: Explanations, strengths, weaknesses  
-✅ **Confidence Scoring**: Reliability indicators  
-✅ **Comparative Analysis**: Side-by-side comparison  
-✅ **Export & Analytics**: JSON export with statistics  
-✅ **Actionable Recommendations**: Improvement suggestions for RuleGen
+- **Hybrid Evaluation**: Combines LLM-as-Judge with rule-based checks
+- **Multi-Dimensional**: 11 metrics (AttackGen) + 15 metrics (RuleGen)
+- **Detailed Feedback**: Explanations, strengths, weaknesses
+- **Confidence Scoring**: Reliability indicators
+- **Comparative Analysis**: Side-by-side comparison
+- **Export & Analytics**: JSON export with statistics
+- **Actionable Recommendations**: Improvement suggestions for RuleGen
 
 ---
 
-## 🗂️ Architecture
+## Architecture
 
 ```
 benchmark/
@@ -156,7 +156,7 @@ data/
 
 ---
 
-## 📊 Evaluation Metrics
+## Evaluation Metrics
 
 ### AttackGen Metrics (11 Total)
 
@@ -211,7 +211,7 @@ data/
 
 ---
 
-## 💻 Usage Examples
+## Usage Examples
 
 ### Example 1: Quick AttackGen Test
 
@@ -361,7 +361,7 @@ asyncio.run(batch_evaluate())
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### Basic Configuration (AttackGen)
 
@@ -426,23 +426,23 @@ See `config/benchmark_config.yaml` for full options:
 
 ---
 
-## 📈 Output Format
+## Output Format
 
 ### Console Output (AttackGen)
 
 ```
-🎯 ATTACKGEN AGENT BENCHMARK
+ATTACKGEN AGENT BENCHMARK
 ================================================================================
 
-📂 Using TEST SAMPLE file (3 commands)
-✅ Loaded 3 commands
+Using TEST SAMPLE file (3 commands)
+Loaded 3 commands
 
-🚀 Evaluating 3 commands...
+Evaluating 3 commands...
 
 [1/3] Mimikatz - Dump LSASS Credentials (Simulated)
-✅ Overall Score: 0.891
+Overall Score: 0.891
 
-   📈 Results:
+   Results:
       Overall Score: 0.891
       Category Scores:
          • correctness: 0.840
@@ -451,7 +451,7 @@ See `config/benchmark_config.yaml` for full options:
          • realism: 0.800
          • detectability: 0.880
 
-📊 BENCHMARK STATISTICS
+BENCHMARK STATISTICS
 Total Evaluations: 3
 Average Score: 0.842
 
@@ -462,52 +462,52 @@ Category Averages:
    • detectability: 0.760
    • realism: 0.700
 
-🏆 TOP PERFORMERS:
+TOP PERFORMERS:
 1. OS Credential Dumping - Score: 0.891
 ```
 
 ### Console Output (RuleGen)
 
 ```
-🎯 RULEGEN BENCHMARK EVALUATION
+RULEGEN BENCHMARK EVALUATION
 ================================================================================
 
-📂 Loading RuleGen output: data/generated_rules/rulegen_llm_output.json
+Loading RuleGen output: data/generated_rules/rulegen_llm_output.json
    Found 3 rules to evaluate
 
-🔧 Initializing RuleGen Benchmark...
-   ✓ Initialized with 15 metrics
-   ✓ LLM Judge: Enabled
+Initializing RuleGen Benchmark...
+   - Initialized with 15 metrics
+   - LLM Judge: Enabled
 
-🚀 Starting evaluation...
+Starting evaluation...
 
-📊 EVALUATION RESULTS
+EVALUATION RESULTS
 ================================================================================
 
-📈 Overall Statistics:
+Overall Statistics:
    Total Evaluations:     3
    Average Score:         0.886/1.0 (Good)
 
-📊 Category Averages:
-   correctness          0.954 [████████████████████████████████████████]
-   quality              0.300 [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░]
+Category Averages:
+   correctness          0.954 
+   quality              0.300 
 
-🎯 Metric Averages (Top 10):
-   sigma_completeness              1.000 [████████████████████████████████████████]
-   platform_syntax_correctness     1.000 [████████████████████████████████████████]
-   detection_logic_correctness     0.800 [████████████████████████████████░░░░░░░░]
-   metadata_richness               0.300 [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░]
+Metric Averages (Top 10):
+   sigma_completeness              1.000 
+   platform_syntax_correctness     1.000 
+   detection_logic_correctness     0.800 
+   metadata_richness               0.300 
 
-🏆 Top 3 Rules:
+Top 3 Rules:
    1. T1059.001     Score: 0.886 - PowerShell
    2. T1003         Score: 0.886 - OS Credential Dumping
    3. T1566.001     Score: 0.886 - Spearphishing Attachment
 
-⚠️  Bottom 3 Rules (Need Improvement):
+Bottom 3 Rules (Need Improvement):
    (All rules scored in Good range)
 
-✅ BENCHMARK COMPLETE
-📁 Detailed results saved to: data/benchmark/rulegen_benchmark_results.json
+BENCHMARK COMPLETE
+Detailed results saved to: data/benchmark/rulegen_benchmark_results.json
 ```
 
 ### JSON Export (AttackGen)
@@ -579,7 +579,7 @@ Category Averages:
 
 ---
 
-## 🔬 Advanced Features
+## Advanced Features
 
 ### Comparative Evaluation
 
@@ -643,7 +643,7 @@ for rec in recommendations:
 
 ---
 
-## 📖 Evaluation Methodology
+## Evaluation Methodology
 
 ### Hybrid Approach
 
@@ -702,7 +702,7 @@ Provide:
 
 ---
 
-## 🛠 Troubleshooting
+## Troubleshooting
 
 ### "GEMINI_API_KEY not set"
 
@@ -769,7 +769,7 @@ python debug_paths.py
 
 ---
 
-## 📚 API Reference
+## API Reference
 
 ### AttackGenBenchmark
 
@@ -834,7 +834,7 @@ class RuleGenBenchmark(BaseBenchmark):
 
 ---
 
-## 🔮 Future Work
+## Future Work
 
 ### Planned Features
 
@@ -852,7 +852,7 @@ class RuleGenBenchmark(BaseBenchmark):
 
 ---
 
-## 📖 References
+## References
 
 **Methodology inspired by:**
 - CyberPal Paper: LLM-as-Judge for cybersecurity evaluation
@@ -869,7 +869,7 @@ class RuleGenBenchmark(BaseBenchmark):
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 ### To add new AttackGen metrics:
 
@@ -890,7 +890,7 @@ class RuleGenBenchmark(BaseBenchmark):
 
 ---
 
-## 📄 License
+## License
 
 Part of Multi-Agent SIEM Framework project.
 
