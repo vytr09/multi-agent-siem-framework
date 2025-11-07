@@ -3,6 +3,9 @@ Run RuleGen Benchmark Evaluation
 Usage: python tests/benchmark/test_rulegen_benchmark.py
 """
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import asyncio
 import json
 import os

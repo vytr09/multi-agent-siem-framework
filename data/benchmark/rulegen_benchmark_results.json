@@ -1,6 +1,6 @@
 {
-  "benchmark_id": "0a0a73cd-fcd2-49d5-816b-28263892d813",
-  "timestamp": "2025-11-04T14:50:09.991236",
+  "benchmark_id": "878c75ae-8407-4b96-8f03-0539de01cbd3",
+  "timestamp": "2025-11-07T04:04:17.202265",
   "config": {
     "platforms": [
       "splunk",
@@ -10,8 +10,8 @@
     "evaluate_platforms": true,
     "syntactic_validation": true,
     "llm_judge": {
-      "enabled": false,
-      "api_key": null,
+      "enabled": true,
+      "api_key": "AIzaSyCTM_SkYvmRfxknUV87vlUKRREZEYHskaY",
       "model": "gemini-2.0-flash-lite",
       "temperature": 0.3,
       "max_tokens": 2000,
@@ -22,83 +22,397 @@
   },
   "statistics": {
     "total_evaluations": 3,
-    "average_score": 0.8862068965517244,
+    "average_score": 0.6648550724637682,
     "category_averages": {
-      "correctness": 0.9538461538461539,
-      "quality": 0.3
+      "correctness": 0.888235294117647,
+      "quality": 0.49019607843137253,
+      "effectiveness": 0.4977777777777777,
+      "realism": 0.7137254901960784,
+      "detectability": 0.337037037037037
     },
     "metric_averages": {
-      "sigma_completeness": 1.0,
-      "detection_logic_correctness": 0.8000000000000002,
-      "metadata_richness": 0.3,
-      "platform_syntax_correctness": 1.0
+      "sigma_completeness": 0.9,
+      "detection_logic_correctness": 0.5666666666666667,
+      "detection_specificity": 0.43333333333333335,
+      "detection_sensitivity": 0.3666666666666667,
+      "metadata_richness": 0.6999999999999998,
+      "optimization_level": 0.6,
+      "attack_coverage": 0.5,
+      "false_positive_resistance": 0.4666666666666666,
+      "contextual_awareness": 0.5333333333333333,
+      "operational_deployability": 0.6666666666666666,
+      "analyst_actionability": 0.6333333333333333,
+      "evasion_resistance": 0.3666666666666667,
+      "multi_stage_detection": 0.3,
+      "platform_syntax_correctness": 1.0,
+      "field_mapping_accuracy": 0.9,
+      "performance_efficiency": 0.7833333333333333
     },
     "score_distribution": {
       "excellent (>=0.9)": 0,
-      "good (0.8-0.9)": 3,
+      "good (0.8-0.9)": 0,
       "fair (0.7-0.8)": 0,
-      "poor (0.6-0.7)": 0,
+      "poor (0.6-0.7)": 3,
       "failing (<0.6)": 0
     }
   },
   "results": [
     {
-      "benchmark_id": "0a0a73cd-fcd2-49d5-816b-28263892d813",
+      "benchmark_id": "878c75ae-8407-4b96-8f03-0539de01cbd3",
       "item_id": "322a3743-29d8-4723-9e6c-71de3056c921",
       "item_type": "detection_rule",
-      "overall_score": 0.8862068965517242,
+      "overall_score": 0.6923913043478261,
       "category_scores": {
-        "correctness": 0.9538461538461539,
-        "quality": 0.3
+        "correctness": 0.8941176470588235,
+        "quality": 0.5235294117647058,
+        "effectiveness": 0.5666666666666667,
+        "realism": 0.7470588235294118,
+        "detectability": 0.35555555555555557
       },
       "metric_results": [
         {
           "metric_name": "sigma_completeness",
-          "score": 10.0,
-          "normalized_score": 1.0,
-          "explanation": "12/12 required fields present",
-          "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The rule is almost complete, adhering to the required Sigma fields. All fields are populated with meaningful content. The only minor improvement would be adding a 'status' field that is more descriptive than 'experimental'.",
+          "confidence": 0.95,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "All required Sigma fields are present.",
+              "Fields are populated with relevant information."
+            ],
+            "weaknesses": [
+              "The 'status' field could be more descriptive."
+            ]
+          }
         },
         {
           "metric_name": "detection_logic_correctness",
-          "score": 8,
-          "normalized_score": 0.8,
-          "explanation": "Selection: True, Condition: True, Filter: False",
-          "confidence": 0.7,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The detection logic correctly targets PowerShell execution. However, it's limited by only checking the image name. While it includes some common malicious tools (Cobalt Strike, Empire), it's missing crucial elements like command-line arguments and parent process analysis, which are vital for accurate detection and reducing false positives. The condition is simple and correct, but the selection criteria are too narrow.",
+          "confidence": 0.75,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Correctly identifies PowerShell execution as the target.",
+              "Uses standard Sigma field names."
+            ],
+            "weaknesses": [
+              "Selection criteria are too limited (only image name).",
+              "Lacks command-line and parent process analysis."
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule's specificity is low. Focusing solely on the image name of PowerShell.exe, Cobalt Strike.exe, and Empire.exe will generate many false positives. It doesn't consider command-line arguments, parent process, or other contextual information to differentiate malicious activity from legitimate use. The inclusion of 'Cobalt Strike.exe' and 'Empire.exe' is a good start, but it needs to be expanded to include more indicators and filtering.",
+          "confidence": 0.65,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Includes some known malicious tool names."
+            ],
+            "weaknesses": [
+              "Overly broad, likely to generate many false positives.",
+              "Lacks filtering to exclude benign activity."
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule's sensitivity is low. It will miss many attack variations. Attackers can easily bypass this rule by renaming the PowerShell executable, obfuscating the command-line arguments, or using a different tool. It doesn't account for encoded commands or other common evasion techniques. The inclusion of 'PowerShell.exe' is good, but the lack of command-line analysis makes it easily bypassed.",
+          "confidence": 0.6,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Detects execution of PowerShell.exe."
+            ],
+            "weaknesses": [
+              "Easily bypassed by renaming or obfuscation.",
+              "Doesn't account for encoded commands or other common evasion techniques."
+            ]
+          }
         },
         {
           "metric_name": "metadata_richness",
-          "score": 3,
-          "normalized_score": 0.3,
-          "explanation": "Threat actor: False, Tools: False, Campaign: False, Refs: True",
-          "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule includes MITRE ATT&CK tags, a reference, and a description. It lacks threat actor information, campaign names, and specific tool/malware family details beyond the generic 'Cobalt Strike' and 'Empire'. The description is adequate but could be more specific about the malicious behavior.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags and a reference.",
+              "Provides a clear description of the detection."
+            ],
+            "weaknesses": [
+              "Lacks threat actor, campaign, and specific malware/tool information.",
+              "Description could be more detailed about malicious behavior."
+            ]
+          }
         },
         {
-          "metric_name": "platform_syntax_correctness",
-          "score": 10.0,
-          "normalized_score": 1.0,
-          "explanation": "[SPLUNK] Validated: True",
+          "metric_name": "optimization_level",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule uses 'endswith' which is generally acceptable. However, it relies solely on 'Image' which is a good start, but could benefit from including other fields like 'CommandLine' for more specific filtering. The logsource is specific to process creation, which is good. No leading wildcards are present.",
           "confidence": 0.8,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:01:30.760784",
           "metadata": {
-            "platform": "splunk"
+            "strengths": [
+              "Uses 'endswith' operator appropriately.",
+              "Specific log source (process_creation)."
+            ],
+            "weaknesses": [
+              "Relies solely on 'Image' field; could benefit from including 'CommandLine'.",
+              "No optimization for performance beyond basic field selection."
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule detects PowerShell execution, including common tools like Cobalt Strike and Empire. However, it's limited to detecting the execution of these tools and does not cover the diverse ways PowerShell can be used maliciously (e.g., obfuscation, script execution from the internet, etc.). It doesn't consider follow-on actions or advanced techniques.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Detects execution of known malicious tools (Cobalt Strike, Empire).",
+              "Covers the basic execution of PowerShell."
+            ],
+            "weaknesses": [
+              "Limited to specific tools; doesn't cover broader PowerShell abuse.",
+              "Doesn't address obfuscation or other advanced techniques.",
+              "Doesn't consider follow-on actions."
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes 'falsepositives' which is a good start. However, the rule's reliance on 'Image|endswith' makes it susceptible to false positives. It doesn't include any filtering for legitimate paths or processes. The 'falsepositives' section is generic and not specific enough.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Includes a 'falsepositives' section."
+            ],
+            "weaknesses": [
+              "High potential for false positives due to broad matching.",
+              "Lacks filtering for legitimate paths or processes.",
+              "False positive guidance is generic."
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some contextual awareness by targeting PowerShell execution, a common TTP. It references MITRE ATT&CK and includes specific tools like Cobalt Strike and Empire. However, it lacks deeper context like specific campaign or APT group references, and the detection logic is relatively basic, making it less attuned to the nuances of real-world PowerShell usage.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Targets a relevant TTP (PowerShell execution).",
+              "References MITRE ATT&CK and includes tool names."
+            ],
+            "weaknesses": [
+              "Lacks specific campaign or APT group context.",
+              "Detection logic is relatively basic and could miss sophisticated attacks."
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule is likely deployable. It has a clear log source and a straightforward detection condition. The severity level is appropriate, and the rule is tagged with relevant MITRE ATT&CK IDs. However, the 'experimental' status suggests it hasn't been fully tested in a production environment, and the false positive rate isn't explicitly addressed beyond a general statement.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Clear log source and detection logic.",
+              "Appropriate severity level and tagging."
+            ],
+            "weaknesses": [
+              "Marked as 'experimental', indicating a lack of production testing.",
+              "False positive rate is only addressed generally."
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule's title and description are clear and concise. The inclusion of tool names provides context for investigation. The 'process_creation' log source suggests useful fields for pivoting. The references to MITRE ATT&CK can guide further investigation. However, the rule could benefit from more specific guidance on false positives and recommended actions.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Clear title and description.",
+              "Includes tool names for context.",
+              "References MITRE ATT&CK for guidance."
+            ],
+            "weaknesses": [
+              "Lacks specific false positive guidance.",
+              "Could benefit from more detailed recommended actions."
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule is vulnerable to evasion. It relies on `Image|endswith`, which can be easily bypassed by renaming the executables. It doesn't consider obfuscation techniques or command-line arguments. It is not robust against LOLBin usage. The detection is based on static indicators.",
+          "confidence": 0.6,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Detects execution of known malicious tools."
+            ],
+            "weaknesses": [
+              "Relies on easily bypassed indicators (executable names).",
+              "Doesn't consider obfuscation or command-line arguments.",
+              "Not robust against LOLBin usage."
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The rule primarily focuses on the initial execution stage by identifying PowerShell and known malicious tools. It doesn't inherently detect persistence, lateral movement, or post-exploitation activities. The single-event focus limits its ability to understand the full attack sequence.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:01:30.760784",
+          "metadata": {
+            "strengths": [
+              "Detects initial execution of PowerShell and related tools.",
+              "Uses a relevant log source (process creation)."
+            ],
+            "weaknesses": [
+              "Lacks detection capabilities for later stages of an attack.",
+              "Limited correlation across multiple events."
+            ]
           }
         },
         {
           "metric_name": "platform_syntax_correctness",
-          "score": 10.0,
+          "score": 10,
           "normalized_score": 1.0,
-          "explanation": "[ELASTICSEARCH] Validated: True",
-          "confidence": 0.8,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "explanation": "[SPLUNK] The query uses correct Splunk Search Processing Language (SPL) syntax. It correctly uses pipes, field=value filtering, wildcards, and the table command for output. There are no apparent syntax errors.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T04:01:35.317607",
           "metadata": {
-            "platform": "elasticsearch"
+            "platform": "splunk",
+            "strengths": [
+              "Correct use of pipes and operators.",
+              "Proper use of wildcard characters for pattern matching.",
+              "Valid field names and functions."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ]
+          }
+        },
+        {
+          "metric_name": "field_mapping_accuracy",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "[SPLUNK] The query correctly maps Sigma rule fields to Splunk fields. `process_name` and `CommandLine` are standard fields in Windows Security event logs. The use of `EventCode=4688` is also correct for process creation events. The query effectively translates the Sigma rule's intent.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:01:35.317607",
+          "metadata": {
+            "platform": "splunk",
+            "strengths": [
+              "Correct mapping of `process_name` and `CommandLine`.",
+              "Uses the appropriate `EventCode` for process creation events.",
+              "Accurately reflects the Sigma rule's logic."
+            ],
+            "weaknesses": [
+              "Could benefit from including `Image` field for more precise matching, although the current approach is functional."
+            ]
+          }
+        },
+        {
+          "metric_name": "performance_efficiency",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "[SPLUNK] The query is reasonably efficient. It starts with index and sourcetype to narrow the search scope. Filtering on `EventCode` is a good practice. However, the use of leading wildcards in `process_name` could impact performance, although the impact is likely minimal given the limited number of values being checked.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:01:35.317607",
+          "metadata": {
+            "platform": "splunk",
+            "strengths": [
+              "Uses `index` and `sourcetype` for initial filtering.",
+              "Filters on `EventCode` early in the query.",
+              "The number of values being checked is limited."
+            ],
+            "weaknesses": [
+              "Uses leading wildcards in `process_name`, which can be less efficient.",
+              "Could benefit from specifying a time range."
+            ]
+          }
+        },
+        {
+          "metric_name": "platform_syntax_correctness",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "[ELASTICSEARCH] The query uses correct Elasticsearch KQL syntax. It employs field:value notation, boolean operators (AND, OR), wildcards (*), and parentheses for grouping, all of which are valid in Elasticsearch.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T04:01:39.529604",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Correct use of field:value pairs.",
+              "Proper use of boolean operators and parentheses."
+            ],
+            "weaknesses": [
+              "None identified."
+            ]
+          }
+        },
+        {
+          "metric_name": "field_mapping_accuracy",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "[ELASTICSEARCH] The query correctly maps Sigma's `process.executable` to Elasticsearch's `process.executable`. The use of `event.category` and `event.action` are also standard and expected. However, the query relies on `process.executable` which might not always be populated or reliable, depending on the logging configuration.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:01:39.529604",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Uses the correct field for process executable.",
+              "Uses standard fields for event categorization."
+            ],
+            "weaknesses": [
+              "Reliance on `process.executable` could lead to false negatives if the field isn't consistently populated."
+            ]
+          }
+        },
+        {
+          "metric_name": "performance_efficiency",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "[ELASTICSEARCH] The query is reasonably efficient. It uses indexed fields (`event.category`, `event.action`, and likely `process.executable`). The use of `*` at the end of the string is generally acceptable. However, it could be improved by adding a time range filter to limit the data scanned.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:01:39.529604",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Uses indexed fields.",
+              "Uses trailing wildcards which are generally more efficient than leading wildcards."
+            ],
+            "weaknesses": [
+              "Lacks a time range filter, which could impact performance on large datasets."
+            ]
           }
         },
         {
@@ -107,7 +421,7 @@
           "normalized_score": 1.0,
           "explanation": "SPLUNK query passed validation",
           "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:01:39.529604",
           "metadata": {
             "platform": "splunk",
             "validation": "syntactic"
@@ -119,15 +433,15 @@
           "normalized_score": 1.0,
           "explanation": "ELASTICSEARCH query passed validation",
           "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:01:39.529604",
           "metadata": {
             "platform": "elasticsearch",
             "validation": "syntactic"
           }
         }
       ],
-      "summary": "Rule for T1059.001 (PowerShell) scored 0.89/1.0 (Good). Best performance in correctness (0.95). Needs improvement in quality (0.30). Issues found in: metadata_richness",
-      "timestamp": "2025-11-04T14:50:09.985007",
+      "summary": "Rule for T1059.001 (PowerShell) scored 0.69/1.0 (Below Average). Best performance in correctness (0.89). Needs improvement in detectability (0.36). Issues found in: detection_specificity, detection_sensitivity, false_positive_resistance",
+      "timestamp": "2025-11-07T04:01:39.529604",
       "metadata": {
         "attack_id": "T1059.001",
         "technique_name": "PowerShell",
@@ -140,62 +454,356 @@
       }
     },
     {
-      "benchmark_id": "0a0a73cd-fcd2-49d5-816b-28263892d813",
+      "benchmark_id": "878c75ae-8407-4b96-8f03-0539de01cbd3",
       "item_id": "9700061c-8d79-4ef2-acb2-97524c0789f4",
       "item_type": "detection_rule",
-      "overall_score": 0.8862068965517242,
+      "overall_score": 0.6728260869565218,
       "category_scores": {
-        "correctness": 0.9538461538461539,
-        "quality": 0.3
+        "correctness": 0.8941176470588235,
+        "quality": 0.4882352941176471,
+        "effectiveness": 0.4866666666666667,
+        "realism": 0.7470588235294118,
+        "detectability": 0.35555555555555557
       },
       "metric_results": [
         {
           "metric_name": "sigma_completeness",
-          "score": 10.0,
-          "normalized_score": 1.0,
-          "explanation": "12/12 required fields present",
-          "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The rule is well-structured and includes all required Sigma fields. All fields are populated with meaningful content, including references, tags, and a description. The metadata section provides additional context and optimization details.",
+          "confidence": 0.95,
+          "timestamp": "2025-11-07T04:03:35.903968",
+          "metadata": {
+            "strengths": [
+              "Complete set of required fields.",
+              "Meaningful content in each field."
+            ],
+            "weaknesses": [
+              "Could benefit from a more detailed description of the detection logic."
+            ]
+          }
         },
         {
           "metric_name": "detection_logic_correctness",
-          "score": 8,
-          "normalized_score": 0.8,
-          "explanation": "Selection: True, Condition: True, Filter: False",
-          "confidence": 0.7,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The detection logic correctly targets Mimikatz, a common tool for credential dumping. However, relying solely on 'Image|endswith: mimikatz.exe' is prone to evasion through renaming. The condition logic is straightforward. While it identifies the TTP, it's not robust enough for real-world scenarios due to the ease of bypassing the detection.",
+          "confidence": 0.75,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Correctly identifies a key indicator of the TTP.",
+              "Uses standard Sigma field names."
+            ],
+            "weaknesses": [
+              "Highly susceptible to evasion (renaming the executable).",
+              "Lacks context like parent process or command-line arguments."
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule is not specific enough to minimize false positives. The single selection criterion is overly broad. While the 'falsepositives' section acknowledges legitimate administrative activity, the rule itself doesn't include any filters to exclude it. This will likely generate a high number of false positives in a production environment.",
+          "confidence": 0.65,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Identifies a specific tool (Mimikatz)."
+            ],
+            "weaknesses": [
+              "Lacks filters to exclude legitimate use.",
+              "Overly broad selection criteria."
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule has low sensitivity. It only detects Mimikatz by filename. Attackers can easily bypass this by renaming the executable or using other credential dumping tools. It doesn't consider variations like encoded commands or different paths. The rule is not designed to detect common evasion techniques.",
+          "confidence": 0.6,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Detects a common credential dumping tool."
+            ],
+            "weaknesses": [
+              "Easily bypassed by renaming the executable.",
+              "Doesn't account for other credential dumping tools.",
+              "Doesn't consider command-line arguments or other indicators."
+            ]
+          }
         },
         {
           "metric_name": "metadata_richness",
-          "score": 3,
-          "normalized_score": 0.3,
-          "explanation": "Threat actor: False, Tools: False, Campaign: False, Refs: True",
-          "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule includes MITRE ATT&CK tags, a clear description, and a reference to the MITRE ATT&CK website. However, it lacks information on potential threat actors, associated malware families, and specific campaign names. The metadata is good but could be more comprehensive for real-world threat hunting.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags (T1003, Credential Access)",
+              "Provides a clear description of the detection"
+            ],
+            "weaknesses": [
+              "Lacks threat actor attribution",
+              "Doesn't mention specific malware families or campaigns"
+            ]
+          }
         },
         {
-          "metric_name": "platform_syntax_correctness",
-          "score": 10.0,
-          "normalized_score": 1.0,
-          "explanation": "[SPLUNK] Validated: True",
+          "metric_name": "optimization_level",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule uses 'endswith' which is generally acceptable. The optimization notes mention normalization to lowercase, which is a good practice. However, it relies solely on the 'Image' field, which could be improved by including other fields like 'CommandLine' or 'ParentProcess' for better context and potentially filtering. The logsource is specific enough.",
           "confidence": 0.8,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:03:35.904934",
           "metadata": {
-            "platform": "splunk"
+            "strengths": [
+              "Uses 'endswith' operator (generally efficient)",
+              "Includes optimization notes (normalization)"
+            ],
+            "weaknesses": [
+              "Relies solely on 'Image' field; could benefit from additional fields",
+              "No mention of indexed fields being used first"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule detects Mimikatz, a common tool for credential dumping. However, it's limited to this single tool and doesn't cover other techniques or tools used for credential dumping, such as using PowerShell scripts, dumping SAM files, or using other credential dumping tools. It doesn't consider sub-techniques or multi-stage attacks.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Detects a common credential dumping tool (Mimikatz)"
+            ],
+            "weaknesses": [
+              "Doesn't cover other credential dumping techniques (e.g., PowerShell, SAM file dumping)",
+              "Doesn't consider sub-techniques or multi-stage attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule's primary weakness is its reliance on a single indicator (mimikatz.exe). While the 'falsepositives' section mentions legitimate administrative activity, the rule lacks specific exclusions for known legitimate processes or paths. This increases the likelihood of false positives. It doesn't use time-based or frequency-based logic.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Acknowledges potential false positives in the metadata"
+            ],
+            "weaknesses": [
+              "Lacks specific exclusions for legitimate processes or paths",
+              "Doesn't use time-based or frequency-based logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule correctly identifies a key TTP (T1003) associated with credential access. It uses the `mimikatz.exe` indicator, which is a common tool used by threat actors. However, it lacks specific campaign or threat actor context beyond the MITRE ATT&CK framework. It doesn't incorporate operational intelligence from threat reports.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Targets a relevant TTP (OS Credential Dumping)",
+              "Uses a known indicator (mimikatz.exe)"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign or threat actor context",
+              "Doesn't incorporate operational intelligence"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule is straightforward and likely deployable in a Windows environment. The log source (process creation) is common. The severity level (medium) is appropriate. The 'experimental' status suggests it may need further testing. The false positive guidance is a positive. However, the reliance on a single indicator (mimikatz.exe) could lead to false positives.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Simple and easy to understand",
+              "Uses a common log source"
+            ],
+            "weaknesses": [
+              "Relies on a single indicator, increasing false positive risk",
+              "Labeled as 'experimental' requiring further validation"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule title and description clearly indicate the detected activity. The detection logic focuses on a specific executable. The inclusion of the MITRE ATT&CK reference is helpful. The severity level is appropriate. The false positive guidance assists analysts. However, the rule could benefit from including more investigation fields (e.g., command line arguments).",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Clear title and description",
+              "Includes MITRE ATT&CK reference"
+            ],
+            "weaknesses": [
+              "Lacks detailed investigation fields (e.g., command line)",
+              "Could benefit from more specific remediation guidance"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule is vulnerable to evasion. It relies solely on the filename `mimikatz.exe`, which can be easily bypassed by renaming the executable. It doesn't consider other techniques like obfuscation or living-off-the-land binaries. The detection is based on a static indicator, making it less robust.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Detects a specific tool associated with credential dumping"
+            ],
+            "weaknesses": [
+              "Easily bypassed by renaming the executable",
+              "Doesn't account for obfuscation or LOLBins",
+              "Relies on a single, static indicator"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The rule focuses solely on the initial execution of Mimikatz. It does not address persistence, lateral movement, data exfiltration, or impact. It's a single-event detection, lacking attack sequence awareness.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:03:35.904934",
+          "metadata": {
+            "strengths": [
+              "Detects the initial execution of Mimikatz.",
+              "Simple and easy to understand."
+            ],
+            "weaknesses": [
+              "Doesn't cover other stages of the attack lifecycle.",
+              "High potential for evasion through renaming or obfuscation of Mimikatz."
+            ]
           }
         },
         {
           "metric_name": "platform_syntax_correctness",
-          "score": 10.0,
+          "score": 10,
           "normalized_score": 1.0,
-          "explanation": "[ELASTICSEARCH] Validated: True",
-          "confidence": 0.8,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "explanation": "[SPLUNK] The query uses correct Splunk Search Processing Language (SPL) syntax. It correctly uses pipes, field=value filtering, index and sourcetype specification, and wildcard matching. The table command is also correctly used for output.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T04:03:40.602395",
           "metadata": {
-            "platform": "elasticsearch"
+            "platform": "splunk",
+            "strengths": [
+              "Correct use of SPL syntax",
+              "Uses index and sourcetype for data source specification"
+            ],
+            "weaknesses": []
+          }
+        },
+        {
+          "metric_name": "field_mapping_accuracy",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "[SPLUNK] The query accurately maps Sigma rule fields to Splunk fields. `process_name` and `CommandLine` are standard fields in Windows Security event logs. The query correctly targets the `WinEventLog:Security` sourcetype and uses `EventCode=4688` which is the process creation event. The `dest_ip` and `dest_port` fields are less common in this context, but are included which is not incorrect.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:03:40.602395",
+          "metadata": {
+            "platform": "splunk",
+            "strengths": [
+              "Correct mapping of `process_name` and `CommandLine` to relevant fields",
+              "Uses the correct sourcetype and event code for process creation events"
+            ],
+            "weaknesses": [
+              "The inclusion of `dest_ip` and `dest_port` is not directly relevant to credential dumping detection and might be noise. However, it doesn't break the query."
+            ]
+          }
+        },
+        {
+          "metric_name": "performance_efficiency",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "[SPLUNK] The query is reasonably efficient. It starts with index and sourcetype to narrow the search scope. The `EventCode=4688` filter is also efficient. The use of a wildcard is acceptable in this case as it is at the end of the string. The query could be improved by adding a time range to limit the data scanned. The table command is efficient for displaying the results.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:03:40.602395",
+          "metadata": {
+            "platform": "splunk",
+            "strengths": [
+              "Uses index and sourcetype for initial filtering",
+              "Uses EventCode for efficient filtering"
+            ],
+            "weaknesses": [
+              "Missing time range specification",
+              "Could benefit from further optimization if performance becomes an issue"
+            ]
+          }
+        },
+        {
+          "metric_name": "platform_syntax_correctness",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "[ELASTICSEARCH] The query uses valid Elasticsearch KQL syntax. It correctly uses field:value notation, boolean operators, and wildcards. The parentheses are correctly used for grouping, and the quotes are used for exact phrase matching.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T04:03:45.025832",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Correct use of field:value notation.",
+              "Proper use of boolean operators (AND, OR).",
+              "Correct use of wildcards."
+            ],
+            "weaknesses": [
+              "None identified."
+            ]
+          }
+        },
+        {
+          "metric_name": "field_mapping_accuracy",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "[ELASTICSEARCH] The query uses fields that are generally available in Elasticsearch for process creation events. `event.category` and `event.action` are common fields. `process.executable` is also a standard field for the executable name. The query correctly maps the Sigma `Image|endswith` to `process.executable:*mimikatz.exe`. However, the exact field names and data types should be verified against the specific log source.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:03:45.025832",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Uses standard Elasticsearch fields for process events.",
+              "Correctly maps the Sigma rule's intent to Elasticsearch fields.",
+              "Uses wildcard for flexibility."
+            ],
+            "weaknesses": [
+              "Requires verification of field names and data types against the specific log source."
+            ]
+          }
+        },
+        {
+          "metric_name": "performance_efficiency",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "[ELASTICSEARCH] The query is reasonably efficient. It uses indexed fields (`event.category`, `event.action`, and likely `process.executable`). The wildcard is at the end, which is generally more efficient than a leading wildcard. The query is specific enough to avoid scanning a large volume of data, assuming the log source is properly configured. However, a time range should be added for optimal performance.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:03:45.025832",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Uses indexed fields.",
+              "Uses an ending wildcard which is more efficient.",
+              "Specific enough to narrow down the search."
+            ],
+            "weaknesses": [
+              "Could benefit from the addition of a time range filter."
+            ]
           }
         },
         {
@@ -204,7 +812,7 @@
           "normalized_score": 1.0,
           "explanation": "SPLUNK query passed validation",
           "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:03:45.025832",
           "metadata": {
             "platform": "splunk",
             "validation": "syntactic"
@@ -216,15 +824,15 @@
           "normalized_score": 1.0,
           "explanation": "ELASTICSEARCH query passed validation",
           "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:03:45.025832",
           "metadata": {
             "platform": "elasticsearch",
             "validation": "syntactic"
           }
         }
       ],
-      "summary": "Rule for T1003 (OS Credential Dumping) scored 0.89/1.0 (Good). Best performance in correctness (0.95). Needs improvement in quality (0.30). Issues found in: metadata_richness",
-      "timestamp": "2025-11-04T14:50:09.985007",
+      "summary": "Rule for T1003 (OS Credential Dumping) scored 0.67/1.0 (Below Average). Best performance in correctness (0.89). Needs improvement in detectability (0.36). Issues found in: detection_specificity, detection_sensitivity, attack_coverage",
+      "timestamp": "2025-11-07T04:03:45.025832",
       "metadata": {
         "attack_id": "T1003",
         "technique_name": "OS Credential Dumping",
@@ -237,62 +845,365 @@
       }
     },
     {
-      "benchmark_id": "0a0a73cd-fcd2-49d5-816b-28263892d813",
+      "benchmark_id": "878c75ae-8407-4b96-8f03-0539de01cbd3",
       "item_id": "e484a02c-0880-44eb-9209-bc6658f5259a",
       "item_type": "detection_rule",
-      "overall_score": 0.8862068965517242,
+      "overall_score": 0.6293478260869566,
       "category_scores": {
-        "correctness": 0.9538461538461539,
-        "quality": 0.3
+        "correctness": 0.8764705882352941,
+        "quality": 0.4588235294117647,
+        "effectiveness": 0.44,
+        "realism": 0.6470588235294118,
+        "detectability": 0.30000000000000004
       },
       "metric_results": [
         {
           "metric_name": "sigma_completeness",
-          "score": 10.0,
-          "normalized_score": 1.0,
-          "explanation": "12/12 required fields present",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The rule is almost complete, missing only the 'status' field. All other required fields are present and populated with relevant information. The use of MITRE ATT&CK tags and a clear description enhances its usability.",
           "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "All required Sigma fields are present and populated.",
+              "Includes MITRE ATT&CK tags and a descriptive title."
+            ],
+            "weaknesses": [
+              "Missing the 'status' field."
+            ]
+          }
         },
         {
           "metric_name": "detection_logic_correctness",
-          "score": 8,
-          "normalized_score": 0.8,
-          "explanation": "Selection: True, Condition: True, Filter: False",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The detection logic is partially correct. It attempts to identify malicious attachments by looking for process creation events related to 'Emotet.exe' and 'Microsoft Office.exe'. However, the logic is very basic and could easily be bypassed. It correctly uses standard Sigma fields.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Uses standard Sigma field names.",
+              "Attempts to detect a relevant TTP."
+            ],
+            "weaknesses": [
+              "Very basic and easily bypassed.",
+              "Relies solely on process name, which is easily changed."
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule lacks specificity. It uses `endswith` on the image name, which is too broad and prone to false positives. It doesn't include any filters to exclude legitimate Office processes or other benign activity. The inclusion of 'Emotet.exe' is a good start, but needs more context.",
           "confidence": 0.7,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Includes a specific indicator ('Emotet.exe')."
+            ],
+            "weaknesses": [
+              "Uses broad `endswith` matching.",
+              "Lacks filters to exclude legitimate activity.",
+              "Doesn't consider parent process or other context."
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The rule has low sensitivity. It only checks for the process name, making it vulnerable to simple evasion techniques like renaming the executable. It doesn't consider variations in command-line arguments, parent processes, or other indicators of compromise.",
+          "confidence": 0.6,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Detects a specific malicious process."
+            ],
+            "weaknesses": [
+              "Easily bypassed by renaming the executable.",
+              "Doesn't consider command-line arguments or other indicators.",
+              "Doesn't use wildcards or regex effectively."
+            ]
+          }
         },
         {
           "metric_name": "metadata_richness",
-          "score": 3,
-          "normalized_score": 0.3,
-          "explanation": "Threat actor: False, Tools: False, Campaign: False, Refs: True",
-          "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
-          "metadata": {}
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule includes MITRE ATT&CK tags, a description, and references. It also has a confidence score. However, it lacks threat actor information, campaign names, and detailed tool/malware family associations. The description is adequate but could be more specific about the malicious Office document aspect.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags and references.",
+              "Provides a clear description of the detection."
+            ],
+            "weaknesses": [
+              "Lacks threat actor and campaign information.",
+              "Could include more specific malware family details."
+            ]
+          }
         },
         {
-          "metric_name": "platform_syntax_correctness",
-          "score": 10.0,
-          "normalized_score": 1.0,
-          "explanation": "[SPLUNK] Validated: True",
+          "metric_name": "optimization_level",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule uses 'endswith' which is generally acceptable. However, the logsource is broad ('process_creation', 'windows') and could be more specific. The selection criteria are relatively simple. No leading wildcards are present. Further optimization could involve more specific filtering based on other process characteristics.",
           "confidence": 0.8,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:04:06.609671",
           "metadata": {
-            "platform": "splunk"
+            "strengths": [
+              "Uses 'endswith' operator appropriately.",
+              "Avoids leading wildcards."
+            ],
+            "weaknesses": [
+              "Logsource is not specific enough.",
+              "Could benefit from more restrictive filters."
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule detects malicious Office documents, which is a core aspect of spearphishing attachments. However, it's limited in scope. It only covers the execution of specific binaries ('Emotet.exe', 'Microsoft Office.exe'). It doesn't consider other file types, macro execution, or follow-on actions. It lacks coverage of different tools and frameworks used in spearphishing.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Addresses the core technique of spearphishing attachments."
+            ],
+            "weaknesses": [
+              "Limited to specific binaries.",
+              "Doesn't cover macro execution or follow-on actions.",
+              "Lacks coverage of different tools and frameworks."
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule's false positive resistance is weak. It only mentions 'Legitimate administrative activity' as a potential false positive. The rule doesn't include any specific exclusions or whitelisting. It's highly likely to generate false positives due to the broad nature of the 'Image|endswith' filter.",
+          "confidence": 0.6,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Acknowledges the potential for false positives."
+            ],
+            "weaknesses": [
+              "Lacks specific exclusions or whitelisting.",
+              "Highly susceptible to false positives."
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule attempts to detect spearphishing attachments by looking for process creation events related to Emotet or Microsoft Office. While it correctly identifies the initial access tactic, the detection logic is overly simplistic and lacks context. It doesn't consider the broader attack chain or specific threat actor behaviors beyond the attachment itself.",
+          "confidence": 0.6,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Identifies the correct MITRE ATT&CK technique (T1566.001)",
+              "Uses the correct log source (process creation)"
+            ],
+            "weaknesses": [
+              "Lacks specific threat actor targeting or campaign context.",
+              "Relies on a very basic indicator (process name) which is easily bypassed.",
+              "Doesn't consider the full attack chain (e.g., macro execution, network activity)."
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule is syntactically correct and uses a common log source (process creation). The severity level is appropriate. However, the detection logic is very basic and likely to generate false positives. The 'experimental' status indicates it hasn't been fully validated. The reliance on `endswith` for process names is also a weakness.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Uses a common and readily available log source.",
+              "The rule is syntactically correct and can be deployed.",
+              "Severity level is appropriate."
+            ],
+            "weaknesses": [
+              "High potential for false positives due to simplistic detection logic.",
+              "The 'experimental' status indicates a lack of validation.",
+              "Relies on `endswith` which is less specific than other options."
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule title and description are clear and concise. The detection logic provides some useful fields for investigation (process name). However, the lack of context and specific indicators limits the analyst's ability to pivot effectively. The false positive guidance is minimal. References are missing.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Clear and concise title and description.",
+              "Provides basic information for initial triage (process name)."
+            ],
+            "weaknesses": [
+              "Lacks detailed information for pivoting and investigation (e.g., parent process, command line).",
+              "Limited false positive guidance.",
+              "Missing references to further investigation steps."
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The rule is easily bypassed. Attackers can simply rename the executable or use different file names. The rule only looks for a specific process name. It doesn't consider behavior patterns or obfuscation techniques. It is not robust against LOLBin usage.",
+          "confidence": 0.6,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Detects process creation, which is a fundamental step in the attack."
+            ],
+            "weaknesses": [
+              "Highly susceptible to evasion through simple renaming.",
+              "Doesn't consider obfuscation or other evasion techniques.",
+              "Doesn't analyze behavior or relationships between processes."
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The rule primarily focuses on the initial execution stage by detecting process creation related to malicious attachments. It doesn't inherently detect persistence, lateral movement, data collection, or impact. The single-event detection approach lacks attack sequence awareness.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:04:06.609671",
+          "metadata": {
+            "strengths": [
+              "Detects initial execution attempts.",
+              "Uses a relevant log source (process creation)."
+            ],
+            "weaknesses": [
+              "Limited to a single stage of the attack.",
+              "Lacks correlation capabilities across multiple events.",
+              "Doesn't address post-exploitation activities."
+            ]
           }
         },
         {
           "metric_name": "platform_syntax_correctness",
-          "score": 10.0,
+          "score": 10,
           "normalized_score": 1.0,
-          "explanation": "[ELASTICSEARCH] Validated: True",
-          "confidence": 0.8,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "explanation": "[SPLUNK] The query uses correct Splunk Search Processing Language (SPL) syntax. It correctly uses pipes, field=value filtering, index and sourcetype specification, and wildcard matching. The table command is also correctly used for output.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T04:04:12.003997",
           "metadata": {
-            "platform": "elasticsearch"
+            "platform": "splunk",
+            "strengths": [
+              "Correct use of index and sourcetype for data source.",
+              "Valid use of boolean operators (OR, AND) and wildcards."
+            ],
+            "weaknesses": [
+              "None identified."
+            ]
+          }
+        },
+        {
+          "metric_name": "field_mapping_accuracy",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "[SPLUNK] The query accurately maps Sigma fields to Splunk fields. `process_name` and `CommandLine` are standard fields in Windows Security Event logs (EventCode 4688). The query also attempts to extract `dest_ip` and `dest_port` which may not always be available in the process creation event, but are useful if present. The use of `EventCode=4688` is correct for process creation events.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:04:12.005039",
+          "metadata": {
+            "platform": "splunk",
+            "strengths": [
+              "Correct mapping of `process_name` and `CommandLine`.",
+              "Uses `EventCode=4688` for process creation events."
+            ],
+            "weaknesses": [
+              "The query doesn't explicitly check for the presence of `dest_ip` and `dest_port`, which may lead to incomplete results if those fields are not populated in the logs. This could be improved by checking if those fields exist before displaying them in the table."
+            ]
+          }
+        },
+        {
+          "metric_name": "performance_efficiency",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "[SPLUNK] The query is reasonably efficient. It starts with index and sourcetype to narrow the search. Filtering on `EventCode` is efficient. Using wildcards at the end of the process name is generally acceptable. However, the lack of a time range could lead to performance issues if the index is large. The use of OR is generally efficient.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:04:12.005039",
+          "metadata": {
+            "platform": "splunk",
+            "strengths": [
+              "Uses index and sourcetype for initial filtering.",
+              "Filters on `EventCode` which is indexed."
+            ],
+            "weaknesses": [
+              "No time range specified, which could lead to performance issues.",
+              "While not inherently bad, the use of OR can sometimes be less efficient than other approaches, especially with a large number of potential values."
+            ]
+          }
+        },
+        {
+          "metric_name": "platform_syntax_correctness",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "[ELASTICSEARCH] The query uses correct Elasticsearch KQL syntax. It correctly uses field:value notation, boolean operators (AND, OR), wildcards (*), and parentheses for grouping. The use of quotes for exact phrase matching is also correct.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T04:04:17.195257",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Correct use of field:value notation.",
+              "Proper use of boolean operators and parentheses.",
+              "Valid use of wildcards for pattern matching."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ]
+          }
+        },
+        {
+          "metric_name": "field_mapping_accuracy",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "[ELASTICSEARCH] The query appears to correctly map Sigma fields to Elasticsearch. `event.category` and `event.action` are common and likely correctly mapped. `process.executable` is also a standard field. The use of `*Emotet.exe` and `*Microsoft Office.exe` suggests the intention is to match on the executable name, which is appropriate.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T04:04:17.195257",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Uses standard Elasticsearch field names (event.category, event.action, process.executable).",
+              "The use of wildcards is appropriate for the intended detection logic."
+            ],
+            "weaknesses": [
+              "Could benefit from explicitly stating the expected field mapping for the executable name (e.g., process.name or process.executable.name).",
+              "The query could be improved by adding a check for the parent process to further refine the detection."
+            ]
+          }
+        },
+        {
+          "metric_name": "performance_efficiency",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "[ELASTICSEARCH] The query is reasonably efficient. It starts with a category and action filter, which should be indexed. The use of wildcards is generally acceptable in this context, as it's likely searching for specific executable names. However, the query could be improved by using exact matches where possible and by adding more specific filters to reduce the search space.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T04:04:17.195257",
+          "metadata": {
+            "platform": "elasticsearch",
+            "strengths": [
+              "Uses indexed fields (event.category, event.action) early in the query.",
+              "The use of wildcards is targeted and likely to be efficient in this scenario."
+            ],
+            "weaknesses": [
+              "Wildcard usage could be refined to improve performance (e.g., using exact matches where possible).",
+              "Could benefit from additional filtering to reduce the dataset scanned."
+            ]
           }
         },
         {
@@ -301,7 +1212,7 @@
           "normalized_score": 1.0,
           "explanation": "SPLUNK query passed validation",
           "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:04:17.195257",
           "metadata": {
             "platform": "splunk",
             "validation": "syntactic"
@@ -313,15 +1224,15 @@
           "normalized_score": 1.0,
           "explanation": "ELASTICSEARCH query passed validation",
           "confidence": 1.0,
-          "timestamp": "2025-11-04T14:50:09.985007",
+          "timestamp": "2025-11-07T04:04:17.195257",
           "metadata": {
             "platform": "elasticsearch",
             "validation": "syntactic"
           }
         }
       ],
-      "summary": "Rule for T1566.001 (Spearphishing Attachment) scored 0.89/1.0 (Good). Best performance in correctness (0.95). Needs improvement in quality (0.30). Issues found in: metadata_richness",
-      "timestamp": "2025-11-04T14:50:09.986009",
+      "summary": "Rule for T1566.001 (Spearphishing Attachment) scored 0.63/1.0 (Below Average). Best performance in correctness (0.88). Needs improvement in detectability (0.30). Issues found in: detection_logic_correctness, detection_specificity, detection_sensitivity",
+      "timestamp": "2025-11-07T04:04:17.195257",
       "metadata": {
         "attack_id": "T1566.001",
         "technique_name": "Spearphishing Attachment",
@@ -337,9 +1248,140 @@
   "recommendations": [
     {
       "priority": "high",
+      "metric": "detection_logic_correctness",
+      "issue": "Low average score (0.57) across all rules",
+      "recommendation": "Improve LLM prompts to generate more accurate detection conditions. Provide examples of correct detection logic. Include MITRE ATT&CK technique descriptions in prompts. Validate selection criteria against known attack indicators.",
+      "affected_rules": [
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "high",
+      "metric": "detection_specificity",
+      "issue": "Low average score (0.43) across all rules",
+      "recommendation": "Add more filters and exclusions to reduce false positives. Include context (parent process, user, path) in detection logic. Provide legitimate use case examples to the LLM for exclusion. Use exact matches instead of wildcards where possible.",
+      "affected_rules": [
+        "T1059.001",
+        "T1003",
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "high",
+      "metric": "detection_sensitivity",
+      "issue": "Low average score (0.37) across all rules",
+      "recommendation": "Expand detection criteria to cover more attack variations. Include multiple tools and techniques for the same TTP. Add case-insensitive matching and wildcards for variations. Consider obfuscation and evasion techniques in detection logic.",
+      "affected_rules": [
+        "T1059.001",
+        "T1003",
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "medium",
       "metric": "metadata_richness",
+      "issue": "Below target score (0.70)",
+      "recommendation": "Include more context in rule generation: threat actor, campaign, tools, references. Add MITRE ATT&CK tags and technique descriptions. Link to authoritative sources (MITRE, vendor blogs, research papers). Provide specific false positive guidance and tuning recommendations.",
+      "affected_rules": []
+    },
+    {
+      "priority": "medium",
+      "metric": "optimization_level",
+      "issue": "Below target score (0.60)",
+      "recommendation": "Optimize queries to use indexed fields first. Avoid leading wildcards and complex regex. Place most restrictive filters early in query logic. Specify time ranges to limit data volume. Use platform-specific optimizations.",
+      "affected_rules": [
+        "T1059.001",
+        "T1003",
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "high",
+      "metric": "attack_coverage",
+      "issue": "Low average score (0.50) across all rules",
+      "recommendation": "Expand rule coverage to include sub-techniques and variations. Consider different tools and frameworks for the same TTP. Include both common and advanced attack variants. Cover multiple stages of the attack lifecycle.",
+      "affected_rules": [
+        "T1003",
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "high",
+      "metric": "false_positive_resistance",
+      "issue": "Low average score (0.47) across all rules",
+      "recommendation": "Implement better filter logic in Sigma rules to exclude benign activity. Add whitelisting for known legitimate processes and users. Consider parent-child process relationships. Provide actionable false positive guidance in metadata.",
+      "affected_rules": [
+        "T1059.001",
+        "T1003",
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "high",
+      "metric": "contextual_awareness",
+      "issue": "Low average score (0.53) across all rules",
+      "recommendation": "Incorporate threat intelligence into rule generation. Align detection logic with known threat actor TTPs. Reference specific campaigns and APT groups in metadata. Use operational intelligence from threat reports, not just textbook examples.",
+      "affected_rules": [
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "medium",
+      "metric": "operational_deployability",
+      "issue": "Below target score (0.67)",
+      "recommendation": "Ensure rules are tested and validated before production deployment. Use realistic log sources available in most environments. Set appropriate severity levels for SOC triage. Minimize alert fatigue through good specificity.",
+      "affected_rules": [
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "medium",
+      "metric": "analyst_actionability",
+      "issue": "Below target score (0.63)",
+      "recommendation": "Provide clear, concise rule titles and descriptions. Include useful fields for investigation and pivoting. Add references for next steps in investigation. Ensure alerts provide sufficient context for quick triage decisions.",
+      "affected_rules": [
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "high",
+      "metric": "evasion_resistance",
+      "issue": "Low average score (0.37) across all rules",
+      "recommendation": "Design rules to detect behavior patterns, not just static indicators. Use multiple detection points (process, network, file). Consider obfuscation and renaming evasions. Test rules against common evasion techniques.",
+      "affected_rules": [
+        "T1059.001",
+        "T1003",
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "high",
+      "metric": "multi_stage_detection",
       "issue": "Low average score (0.30) across all rules",
-      "recommendation": "Include more context (threat actor, campaign, tools) in rule generation"
+      "recommendation": "Expand detection to cover multiple attack lifecycle stages. Include correlation across related events. Detect both atomic indicators and behavioral chains. Consider persistence, lateral movement, and exfiltration stages.",
+      "affected_rules": [
+        "T1059.001",
+        "T1003",
+        "T1566.001"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "quality",
+      "issue": "Category 'quality' needs improvement (0.49)",
+      "recommendation": "Improve detection quality: balance specificity and sensitivity, enrich metadata, optimize for performance. Tune based on production feedback."
+    },
+    {
+      "priority": "high",
+      "category": "effectiveness",
+      "issue": "Category 'effectiveness' needs improvement (0.50)",
+      "recommendation": "Enhance real-world effectiveness: expand attack coverage, reduce false positives, incorporate threat intelligence and operational context."
+    },
+    {
+      "priority": "high",
+      "category": "detectability",
+      "issue": "Category 'detectability' needs improvement (0.34)",
+      "recommendation": "Strengthen detection capabilities: improve evasion resistance, enable multi-stage detection. Test against adversary simulation frameworks."
     }
   ]
 }
