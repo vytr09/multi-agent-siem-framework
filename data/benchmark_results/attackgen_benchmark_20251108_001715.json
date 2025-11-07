@@ -1,0 +1,2086 @@
+{
+  "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+  "timestamp": "2025-11-07T17:17:15.966198",
+  "config": {
+    "llm_judge": {
+      "enabled": true,
+      "api_key": "",
+      "model": "gemini-2.0-flash-lite",
+      "temperature": 0.3,
+      "max_tokens": 2000,
+      "persona": "expert cybersecurity researcher specializing in offensive security and red team operations",
+      "detailed_feedback": true,
+      "confidence_scores": true
+    }
+  },
+  "statistics": {
+    "total_evaluations": 10,
+    "average_score": 0.8488235294117648,
+    "category_averages": {
+      "correctness": 0.813,
+      "realism": 0.6933333333333332,
+      "safety": 0.95,
+      "detectability": 0.806,
+      "effectiveness": 0.9879999999999999
+    },
+    "metric_averages": {
+      "technical_correctness": 0.9000000000000001,
+      "attack_alignment": 0.93,
+      "operational_realism": 0.73,
+      "threat_actor_alignment": 0.62,
+      "testing_safety": 0.9200000000000002,
+      "detection_value": 0.8099999999999999,
+      "documentation_quality": 0.9700000000000001,
+      "platform_compatibility": 0.58,
+      "completeness": 1.0,
+      "controlled_impact": 1.0,
+      "artifact_generation": 0.8
+    },
+    "score_distribution": {
+      "excellent (>=0.9)": 0,
+      "good (0.8-0.9)": 10,
+      "fair (0.7-0.8)": 0,
+      "poor (0.6-0.7)": 0,
+      "failing (<0.6)": 0
+    }
+  },
+  "results": [
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "1afeef83-c82a-4d60-b7e4-c3fcb7acdf8e",
+      "item_type": "attack_command",
+      "overall_score": 0.8323529411764705,
+      "category_scores": {
+        "correctness": 0.77,
+        "realism": 0.6666666666666666,
+        "safety": 0.9375,
+        "detectability": 0.8200000000000001,
+        "effectiveness": 1.0
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell command is syntactically correct and will download and open a .docm file. The use of Invoke-WebRequest and Start-Process is appropriate. The explanation correctly notes that the macro will not be executed by this command. Error handling is minimal, but this is acceptable for a basic simulation.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:15:40.976122",
+          "metadata": {
+            "strengths": [
+              "Correct PowerShell syntax.",
+              "Uses appropriate tools for the task (Invoke-WebRequest, Start-Process)."
+            ],
+            "weaknesses": [
+              "Lacks error handling (e.g., checking for successful download).",
+              "Assumes PowerShell execution policy is permissive, which is not ideal."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command accurately simulates a spearphishing attack by downloading a malicious document. It aligns with T1566.001 by attempting to deliver a malicious document to the victim. The indicators of compromise (IOCs) are also correctly identified.",
+          "confidence": 0.95,
+          "timestamp": "2025-11-07T17:15:40.976122",
+          "metadata": {
+            "strengths": [
+              "Directly simulates the initial access phase of a phishing attack.",
+              "Identifies relevant IOCs."
+            ],
+            "weaknesses": [
+              "Does not include the macro execution phase, which is a key part of the attack chain. (This is acknowledged in the explanation)."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The command uses a common spearphishing delivery method (downloading a document from a web server). The use of a .docm file is realistic. However, the command only downloads and opens the document, not executing the macro, which reduces realism. Real-world attacks often involve more obfuscation and evasion techniques.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:15:40.976122",
+          "metadata": {
+            "strengths": [
+              "Uses a common delivery method (downloading a document).",
+              "Uses a realistic file type (.docm)."
+            ],
+            "weaknesses": [
+              "Does not include macro execution, reducing realism.",
+              "Lacks obfuscation or evasion techniques."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "While the technique aligns with the Lazarus Group's known use of phishing, the command itself is a basic implementation. The Lazarus Group is known for more sophisticated techniques, including advanced social engineering, obfuscation, and multi-stage payloads. This command is a simplified version of what they might use.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:15:40.976122",
+          "metadata": {
+            "strengths": [
+              "Aligns with the general phishing tactics used by the Lazarus Group."
+            ],
+            "weaknesses": [
+              "Lacks the sophistication and complexity often associated with Lazarus Group campaigns.",
+              "Does not incorporate any specific TTPs known to be used by the Lazarus Group beyond basic phishing."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is generally safe as it downloads and opens a document. The explanation emphasizes the use of a harmless macro. The cleanup instruction is present. The primary safety concern is the potential for a user to accidentally use a malicious document, but the documentation explicitly warns against this. The command itself does not execute malicious code directly.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:15:40.976122",
+          "metadata": {
+            "strengths": [
+              "Explicit warning against using a malicious macro.",
+              "Includes cleanup instructions.",
+              "Downloads and opens a document, not directly executing code."
+            ],
+            "weaknesses": [
+              "Relies on the user to ensure the document is safe, which introduces a human error risk.",
+              "Opening a document can be considered a destructive action depending on the environment."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command generates several useful artifacts for detection. Network traffic to a suspicious domain, file creation, and process execution (WINWORD.EXE) are all easily detectable. The indicators are clearly defined. While the command itself is straightforward, the technique it simulates (spearphishing) is a common attack vector, making it valuable for detection engineering.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:15:40.976122",
+          "metadata": {
+            "strengths": [
+              "Generates network traffic (HTTP GET).",
+              "Creates a file on disk.",
+              "Involves process execution (WINWORD.EXE).",
+              "Provides clear indicators."
+            ],
+            "weaknesses": [
+              "The command's simplicity might make it easy to bypass basic detection rules.",
+              "Does not directly execute malicious code, limiting the scope of detection opportunities."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The documentation is excellent. The explanation clearly describes the command's purpose and behavior. Prerequisites are well-defined, including the crucial safety requirement. Expected indicators are listed. Cleanup instructions are provided. The command aligns well with the provided context.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:40.976122",
+          "metadata": {
+            "strengths": [
+              "Clear explanation of the command's function.",
+              "Detailed prerequisites.",
+              "Comprehensive list of indicators.",
+              "Complete cleanup instructions."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:40.977137",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:40.977137",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:40.977137",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 8.5,
+          "normalized_score": 0.85,
+          "explanation": "Command generates 3 diverse detection artifacts",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:40.977137",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Simulate Spearphishing with a Malicious Macro-Enabled Document (T1566.001)\nOverall Score: 0.832/1.0\n\nCategory Scores:\n  - effectiveness: 1.000\n  - safety: 0.938\n  - detectability: 0.820\n  - correctness: 0.770\n  - realism: 0.667\n\nAssessment: GOOD - Solid attack command with minor improvements needed",
+      "timestamp": "2025-11-07T17:15:40.977137",
+      "metadata": {
+        "attack_id": "T1566.001",
+        "technique_name": "Phishing",
+        "platform": "windows",
+        "tactic": "Initial Access",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "db7dc6c2-5afa-4b90-ae07-6ef4db26791d",
+      "item_type": "attack_command",
+      "overall_score": 0.8264705882352941,
+      "category_scores": {
+        "correctness": 0.77,
+        "realism": 0.6666666666666666,
+        "safety": 0.875,
+        "detectability": 0.8800000000000001,
+        "effectiveness": 1.0
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell command is syntactically correct and will execute on a Windows system. It downloads a file from a URL, saves it, and opens it. The use of `Start-Process` to open the downloaded HTML file is also correct. However, the success depends on the availability of the URL and the execution policy.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:15:52.801167",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax.",
+              "Correctly uses `Invoke-WebRequest` and `Start-Process`."
+            ],
+            "weaknesses": [
+              "Relies on external URL availability.",
+              "Requires a permissive PowerShell execution policy (or bypass).",
+              "Does not handle potential download errors."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command directly aligns with the Phishing technique (T1566.001). It simulates the delivery of a malicious document via a link, a common phishing tactic. It creates artifacts like network traffic and file creation, which are key indicators of this technique.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:52.801167",
+          "metadata": {
+            "strengths": [
+              "Directly simulates a phishing attack.",
+              "Uses a URL shortener to obfuscate the link, a common tactic.",
+              "Generates expected artifacts (network traffic, file creation)."
+            ],
+            "weaknesses": [
+              "The attack is limited to downloading and opening a file; it doesn't demonstrate credential harvesting itself.",
+              "The effectiveness depends on the content of the downloaded HTML file."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The command reflects a realistic phishing scenario. Using a URL shortener is common to obfuscate malicious links. The use of PowerShell for download and execution is also realistic. However, the lack of email delivery and the reliance on a pre-existing HTML file slightly reduces realism.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:15:52.801167",
+          "metadata": {
+            "strengths": [
+              "Uses a URL shortener, a common obfuscation technique.",
+              "Employs PowerShell, a frequently used tool in real-world attacks.",
+              "Simulates the initial access phase of a phishing campaign."
+            ],
+            "weaknesses": [
+              "Does not include email delivery, which is a core component of phishing.",
+              "Relies on a pre-existing HTML file, which is not part of the command itself.",
+              "The attack chain is relatively short."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command aligns with the Lazarus Group's known TTPs to a moderate degree. While the use of phishing is consistent with their activities, the command itself is a basic implementation. The lack of more sophisticated techniques, such as advanced obfuscation or exploitation, limits the alignment.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:15:52.801167",
+          "metadata": {
+            "strengths": [
+              "Uses phishing, a technique employed by the Lazarus Group.",
+              "Employs PowerShell, a tool often used by advanced threat actors."
+            ],
+            "weaknesses": [
+              "The command is relatively simple and lacks advanced techniques often associated with the Lazarus Group.",
+              "Does not incorporate any specific Lazarus Group tooling or methods."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command is relatively safe as it downloads and opens an HTML file. It doesn't directly execute code or modify system settings beyond file creation. Cleanup is provided. However, the reliance on a URL shortener introduces a slight risk if the shortened URL redirects to a malicious site, but this is mitigated by the fact that it only downloads and opens a file, not executes code. The test environment should be isolated.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:15:52.801167",
+          "metadata": {
+            "strengths": [
+              "Provides cleanup instructions.",
+              "Doesn't directly execute code (only opens a file)."
+            ],
+            "weaknesses": [
+              "Relies on a URL shortener, which could lead to unexpected behavior if the destination changes.",
+              "Requires a controlled test environment to prevent unintended consequences from opening the downloaded HTML file."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command generates several useful artifacts for detection. Network traffic to the URL shortener and the final destination, file creation, and process execution are all readily detectable. The use of PowerShell and a URL shortener are also valuable indicators for detection engineering. The command provides a good balance between simulating a real-world attack and generating detectable artifacts.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:15:52.801167",
+          "metadata": {
+            "strengths": [
+              "Generates clear network traffic indicators.",
+              "Creates a file on disk, providing a file creation artifact.",
+              "Involves process execution (browser), which is easily detectable."
+            ],
+            "weaknesses": [
+              "Detection might be bypassed if the HTML file is crafted to be very stealthy. However, this is not the focus of the command.",
+              "The use of a URL shortener could make it slightly harder to immediately identify the final destination."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The documentation is excellent. The explanation clearly describes the command's purpose and functionality. Prerequisites are well-defined, and the expected indicators are explicitly listed. Cleanup instructions are provided, and the command is correctly mapped to the MITRE ATT&CK framework.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:52.801167",
+          "metadata": {
+            "strengths": [
+              "Clear explanation of the command's purpose.",
+              "Well-defined prerequisites.",
+              "Detailed expected indicators.",
+              "Complete cleanup instructions."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:52.801167",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:52.802182",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:52.802182",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 8.5,
+          "normalized_score": 0.85,
+          "explanation": "Command generates 3 diverse detection artifacts",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:15:52.802182",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Simulate Spearphishing with a Link to a Credential Harvesting Site (T1566.001)\nOverall Score: 0.826/1.0\n\nCategory Scores:\n  - effectiveness: 1.000\n  - detectability: 0.880\n  - safety: 0.875\n  - correctness: 0.770\n  - realism: 0.667\n\nAssessment: GOOD - Solid attack command with minor improvements needed",
+      "timestamp": "2025-11-07T17:15:52.802182",
+      "metadata": {
+        "attack_id": "T1566.001",
+        "technique_name": "Phishing",
+        "platform": "windows",
+        "tactic": "Initial Access",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "0d70e839-35b9-4256-8d02-92827460a3e4",
+      "item_type": "attack_command",
+      "overall_score": 0.8705882352941177,
+      "category_scores": {
+        "correctness": 0.8399999999999999,
+        "realism": 0.7666666666666666,
+        "safety": 0.9375,
+        "detectability": 0.8200000000000001,
+        "effectiveness": 1.0
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is technically sound for a Linux environment. It correctly uses `wget` to download a file, `chmod +x` to make it executable, and then executes the downloaded script. The use of `/tmp` is appropriate for temporary files. The prerequisites are clearly defined.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "strengths": [
+              "Correct syntax and execution flow.",
+              "Uses standard Linux utilities.",
+              "Includes a cleanup step."
+            ],
+            "weaknesses": [
+              "Doesn't handle potential wget errors (e.g., server unavailable).",
+              "Error handling is minimal."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command perfectly aligns with the Phishing (T1566.001) technique. It simulates a user downloading and executing a malicious attachment (a script in this case). The indicators listed directly reflect the expected artifacts of this technique.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "strengths": [
+              "Directly simulates the core action of the technique.",
+              "Generates expected artifacts for detection.",
+              "Clear mapping to the ATT&CK technique."
+            ],
+            "weaknesses": [
+              "Could be more sophisticated by including encoding or obfuscation of the script, but this is not strictly necessary for alignment."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "This command is operationally realistic. Downloading and executing a script is a common technique used in phishing attacks. The use of `wget` and a bash script is a realistic approach. The command is simple, which is often the case in initial access attempts.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "strengths": [
+              "Mirrors real-world phishing attack patterns.",
+              "Uses common tools and methods.",
+              "Simple and effective."
+            ],
+            "weaknesses": [
+              "Doesn't include any obfuscation or anti-detection measures, which are often present in more advanced attacks.",
+              "The script's simplicity might make it too obvious."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "While the command itself is generic, the context mentions the Lazarus Group. Lazarus is known for using spearphishing. The command's simplicity is not inconsistent with Lazarus's initial access methods, though they often employ more sophisticated techniques in later stages. The provided context helps in this assessment.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "strengths": [
+              "Aligns with the general spearphishing tactics of the Lazarus Group.",
+              "The simplicity is not necessarily a weakness, as initial access can be straightforward."
+            ],
+            "weaknesses": [
+              "Doesn't include any specific TTPs directly attributable to the Lazarus Group beyond spearphishing.",
+              "Lazarus often uses more sophisticated techniques in their attacks."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is designed to be safe by downloading and executing a script from a controlled server. The explanation explicitly states the script should be harmless. Cleanup is provided. The use of /tmp for the script further enhances safety. The only risk is if the user fails to host a safe script.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "strengths": [
+              "Uses a controlled server for the script.",
+              "Explicitly states the script should be harmless.",
+              "Provides cleanup instructions."
+            ],
+            "weaknesses": [
+              "Relies on the user to ensure the hosted script is safe.",
+              "Execution of arbitrary code always carries a small risk."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command generates several clear indicators: wget, chmod, script execution, network connection, and potentially file creation. These are all easily detectable with standard monitoring tools. The command provides good opportunities for building SIEM rules and detection logic related to spearphishing attacks.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "strengths": [
+              "Generates multiple distinct indicators.",
+              "Indicators are readily detectable.",
+              "Provides a good foundation for building detection rules."
+            ],
+            "weaknesses": [
+              "Could be improved by adding a more sophisticated payload to test more advanced detection capabilities (e.g., obfuscation).",
+              "Detection can be bypassed with more advanced techniques."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The documentation is excellent. It clearly explains the command's purpose, provides detailed prerequisites, lists expected indicators, and includes complete cleanup instructions. The explanation of the attack and the use of a controlled environment is also very clear.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "strengths": [
+              "Clear explanation of the command's purpose.",
+              "Detailed prerequisites.",
+              "Comprehensive list of expected indicators.",
+              "Complete cleanup instructions."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with linux but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 8.5,
+          "normalized_score": 0.85,
+          "explanation": "Command generates 5 diverse detection artifacts",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:08.183926",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Simulate Spearphishing Attachment Delivery - Download & Execute (T1566.001)\nOverall Score: 0.871/1.0\n\nCategory Scores:\n  - effectiveness: 1.000\n  - safety: 0.938\n  - correctness: 0.840\n  - detectability: 0.820\n  - realism: 0.767\n\nAssessment: EXCELLENT - High quality attack command",
+      "timestamp": "2025-11-07T17:16:08.183926",
+      "metadata": {
+        "attack_id": "T1566.001",
+        "technique_name": "Phishing",
+        "platform": "linux",
+        "tactic": "Initial Access",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "7efcd640-f1be-4fed-97d5-6159352c1c98",
+      "item_type": "attack_command",
+      "overall_score": 0.8088235294117647,
+      "category_scores": {
+        "correctness": 0.75,
+        "realism": 0.5666666666666667,
+        "safety": 0.9375,
+        "detectability": 0.8200000000000001,
+        "effectiveness": 1.0
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is syntactically correct for a Linux environment and will execute as intended. It leverages Python's built-in HTTP server for simplicity and creates a basic HTML file. The cleanup command is also correctly formatted. The use of '&' for backgrounding the server is appropriate.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "strengths": [
+              "Uses a built-in, readily available tool (Python's HTTP server).",
+              "Includes a proper cleanup mechanism.",
+              "Simple and easy to understand."
+            ],
+            "weaknesses": [
+              "Error handling is minimal (e.g., doesn't check if port 8000 is already in use).",
+              "The HTML is very basic and could be improved for realism."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command accurately simulates the initial stage of a phishing attack (credential harvesting). It creates a basic web page with a login form, mimicking a legitimate service. It aligns with T1566.001 by attempting to trick a user into providing credentials. The indicators are also relevant.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "strengths": [
+              "Directly simulates credential harvesting.",
+              "Uses a common method (HTML form).",
+              "Generates expected artifacts (network connection, file creation)."
+            ],
+            "weaknesses": [
+              "Doesn't include any actual credential harvesting functionality (e.g., saving the credentials).",
+              "The simulation is very basic and could be expanded."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command simulates a simplified version of a phishing attack. While the use of a Python HTTP server is not common in real-world attacks, the overall concept of hosting a fake login page is. The HTML is very basic, which lowers the realism. The command is not as sophisticated as real-world phishing campaigns.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "strengths": [
+              "Mimics the core concept of a phishing attack (fake login page).",
+              "Uses a common attack vector (HTML form)."
+            ],
+            "weaknesses": [
+              "The method of hosting the page (Python's built-in server) is not realistic.",
+              "The HTML is very basic and lacks sophistication.",
+              "Doesn't include common phishing techniques like obfuscation or redirection."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command's simplicity doesn't strongly align with the Lazarus Group, known for more sophisticated attacks. While credential harvesting is a common goal, the execution here is too basic. The Lazarus Group often uses more complex techniques and tools.",
+          "confidence": 0.6,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "strengths": [
+              "Addresses a common goal of the Lazarus Group (credential theft)."
+            ],
+            "weaknesses": [
+              "The technique is too simplistic for the Lazarus Group.",
+              "Doesn't reflect the group's known TTPs (e.g., use of custom malware, advanced social engineering).",
+              "The tools used are not associated with the Lazarus Group."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is very safe. It uses a built-in Python HTTP server, which is isolated and doesn't interact with the system beyond serving a static HTML file. The cleanup is also straightforward and effective, removing the server and the temporary file. This makes it suitable for production-like test environments.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "strengths": [
+              "Uses a safe, built-in Python module.",
+              "Provides clear and effective cleanup instructions.",
+              "No destructive actions."
+            ],
+            "weaknesses": [
+              "The HTML is very basic; a more realistic phishing page might be more effective for testing detection capabilities."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "This command generates several useful artifacts for detection. It creates a process (python3), a network connection on port 8000, and a file. The indicators are clearly defined. While it's a simple simulation, it provides a good starting point for detecting phishing attempts. The balance between evasion and detectability is good for the purpose of simulating the initial stage.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "strengths": [
+              "Generates clear network and process artifacts.",
+              "Provides a good foundation for building detection rules.",
+              "Easy to understand and implement detection logic."
+            ],
+            "weaknesses": [
+              "Doesn't simulate credential harvesting (which is the ultimate goal of phishing), limiting the scope of detection opportunities.",
+              "The simplicity of the HTML may make it less effective at triggering advanced detection mechanisms."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The documentation is excellent. The explanation clearly describes the command's purpose and functionality. The prerequisites and cleanup instructions are well-defined. The indicators are comprehensive and provide valuable information for detection engineers. The command is well-documented.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "strengths": [
+              "Clear and concise explanation.",
+              "Comprehensive list of indicators.",
+              "Complete prerequisites and cleanup instructions."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.0,
+          "normalized_score": 0.5,
+          "explanation": "Command shows limited linux platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 8.5,
+          "normalized_score": 0.85,
+          "explanation": "Command generates 4 diverse detection artifacts",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:20.960742",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Simulate Spearphishing - Credential Harvesting Simulation (T1566.001)\nOverall Score: 0.809/1.0\n\nCategory Scores:\n  - effectiveness: 1.000\n  - safety: 0.938\n  - detectability: 0.820\n  - correctness: 0.750\n  - realism: 0.567\n\nAssessment: GOOD - Solid attack command with minor improvements needed",
+      "timestamp": "2025-11-07T17:16:20.960742",
+      "metadata": {
+        "attack_id": "T1566.001",
+        "technique_name": "Phishing",
+        "platform": "linux",
+        "tactic": "Initial Access",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "089a6154-c9ce-4bc5-a594-8f33d8071d20",
+      "item_type": "attack_command",
+      "overall_score": 0.876470588235294,
+      "category_scores": {
+        "correctness": 0.8800000000000001,
+        "realism": 0.7333333333333334,
+        "safety": 0.9375,
+        "detectability": 0.8200000000000001,
+        "effectiveness": 1.0
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The PowerShell command is syntactically correct and will execute as intended on a Windows system with PowerShell. It correctly uses `Invoke-WebRequest` to download a file from a specified URL and saves it to a designated location. The cleanup command is also valid.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax.",
+              "Correct use of `Invoke-WebRequest`.",
+              "Includes a valid cleanup command."
+            ],
+            "weaknesses": [
+              "None identified."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command directly aligns with the T1059.001 (PowerShell) technique by executing a PowerShell command to download a file from a remote location. It achieves the objective of executing code (in this case, downloading a file) using PowerShell.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "strengths": [
+              "Directly implements the core functionality of T1059.001.",
+              "Produces expected artifacts (network traffic, file creation).",
+              "Uses the appropriate tool (PowerShell)."
+            ],
+            "weaknesses": [
+              "Could be more sophisticated by including obfuscation or other techniques, but this is a simple example."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "Downloading and executing scripts or configuration files from the internet is a common technique used by attackers. While the example uses a safe file, the method itself is realistic. The use of `Invoke-WebRequest` is also a common method.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "strengths": [
+              "Mirrors a common attack pattern.",
+              "Uses a tool (PowerShell) frequently used in real-world attacks.",
+              "The download and execution aspect is realistic."
+            ],
+            "weaknesses": [
+              "The use of a safe file reduces the realism slightly, although the technique is still valid.",
+              "Could benefit from adding a more malicious payload (e.g., a script that downloads and executes another script)."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "While the Lazarus Group is known to use PowerShell, this specific command is a very basic example and doesn't reflect the group's typical sophistication. It's a building block, but not a TTP directly attributable to them. The provided context mentions credential harvesting, which this command doesn't directly support.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "strengths": [
+              "PowerShell is used by the Lazarus Group.",
+              "The technique is within the realm of their capabilities."
+            ],
+            "weaknesses": [
+              "The command is too simple to be directly attributed to the Lazarus Group's typical TTPs.",
+              "Doesn't align with the provided threat context of credential harvesting."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command downloads a harmless JSON file from a reputable source (GitHub). The cleanup instruction removes the downloaded file, ensuring no persistent changes. The behavior is predictable and easily reversible, making it safe for testing.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "strengths": [
+              "Uses a safe, publicly available file",
+              "Provides clear cleanup instructions",
+              "No destructive actions"
+            ],
+            "weaknesses": [
+              "Relies on internet connectivity, which might fail in some isolated environments"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command generates several useful detection artifacts, including PowerShell process creation, network traffic, and file creation. These artifacts can be used to build SIEM rules to detect similar malicious download and execution attempts. The command balances detectability and a degree of realism.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "strengths": [
+              "Generates clear network and file artifacts",
+              "Uses a common PowerShell cmdlet (Invoke-WebRequest)",
+              "Provides a good starting point for detection rule development"
+            ],
+            "weaknesses": [
+              "The use of a benign file might make it less valuable for testing advanced detection capabilities (e.g., behavioral analysis)"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The documentation is excellent. It clearly explains the command's purpose, lists prerequisites, details expected indicators, and provides complete cleanup instructions. The inclusion of the ATT&CK ID and platform further enhances the documentation's value.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "strengths": [
+              "Clear explanation of the command's purpose",
+              "Detailed prerequisites and expected indicators",
+              "Complete cleanup instructions",
+              "Includes ATT&CK ID and platform"
+            ],
+            "weaknesses": [
+              "None apparent"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 8.5,
+          "normalized_score": 0.85,
+          "explanation": "Command generates 4 diverse detection artifacts",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:31.093918",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Download and Execute a Simple Script from the Internet (Invoke-WebRequest) (T1059.001)\nOverall Score: 0.876/1.0\n\nCategory Scores:\n  - effectiveness: 1.000\n  - safety: 0.938\n  - correctness: 0.880\n  - detectability: 0.820\n  - realism: 0.733\n\nAssessment: EXCELLENT - High quality attack command",
+      "timestamp": "2025-11-07T17:16:31.093918",
+      "metadata": {
+        "attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "platform": "windows",
+        "tactic": "Execution",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "b0d718f9-d232-4621-896f-d3c0c80ca33a",
+      "item_type": "attack_command",
+      "overall_score": 0.8661764705882353,
+      "category_scores": {
+        "correctness": 0.825,
+        "realism": 0.7666666666666666,
+        "safety": 1.0,
+        "detectability": 0.76,
+        "effectiveness": 0.96
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is syntactically correct and will execute on a Windows system with PowerShell. The base64 encoding is valid and the decoded command is also valid. The command, while harmless, demonstrates the intended technique effectively.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax.",
+              "Correct use of -EncodedCommand.",
+              "Demonstrates the obfuscation technique."
+            ],
+            "weaknesses": [
+              "The command is benign and does not demonstrate malicious behavior."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command perfectly aligns with the MITRE ATT&CK technique T1059.001 (PowerShell). It uses PowerShell to execute a command, utilizing the -EncodedCommand parameter, which is a core aspect of this technique. The provided indicators are also relevant.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "strengths": [
+              "Directly implements the specified ATT&CK technique.",
+              "Uses the correct method (-EncodedCommand).",
+              "Produces expected artifacts (PowerShell process creation with -EncodedCommand)."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "Base64 encoding PowerShell commands is a common obfuscation technique used by attackers. The use of -EncodedCommand is frequently observed in real-world attacks. While the specific command is harmless, the technique itself is highly realistic.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "strengths": [
+              "Mirrors real-world attack techniques.",
+              "Uses a common obfuscation method.",
+              "Applicable to various attack scenarios."
+            ],
+            "weaknesses": [
+              "The benign nature of the command reduces realism slightly."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "While the Lazarus Group is known to use PowerShell, the provided context doesn't specify this exact technique. However, the use of PowerShell and obfuscation is consistent with their general TTPs. The harmless nature of the command doesn't provide specific alignment to the threat actor's objectives.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "strengths": [
+              "PowerShell usage aligns with Lazarus Group TTPs.",
+              "Obfuscation is a common practice among sophisticated actors."
+            ],
+            "weaknesses": [
+              "The specific command's functionality isn't directly tied to Lazarus Group's known campaigns.",
+              "The benign nature of the command doesn't reflect the threat actor's objectives."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command is exceptionally safe. It uses a base64 encoded PowerShell command that, when decoded, sets a user's password quality to 'test'. This action is harmless and doesn't modify any critical system settings or data. The lack of any system modifications ensures a safe testing experience.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "strengths": [
+              "No destructive actions.",
+              "Predictable and controlled behavior.",
+              "No cleanup required."
+            ],
+            "weaknesses": [
+              "None identified."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command provides good detection value. It generates artifacts such as PowerShell process creation events and command-line arguments containing `-EncodedCommand`. These are valuable for SIEM rule creation and detection logic. While the specific command is benign, the technique itself is commonly used for malicious purposes, making it useful for testing detection capabilities against obfuscation.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "strengths": [
+              "Generates clear indicators (process creation, command-line arguments).",
+              "Simulates a common attacker technique (obfuscation)."
+            ],
+            "weaknesses": [
+              "The specific command is benign, so it doesn't test detection of malicious behavior directly."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The documentation is well-written and comprehensive. It clearly explains the purpose of the command, the prerequisites, and the expected indicators. The inclusion of the decoded command and the explanation of its harmless nature further enhances understanding. The lack of cleanup is also correctly stated.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "strengths": [
+              "Clear explanation of the command's purpose and behavior.",
+              "Detailed prerequisites and expected indicators.",
+              "Complete cleanup instructions (or lack thereof)."
+            ],
+            "weaknesses": [
+              "Could potentially include a brief mention of how this technique is used maliciously."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 7.0,
+          "normalized_score": 0.7,
+          "explanation": "Command generates 3 detection artifacts but could be more diverse",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:40.085206",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Base64 Encoded PowerShell Command (Simple Echo) (T1059.001)\nOverall Score: 0.866/1.0\n\nCategory Scores:\n  - safety: 1.000\n  - effectiveness: 0.960\n  - correctness: 0.825\n  - realism: 0.767\n  - detectability: 0.760\n\nAssessment: EXCELLENT - High quality attack command",
+      "timestamp": "2025-11-07T17:16:40.085206",
+      "metadata": {
+        "attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "platform": "windows",
+        "tactic": "Execution",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "3dd0ce1f-fde7-4af3-8ec0-c2822aa35933",
+      "item_type": "attack_command",
+      "overall_score": 0.8308823529411764,
+      "category_scores": {
+        "correctness": 0.765,
+        "realism": 0.6666666666666666,
+        "safety": 1.0,
+        "detectability": 0.76,
+        "effectiveness": 0.96
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is technically correct and executable on a Linux system with pwsh installed. The syntax is valid, using the `-c` parameter to execute a PowerShell command. The `Get-ChildItem` cmdlet functions as expected, listing files in the specified path. Error handling is not explicitly present, but the command's simplicity minimizes potential issues.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax.",
+              "Correct use of `Get-ChildItem`.",
+              "Clear and concise command structure."
+            ],
+            "weaknesses": [
+              "Doesn't handle potential errors from `Get-ChildItem` (e.g., permission issues).",
+              "Relies on the user's home directory existing."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command aligns well with the T1059.001 technique (PowerShell). It demonstrates the execution of PowerShell commands on a Linux system, which is a valid method for achieving the technique's objective. The command produces expected artifacts (file listing). It directly uses PowerShell, fulfilling the technique's core concept.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "strengths": [
+              "Directly uses PowerShell.",
+              "Executes a command relevant to the technique.",
+              "Produces observable artifacts."
+            ],
+            "weaknesses": [
+              "Could be expanded to include more complex PowerShell functionality to better demonstrate the technique's breadth.",
+              "Doesn't showcase advanced PowerShell features like script execution or module usage."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "While using PowerShell on Linux is becoming more common, this specific command is somewhat basic. Real-world attackers might use more sophisticated PowerShell scripts or leverage PowerShell for lateral movement or privilege escalation. The command is realistic in that attackers might enumerate files, but the simplicity limits its realism.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "strengths": [
+              "Demonstrates a valid attack vector (PowerShell execution).",
+              "Uses a common command for reconnaissance."
+            ],
+            "weaknesses": [
+              "The command is relatively simple compared to typical attacker behavior.",
+              "Doesn't reflect the full range of PowerShell capabilities used by attackers."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command's alignment with the Lazarus Group is moderate. While the group is known to use PowerShell, this specific command is not strongly indicative of their TTPs. The group is known for more complex PowerShell usage, including credential harvesting and malware deployment. This command is a basic reconnaissance step, which could be part of a larger campaign, but it's not directly tied to the provided threat context.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "strengths": [
+              "Uses a tool (PowerShell) that the threat actor is known to use.",
+              "Could be a precursor to more advanced actions."
+            ],
+            "weaknesses": [
+              "The command is too basic to be strongly associated with the Lazarus Group's sophisticated TTPs.",
+              "Doesn't reflect the credential harvesting focus of the provided campaign."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command is entirely safe. It only reads files and does not modify the system in any way. The provided cleanup instructions confirm this, and the behavior is predictable within a controlled environment.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "strengths": [
+              "Non-destructive operation",
+              "Clear cleanup instructions (none needed)",
+              "Predictable behavior"
+            ],
+            "weaknesses": [
+              "None identified"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command generates several useful detection artifacts, including process execution of `pwsh` and specific command-line arguments. The output, while potentially noisy, provides a clear indicator. These artifacts are suitable for SIEM rule creation.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "strengths": [
+              "Generates process execution artifacts",
+              "Provides specific command-line arguments for detection",
+              "Clear output indicators"
+            ],
+            "weaknesses": [
+              "Output might be noisy depending on the user's home directory content",
+              "Evasion potential is low, but not explicitly addressed"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The documentation is comprehensive and well-written. The explanation clearly describes the command's purpose, the prerequisites are explicitly stated, and the indicators are detailed. Cleanup instructions are also provided, even if they are 'none'.",
+          "confidence": 0.95,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "strengths": [
+              "Clear explanation of the command's purpose",
+              "Well-defined prerequisites",
+              "Detailed indicators provided",
+              "Complete cleanup instructions"
+            ],
+            "weaknesses": [
+              "Could benefit from explicitly mentioning potential noise in output"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited linux platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 7.0,
+          "normalized_score": 0.7,
+          "explanation": "Command generates 4 detection artifacts but could be more diverse",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:49.627000",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Simulate PowerShell execution using pwsh to list files (T1059.001)\nOverall Score: 0.831/1.0\n\nCategory Scores:\n  - safety: 1.000\n  - effectiveness: 0.960\n  - correctness: 0.765\n  - detectability: 0.760\n  - realism: 0.667\n\nAssessment: GOOD - Solid attack command with minor improvements needed",
+      "timestamp": "2025-11-07T17:16:49.627000",
+      "metadata": {
+        "attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "platform": "linux",
+        "tactic": "Execution",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "7cf055c5-b23f-492d-ac4b-2e5497c4ce07",
+      "item_type": "attack_command",
+      "overall_score": 0.8426470588235294,
+      "category_scores": {
+        "correctness": 0.835,
+        "realism": 0.5666666666666667,
+        "safety": 1.0,
+        "detectability": 0.8200000000000001,
+        "effectiveness": 0.96
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command is syntactically correct for pwsh on Linux. It uses the `-c` argument to execute a PowerShell command, pipes a string to `Out-File`, and specifies a valid file path. Error handling is not explicitly present, but the command is simple and unlikely to fail in a standard environment. The cleanup command is also correct.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax.",
+              "Correct use of `Out-File`.",
+              "Clear and concise command."
+            ],
+            "weaknesses": [
+              "No explicit error handling (not a major issue for this simple example)."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command directly aligns with T1059.001 (PowerShell) by executing a PowerShell command. It demonstrates a basic file write operation, which is a common action performed by PowerShell scripts. The indicators accurately reflect the expected artifacts of this technique.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "strengths": [
+              "Directly implements the PowerShell technique.",
+              "Generates expected artifacts (file creation, content).",
+              "Clear mapping to the ATT&CK technique."
+            ],
+            "weaknesses": [
+              "It's a very basic example; more complex PowerShell usage could be demonstrated."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "While writing to a file is a realistic action, this specific command is a simplified example. Real-world attacks often involve more complex PowerShell scripts, obfuscation, and interaction with other systems. The use of `pwsh` on Linux is becoming more common, increasing realism.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "strengths": [
+              "Uses a common tool (pwsh).",
+              "Demonstrates a fundamental action (file write) often used in attacks."
+            ],
+            "weaknesses": [
+              "Lacks complexity and obfuscation often seen in real-world attacks.",
+              "The specific command is too simple to be directly representative of a typical attack."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The Lazarus Group is known to use PowerShell, but this simple example doesn't reflect their typical sophistication or specific TTPs. Their PowerShell usage is often more complex, involving credential harvesting, lateral movement, and data exfiltration. This command is a building block, but not directly representative.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "strengths": [
+              "Uses a tool (PowerShell) used by the Lazarus Group."
+            ],
+            "weaknesses": [
+              "Doesn't reflect the Lazarus Group's advanced PowerShell techniques.",
+              "Lacks the complexity and specific actions associated with the group."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command is exceptionally safe. It writes to a temporary file in /tmp, a standard location for temporary files, and includes a cleanup step to remove the file. The operation is non-destructive and easily reversible.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "strengths": [
+              "Writes to a temporary directory.",
+              "Includes a cleanup command.",
+              "Non-destructive operation."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command provides several useful indicators for detection. The process execution of `pwsh`, the command-line arguments, and the file creation event are all valuable for SIEM rules. The indicators are clear and easily detectable.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "strengths": [
+              "Clear process execution indicator (pwsh).",
+              "Provides command-line arguments for detection.",
+              "Generates a file creation event."
+            ],
+            "weaknesses": [
+              "Could be slightly more evasive by using obfuscation (though this is not the goal here).",
+              "Basic file write may be common, requiring context for high-fidelity detection."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The documentation is well-written and comprehensive. It clearly explains the command's purpose, lists prerequisites, details expected indicators, and provides a cleanup step. The explanation is concise and easy to understand.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "strengths": [
+              "Clear explanation of the command's function.",
+              "Detailed list of expected indicators.",
+              "Includes prerequisites and cleanup instructions."
+            ],
+            "weaknesses": [
+              "Could benefit from a brief note on potential false positives (e.g., legitimate use of pwsh)."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited linux platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 8.5,
+          "normalized_score": 0.85,
+          "explanation": "Command generates 6 diverse detection artifacts",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:16:58.570746",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Simulate PowerShell execution using pwsh to write to a file (T1059.001)\nOverall Score: 0.843/1.0\n\nCategory Scores:\n  - safety: 1.000\n  - effectiveness: 0.960\n  - correctness: 0.835\n  - detectability: 0.820\n  - realism: 0.567\n\nAssessment: GOOD - Solid attack command with minor improvements needed",
+      "timestamp": "2025-11-07T17:16:58.570746",
+      "metadata": {
+        "attack_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "platform": "linux",
+        "tactic": "Execution",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "15e498eb-4b1f-4d8d-a869-4d9df47abd06",
+      "item_type": "attack_command",
+      "overall_score": 0.8691176470588236,
+      "category_scores": {
+        "correctness": 0.8550000000000001,
+        "realism": 0.7666666666666666,
+        "safety": 0.9375,
+        "detectability": 0.78,
+        "effectiveness": 1.0
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is syntactically correct for Windows and will create the specified registry key. The use of `/f` ensures the operation completes without prompting. The explanation accurately describes the command's function.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:06.437393",
+          "metadata": {
+            "strengths": [
+              "Correct syntax",
+              "Uses the `/f` flag for silent execution"
+            ],
+            "weaknesses": [
+              "No error handling is present"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command directly implements the Registry Run Keys technique (T1547.001) by creating a registry entry that executes a program at user login. The artifacts (registry key and process spawning) are as expected.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:06.437393",
+          "metadata": {
+            "strengths": [
+              "Directly implements the technique",
+              "Generates expected artifacts"
+            ],
+            "weaknesses": [],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "Registry Run Keys are a common persistence mechanism. The use of `notepad.exe` is less realistic for a real attack, but the technique itself is very realistic. The command uses a standard tool (reg.exe).",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:17:06.437393",
+          "metadata": {
+            "strengths": [
+              "Uses a common persistence technique",
+              "Employs a standard Windows tool"
+            ],
+            "weaknesses": [
+              "The target application (notepad.exe) is not typical for malicious persistence"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "While Lazarus Group is known for sophisticated attacks, they also employ basic persistence techniques. This command is a basic persistence method that could be used as part of a larger campaign. The choice of `notepad.exe` is not directly aligned with Lazarus Group's known TTPs.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:17:06.437393",
+          "metadata": {
+            "strengths": [
+              "Persistence is a common TTP for many threat actors",
+              "Uses a standard Windows tool"
+            ],
+            "weaknesses": [
+              "The target application is not typical for Lazarus Group",
+              "Lacks sophistication seen in Lazarus Group's campaigns"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is generally safe as it only modifies the user's registry. The provided cleanup command ensures reversibility. The use of notepad.exe is benign, minimizing risk in a testing environment. However, it's important to test in a controlled environment to avoid unintended consequences.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:17:06.437393",
+          "metadata": {
+            "strengths": [
+              "Provides a cleanup command.",
+              "Uses a benign executable (notepad.exe)."
+            ],
+            "weaknesses": [
+              "Modifies the registry, which, if not handled carefully, could impact system stability (though unlikely in this case)."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "This command generates clear and easily detectable artifacts. The creation of a new registry key and the subsequent spawning of notepad.exe upon login are both excellent indicators for SIEM rules. While simple, the technique is commonly used by attackers, making detection valuable.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:17:06.437393",
+          "metadata": {
+            "strengths": [
+              "Generates clear registry modification artifacts.",
+              "Spawns a process, providing process creation events for detection."
+            ],
+            "weaknesses": [
+              "Relatively easy to detect with basic security monitoring.",
+              "Could be bypassed with more sophisticated techniques."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The documentation is excellent. It clearly explains the command's purpose, the prerequisites, and the expected indicators. The inclusion of a cleanup command is crucial. The explanation of the /f flag is also helpful.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:06.437393",
+          "metadata": {
+            "strengths": [
+              "Clear explanation of the command's purpose.",
+              "Detailed prerequisites and expected indicators.",
+              "Complete cleanup instructions."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.5,
+          "normalized_score": 0.65,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:06.438392",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:06.438392",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:06.438392",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 7.5,
+          "normalized_score": 0.75,
+          "explanation": "Command generates 2 detection artifacts but could be more diverse",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:06.438392",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Create Registry Run Key for Notepad.exe (T1547.001)\nOverall Score: 0.869/1.0\n\nCategory Scores:\n  - effectiveness: 1.000\n  - safety: 0.938\n  - correctness: 0.855\n  - detectability: 0.780\n  - realism: 0.767\n\nAssessment: EXCELLENT - High quality attack command",
+      "timestamp": "2025-11-07T17:17:06.438392",
+      "metadata": {
+        "attack_id": "T1547.001",
+        "technique_name": "Registry Run Keys",
+        "platform": "windows",
+        "tactic": "Persistence",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    },
+    {
+      "benchmark_id": "cde8de95-b63a-4643-93b1-602f36d997ec",
+      "item_id": "b905044a-9577-406c-8df4-ff45589b7d14",
+      "item_type": "attack_command",
+      "overall_score": 0.8647058823529412,
+      "category_scores": {
+        "correctness": 0.8399999999999999,
+        "realism": 0.7666666666666666,
+        "safety": 0.9375,
+        "detectability": 0.78,
+        "effectiveness": 1.0
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is syntactically correct and will create the registry key. The use of `Set-ItemProperty` is appropriate. The inclusion of `-ExecutionPolicy Bypass` is necessary for the script to execute without policy restrictions. The prerequisites and cleanup steps are also well-defined.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "strengths": [
+              "Correct PowerShell syntax.",
+              "Includes necessary execution policy bypass.",
+              "Provides clear prerequisites and cleanup instructions."
+            ],
+            "weaknesses": [
+              "Relies on the existence of C:\\Temp\\startup_script.ps1, which is not created by the command itself. This is addressed in the prerequisites, but could be improved by including a basic script creation within the command or prerequisites."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The command directly implements the Registry Run Keys technique (T1547.001) by creating a registry entry that executes a script upon user login. It achieves the objective of persistence by ensuring the script runs automatically.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "strengths": [
+              "Directly implements the specified ATT&CK technique.",
+              "Produces the expected artifact (registry key).",
+              "Achieves the persistence objective."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "This technique is commonly used by attackers for persistence. The use of PowerShell is realistic, and the location of the script in C:\\Temp is plausible, though less stealthy than other locations. The command itself is straightforward and easy to implement.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "strengths": [
+              "Mirrors a common persistence technique.",
+              "Uses a tool (PowerShell) frequently employed by attackers.",
+              "Simple and easy to implement."
+            ],
+            "weaknesses": [
+              "The C:\\Temp directory is a less stealthy location for the script. Attackers often use more hidden locations.",
+              "The command is relatively simple and might be easily detected."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "While the Lazarus Group is known to use PowerShell and persistence techniques, this specific command is not uniquely tied to them. It's a general persistence method that could be used by many actors. The context mentions credential harvesting, which is not directly implemented by this command, but is a common follow-on activity.",
+          "confidence": 0.7,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "strengths": [
+              "Uses PowerShell, a tool often used by Lazarus Group.",
+              "Implements a persistence technique, which is a common tactic."
+            ],
+            "weaknesses": [
+              "The specific command is not unique to the Lazarus Group.",
+              "The command doesn't directly implement the credential harvesting mentioned in the threat context."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is relatively safe as it operates within the user's registry hive (HKCU) and creates a file in C:\\Temp. The provided cleanup instructions are complete, removing the registry key and the test file. The prerequisites are clearly defined, ensuring predictable behavior. The use of -ExecutionPolicy Bypass is a potential risk, but contained within a test environment, it is acceptable.",
+          "confidence": 0.9,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "strengths": [
+              "Complete cleanup instructions provided.",
+              "Operates within the user's context (HKCU)."
+            ],
+            "weaknesses": [
+              "Reliance on a file in C:\\Temp, which could be a shared resource in some environments, though unlikely to cause significant harm."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "This command generates several useful detection artifacts. The creation of a new registry key in the Run key is a clear indicator. The spawning of powershell.exe upon user login is another. The script execution itself provides opportunities for detection based on its behavior. The indicators are well-defined and can be used to build SIEM rules.",
+          "confidence": 0.8,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "strengths": [
+              "Clear registry key creation indicator.",
+              "Powershell process spawning is easily detectable.",
+              "Provides opportunities for behavioral analysis of the executed script."
+            ],
+            "weaknesses": [
+              "The -ExecutionPolicy Bypass parameter could potentially make it harder to detect the initial execution, but the registry key creation is still a strong indicator."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 10,
+          "normalized_score": 1.0,
+          "explanation": "The documentation is excellent. The explanation clearly describes the command's purpose and functionality. The prerequisites are well-defined, and the expected indicators are clearly listed. The cleanup instructions are complete. The inclusion of a sample startup_script.ps1 is a bonus.",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "strengths": [
+              "Clear and concise explanation.",
+              "Detailed prerequisites.",
+              "Comprehensive list of indicators.",
+              "Complete cleanup instructions."
+            ],
+            "weaknesses": [
+              "None apparent."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command is complete with all required fields and documentation",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 7.5,
+          "normalized_score": 0.75,
+          "explanation": "Command generates 3 detection artifacts but could be more diverse",
+          "confidence": 1.0,
+          "timestamp": "2025-11-07T17:17:15.962255",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Create Registry Run Key for a PowerShell Script (T1547.001)\nOverall Score: 0.865/1.0\n\nCategory Scores:\n  - effectiveness: 1.000\n  - safety: 0.938\n  - correctness: 0.840\n  - detectability: 0.780\n  - realism: 0.767\n\nAssessment: EXCELLENT - High quality attack command",
+      "timestamp": "2025-11-07T17:17:15.962255",
+      "metadata": {
+        "attack_id": "T1547.001",
+        "technique_name": "Registry Run Keys",
+        "platform": "windows",
+        "tactic": "Persistence",
+        "confidence_score": 0.7,
+        "source": "gemini_llm"
+      }
+    }
+  ]
+}

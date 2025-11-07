@@ -105,14 +105,21 @@ async def run_benchmark():
         print("[ERROR] No commands found in results")
         return
     
+    # Limit to first 10 commands for faster evaluation
+    max_commands = 10
+    commands_to_evaluate = commands[:max_commands]
+    
+    if len(commands) > max_commands:
+        print(f"\n[INFO] Limiting evaluation to first {max_commands} commands (out of {len(commands)} total)")
+    
     # Evaluate commands
-    print(f"\n[RUN] Evaluating {len(commands)} commands...")
+    print(f"\n[RUN] Evaluating {len(commands_to_evaluate)} commands...")
     print("="*80)
     
     results = []
     
-    for i, command in enumerate(commands, 1):
-        print(f"\n[{i}/{len(commands)}] {command.get('name', 'Unknown')}")
+    for i, command in enumerate(commands_to_evaluate, 1):
+        print(f"\n[{i}/{len(commands_to_evaluate)}] {command.get('name', 'Unknown')}")
         print(f"   Technique: {command.get('mitre_attack_id')} - {command.get('technique_name')}")
         print(f"   Platform: {command.get('platform')}")
         
