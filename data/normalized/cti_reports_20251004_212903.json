@@ -824,5 +824,1039 @@
         }
       ]
     }
+  },
+  {
+    "report_id": "a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "source_id": "mock-event-4",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "APT29 - Supply Chain Attack Using Cobalt Strike",
+    "description": "APT29 - Supply Chain Attack Using Cobalt Strike\n\nDetails: Threat Intelligence Report: APT29 Campaign\n            \n            Overview: This campaign demonstrates supply chain attack techniques \n            attributed to APT29 (Cozy Bear). The threat actor is leveraging Cobalt Strike \n            to compromise software supply chains and deploy backdoors.\n            \n            TTPs Observed:\n            - Initial Access: Compromise of trusted software vendors\n            - Execution: Malicious DLL loading, rundll32 execution\n            - Persistence: Service creation, bootkit installation\n            - Privilege Escalation: Exploitation of vulnerable drivers\n            - Defense Evasion: Timestomp, indicator removal\n            - Credential Access: DCSync attacks, NTDS.dit extraction\n            - Discovery: Active Directory enumeration, cloud service discovery\n            - Lateral Movement: Pass-the-ticket, SSH hijacking\n            - Collection: Email collection, browser credential theft\n            - Exfiltration: Exfiltration over alternative protocol\n            \n            Indicators of Compromise:\n            - Compromised software update servers\n            - Cobalt Strike beacon configurations\n            - Malicious certificates used for code signing\n            - DNS tunneling traffic patterns",
+    "confidence": 95,
+    "severity": "high",
+    "published": true,
+    "analysis_status": "complete",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "update-server-cdn.net",
+        "category": "Network activity",
+        "confidence": 90,
+        "comment": "Compromised software update server",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "cozy-beacon-1337.com",
+        "category": "Network activity",
+        "confidence": 90,
+        "comment": "Cobalt Strike C2 server",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "dns-tunnel-alpha.org",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "DNS tunneling domain",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+        "category": "Payload delivery",
+        "confidence": 95,
+        "comment": "Malicious DLL hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+        "category": "Payload delivery",
+        "confidence": 95,
+        "comment": "Backdoor hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",
+        "category": "Payload delivery",
+        "confidence": 95,
+        "comment": "Cobalt Strike beacon",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "185.220.101.45",
+        "category": "Network activity",
+        "confidence": 90,
+        "comment": "C2 infrastructure IP",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "193.169.245.78",
+        "category": "Network activity",
+        "confidence": 90,
+        "comment": "Exfiltration server IP",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "apt29",
+      "cozy bear"
+    ],
+    "malware_families": [
+      "cobalt strike",
+      "Cobalt Strike"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Supply Chain Compromise\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Compromise Software Supply Chain",
+        "technique_id": "T1195.002",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"APT29\"",
+      "misp-galaxy:malware=\"Cobalt Strike\"",
+      "attack-pattern:\"Supply Chain Compromise\"",
+      "type:OSINT",
+      "tlp:red"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-4",
+      "uuid": "event-uuid-4",
+      "info": "APT29 - Supply Chain Attack Using Cobalt Strike",
+      "date": "2025-10-02",
+      "timestamp": "1759401343",
+      "published": true,
+      "analysis": "2",
+      "threat_level_id": "1",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "3",
+      "comment": "Supply chain compromise campaign by APT29",
+      "Attribute": [],
+      "Tag": [],
+      "RelatedEvent": [],
+      "Object": [
+        {
+          "id": "obj-1",
+          "name": "malware",
+          "template_uuid": "malware-template-uuid",
+          "description": "Malware sample: Cobalt Strike",
+          "meta-category": "file",
+          "Attribute": [
+            {
+              "type": "text",
+              "object_relation": "name",
+              "value": "Cobalt Strike"
+            }
+          ]
+        },
+        {
+          "id": "obj-2",
+          "name": "attack-pattern",
+          "template_uuid": "attack-pattern-template-uuid",
+          "description": "MITRE ATT&CK technique",
+          "meta-category": "misc",
+          "Attribute": [
+            {
+              "type": "text",
+              "object_relation": "name",
+              "value": "Compromise Software Supply Chain"
+            },
+            {
+              "type": "text",
+              "object_relation": "id",
+              "value": "T1195.002"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "report_id": "f1e2d3c4-b5a6-9786-5432-1098fedcba98",
+    "source_id": "mock-event-5",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "FIN7 - Point-of-Sale Malware Campaign",
+    "description": "FIN7 - Point-of-Sale Malware Campaign\n\nDetails: Threat Intelligence Report: FIN7 Campaign\n            \n            Overview: This campaign demonstrates point-of-sale compromise techniques \n            attributed to FIN7 (Carbanak). The threat actor is targeting retail and \n            hospitality sectors to harvest payment card data.\n            \n            TTPs Observed:\n            - Initial Access: Spear phishing with malicious Word documents\n            - Execution: VBA macro execution, JavaScript execution\n            - Persistence: Registry Run keys, COM hijacking\n            - Privilege Escalation: Process injection\n            - Defense Evasion: Obfuscated files, NTFS file attributes\n            - Credential Access: Keylogging, memory scraping\n            - Discovery: System network configuration discovery\n            - Lateral Movement: Windows Remote Management\n            - Collection: Screen capture, data from local system\n            - Exfiltration: Exfiltration over C2 channel\n            \n            Indicators of Compromise:\n            - Malicious Office documents with embedded macros\n            - Memory scraping malware signatures\n            - POS malware file hashes\n            - C2 domain patterns",
+    "confidence": 88,
+    "severity": "high",
+    "published": true,
+    "analysis_status": "complete",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "payment-processor-api.com",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Fake payment processing domain",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "pos-update-system.net",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Malicious POS update server",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "carbanak-c2-2025.org",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "FIN7 C2 infrastructure",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "fedcba9876543210abcdef1234567890abcdef1234567890abcdef1234567890",
+        "category": "Payload delivery",
+        "confidence": 90,
+        "comment": "POS malware hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "123456789abcdef0123456789abcdef0",
+        "category": "Payload delivery",
+        "confidence": 90,
+        "comment": "Memory scraper hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "abcdef0123456789abcdef0123456789abcdef01",
+        "category": "Payload delivery",
+        "confidence": 90,
+        "comment": "Malicious macro document",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "45.142.212.61",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "C2 server IP",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "91.218.114.77",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Data exfiltration IP",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "fin7",
+      "carbanak"
+    ],
+    "malware_families": [
+      "carbanak",
+      "pos malware"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Input Capture\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Keylogging",
+        "technique_id": "T1056.001",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"FIN7\"",
+      "misp-galaxy:malware=\"Carbanak\"",
+      "attack-pattern:\"Input Capture\"",
+      "type:OSINT",
+      "sector:retail",
+      "sector:hospitality"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-5",
+      "uuid": "event-uuid-5",
+      "info": "FIN7 - Point-of-Sale Malware Campaign",
+      "date": "2025-10-01",
+      "timestamp": "1759314943",
+      "published": true,
+      "analysis": "2",
+      "threat_level_id": "1",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "3",
+      "comment": "FIN7 targeting retail POS systems",
+      "Attribute": [],
+      "Tag": [],
+      "RelatedEvent": [],
+      "Object": []
+    }
+  },
+  {
+    "report_id": "7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d",
+    "source_id": "mock-event-6",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "Emotet - Large Scale Phishing Campaign",
+    "description": "Emotet - Large Scale Phishing Campaign\n\nDetails: Threat Intelligence Report: Emotet Campaign\n            \n            Overview: This campaign demonstrates the resurgence of Emotet botnet \n            conducting large-scale phishing operations. The malware is being distributed \n            through malicious email attachments and links.\n            \n            TTPs Observed:\n            - Initial Access: Phishing emails with malicious attachments\n            - Execution: User execution of malicious files\n            - Persistence: Registry Run keys, scheduled tasks\n            - Privilege Escalation: Bypass User Account Control\n            - Defense Evasion: File deletion, obfuscated files\n            - Credential Access: Credential dumping\n            - Discovery: System information discovery\n            - Lateral Movement: SMB/Windows Admin Shares\n            - Collection: Email collection, data from local system\n            - Command and Control: Application layer protocol (HTTP/HTTPS)\n            - Impact: Service stop, inhibit system recovery\n            \n            Indicators of Compromise:\n            - Malicious email subject patterns\n            - Document file hashes with malicious macros\n            - Emotet loader DLL signatures\n            - C2 IP addresses and domains",
+    "confidence": 82,
+    "severity": "medium",
+    "published": true,
+    "analysis_status": "ongoing",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "emotet-loader-2025.com",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "Emotet C2 domain",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "invoice-document-share.net",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "Phishing infrastructure",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "payment-notification-system.org",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "Malicious email lure domain",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx1234yzab5678cdef9012",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "Emotet loader hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "Malicious document hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "fedcba9876543210fedcba9876543210fedcba98",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "Emotet DLL hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "192.168.100.200",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "C2 server IP",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "203.0.113.45",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "Secondary C2 IP",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "emotet",
+      "mealybug"
+    ],
+    "malware_families": [
+      "emotet",
+      "Emotet"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Phishing\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Phishing: Spearphishing Attachment",
+        "technique_id": "T1566.001",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"Emotet\"",
+      "misp-galaxy:malware=\"Emotet\"",
+      "attack-pattern:\"Phishing\"",
+      "type:OSINT",
+      "tlp:amber"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-6",
+      "uuid": "event-uuid-6",
+      "info": "Emotet - Large Scale Phishing Campaign",
+      "date": "2025-09-30",
+      "timestamp": "1759228543",
+      "published": true,
+      "analysis": "1",
+      "threat_level_id": "2",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "2",
+      "comment": "Emotet botnet resurgence campaign",
+      "Attribute": [],
+      "Tag": [],
+      "RelatedEvent": [],
+      "Object": []
+    }
+  },
+  {
+    "report_id": "9e8d7c6b-5a4f-3e2d-1c0b-9a8f7e6d5c4b",
+    "source_id": "mock-event-7",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "REvil/Sodinokibi - Ransomware as a Service Operation",
+    "description": "REvil/Sodinokibi - Ransomware as a Service Operation\n\nDetails: Threat Intelligence Report: REvil/Sodinokibi Campaign\n            \n            Overview: This campaign represents a sophisticated ransomware-as-a-service \n            operation conducted by the REvil group. Targets include enterprise networks \n            with double-extortion tactics.\n            \n            TTPs Observed:\n            - Initial Access: Exploit public-facing applications, RDP compromise\n            - Execution: PowerShell, Windows Command Shell\n            - Persistence: Create account, external remote services\n            - Privilege Escalation: Valid accounts\n            - Defense Evasion: Indicator removal, file deletion\n            - Credential Access: OS credential dumping\n            - Discovery: Network service scanning, file and directory discovery\n            - Lateral Movement: Remote services, taint shared content\n            - Collection: Data from network shared drives, archive collected data\n            - Command and Control: Encrypted channel, web protocols\n            - Impact: Data encrypted for impact, defacement, inhibit system recovery\n            \n            Indicators of Compromise:\n            - REvil ransomware executable hashes\n            - Ransom note templates\n            - Tor-based payment portal domains\n            - Data leak site infrastructure",
+    "confidence": 93,
+    "severity": "critical",
+    "published": true,
+    "analysis_status": "complete",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "revil-payment-portal.onion",
+        "category": "Network activity",
+        "confidence": 90,
+        "comment": "REvil payment portal",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "happy-blog-leak-site.onion",
+        "category": "Network activity",
+        "confidence": 90,
+        "comment": "Data leak site",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "sodinokibi-affiliate-panel.com",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Affiliate management panel",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "9876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba",
+        "category": "Payload delivery",
+        "confidence": 95,
+        "comment": "REvil ransomware binary",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "fedcba9876543210fedcba9876543210",
+        "category": "Payload delivery",
+        "confidence": 95,
+        "comment": "Ransomware loader",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "1234567890abcdef1234567890abcdef12345678",
+        "category": "Payload delivery",
+        "confidence": 95,
+        "comment": "Encryption module",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "198.51.100.42",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "C2 infrastructure",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "203.0.113.99",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Data exfiltration server",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "revil",
+      "sodinokibi",
+      "gold southfield"
+    ],
+    "malware_families": [
+      "revil",
+      "sodinokibi",
+      "REvil"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Data Encrypted for Impact\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Data Encrypted for Impact",
+        "technique_id": "T1486",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"REvil\"",
+      "misp-galaxy:malware=\"Sodinokibi\"",
+      "attack-pattern:\"Data Encrypted for Impact\"",
+      "type:OSINT",
+      "tlp:red",
+      "ransomware"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-7",
+      "uuid": "event-uuid-7",
+      "info": "REvil/Sodinokibi - Ransomware as a Service Operation",
+      "date": "2025-09-29",
+      "timestamp": "1759142143",
+      "published": true,
+      "analysis": "2",
+      "threat_level_id": "1",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "3",
+      "comment": "REvil ransomware campaign with double extortion",
+      "Attribute": [],
+      "Tag": [],
+      "RelatedEvent": [],
+      "Object": []
+    }
+  },
+  {
+    "report_id": "3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f",
+    "source_id": "mock-event-8",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "APT41 - Dual Espionage and Financial Crime Operation",
+    "description": "APT41 - Dual Espionage and Financial Crime Operation\n\nDetails: Threat Intelligence Report: APT41 Campaign\n            \n            Overview: This campaign showcases APT41's unique dual-purpose operations \n            conducting both state-sponsored espionage and financially motivated cybercrime. \n            The group targets healthcare, telecommunications, and gaming industries.\n            \n            TTPs Observed:\n            - Initial Access: Supply chain compromise, exploit public-facing application\n            - Execution: Command and scripting interpreter\n            - Persistence: Create or modify system process, BITS jobs\n            - Privilege Escalation: Process injection, access token manipulation\n            - Defense Evasion: Rootkit, virtualization/sandbox evasion\n            - Credential Access: Brute force, steal web session cookies\n            - Discovery: Cloud infrastructure discovery, software discovery\n            - Lateral Movement: Use alternate authentication material\n            - Collection: Data from information repositories\n            - Exfiltration: Transfer data to cloud account\n            - Impact: Data manipulation, financial theft\n            \n            Indicators of Compromise:\n            - Custom malware toolset signatures\n            - Cryptocurrency wallet addresses\n            - Gaming platform exploit code\n            - Healthcare data theft indicators",
+    "confidence": 87,
+    "severity": "high",
+    "published": true,
+    "analysis_status": "complete",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "healthcare-portal-update.com",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Malicious healthcare portal",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "gaming-api-service.net",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Gaming platform exploit infrastructure",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "telecom-management-cdn.org",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Telecom sector targeting",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+        "category": "Payload delivery",
+        "confidence": 90,
+        "comment": "APT41 custom malware",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "9876543210abcdef9876543210abcdef",
+        "category": "Payload delivery",
+        "confidence": 90,
+        "comment": "Rootkit component",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "fedcba0987654321fedcba0987654321fedcba09",
+        "category": "Payload delivery",
+        "confidence": 90,
+        "comment": "Data theft module",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "45.77.156.234",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "C2 server IP",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "104.238.168.145",
+        "category": "Network activity",
+        "confidence": 85,
+        "comment": "Data staging server",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "apt41",
+      "barium",
+      "winnti group"
+    ],
+    "malware_families": [
+      "winnti",
+      "crosswalk",
+      "spyder loader"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Supply Chain Compromise\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Exploit Public-Facing Application",
+        "technique_id": "T1190",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"APT41\"",
+      "misp-galaxy:malware=\"Winnti\"",
+      "attack-pattern:\"Supply Chain Compromise\"",
+      "type:OSINT",
+      "sector:healthcare",
+      "sector:gaming",
+      "sector:telecommunications"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-8",
+      "uuid": "event-uuid-8",
+      "info": "APT41 - Dual Espionage and Financial Crime Operation",
+      "date": "2025-09-28",
+      "timestamp": "1759055743",
+      "published": true,
+      "analysis": "2",
+      "threat_level_id": "1",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "3",
+      "comment": "APT41 dual-purpose campaign",
+      "Attribute": [],
+      "Tag": [],
+      "RelatedEvent": [],
+      "Object": []
+    }
+  },
+  {
+    "report_id": "5f6a7b8c-9d0e-1f2a-3b4c-5d6e7f8a9b0c",
+    "source_id": "mock-event-9",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "Maze Ransomware - Corporate Network Breach",
+    "description": "Maze Ransomware - Corporate Network Breach\n\nDetails: Threat Intelligence Report: Maze Ransomware Campaign\n            \n            Overview: This campaign demonstrates Maze ransomware operators targeting \n            corporate networks with advanced evasion techniques and data exfiltration \n            before encryption.\n            \n            TTPs Observed:\n            - Initial Access: Valid accounts obtained through credential purchase\n            - Execution: Windows Management Instrumentation\n            - Persistence: Valid accounts, external remote services\n            - Privilege Escalation: Domain policy modification\n            - Defense Evasion: Disable or modify tools, impair defenses\n            - Credential Access: LSASS memory dumping\n            - Discovery: Domain trust discovery, network share discovery\n            - Lateral Movement: Remote Desktop Protocol\n            - Collection: Automated collection, data staged\n            - Exfiltration: Exfiltration over web service\n            - Impact: Data encrypted for impact, data destruction\n            \n            Indicators of Compromise:\n            - Maze ransomware binary signatures\n            - Pre-encryption data staging patterns\n            - Tor-based leak site domains\n            - RDP brute force patterns",
+    "confidence": 79,
+    "severity": "high",
+    "published": false,
+    "analysis_status": "ongoing",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "maze-news-leak-portal.onion",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "Maze leak site",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "corporate-data-dump.com",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "Data exfiltration domain",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "maze-team-negotiation.org",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "Ransom negotiation portal",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "123abc456def789012abc345def678901abc234def567890abc123def456789012",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "Maze ransomware variant",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "abc123def456789abc012def345678ab",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "Maze loader component",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "789abc012def345678abc901def234567abc8901",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "Data exfiltration tool",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "176.123.45.67",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "Data staging server",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "89.234.56.78",
+        "category": "Network activity",
+        "confidence": 75,
+        "comment": "RDP brute force origin",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "maze",
+      "maze team"
+    ],
+    "malware_families": [
+      "maze",
+      "Maze"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Data Encrypted for Impact\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Data Encrypted for Impact",
+        "technique_id": "T1486",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"Maze\"",
+      "misp-galaxy:malware=\"Maze\"",
+      "attack-pattern:\"Data Encrypted for Impact\"",
+      "type:OSINT",
+      "tlp:amber",
+      "ransomware"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-9",
+      "uuid": "event-uuid-9",
+      "info": "Maze Ransomware - Corporate Network Breach",
+      "date": "2025-09-27",
+      "timestamp": "1758969343",
+      "published": false,
+      "analysis": "1",
+      "threat_level_id": "1",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "2",
+      "comment": "Maze ransomware with data exfiltration",
+      "Attribute": [],
+      "Tag": [],
+      "RelatedEvent": [],
+      "Object": []
+    }
+  },
+  {
+    "report_id": "8d9e0f1a-2b3c-4d5e-6f7a-8b9c0d1e2f3a",
+    "source_id": "mock-event-10",
+    "source": "MISP",
+    "timestamp": "2025-10-04T14:29:03.345141Z",
+    "title": "OilRig - Middle East Targeted Espionage",
+    "description": "OilRig - Middle East Targeted Espionage\n\nDetails: Threat Intelligence Report: OilRig Campaign\n            \n            Overview: This campaign demonstrates targeted espionage operations by OilRig \n            (APT34) focusing on government and energy sectors in the Middle East region.\n            \n            TTPs Observed:\n            - Initial Access: Spear phishing with LinkedIn messages\n            - Execution: PowerShell, VBA macros\n            - Persistence: Web shell deployment, registry run keys\n            - Privilege Escalation: Exploitation for privilege escalation\n            - Defense Evasion: Web service as dead drop resolver\n            - Credential Access: Input capture, credential API hooking\n            - Discovery: Account discovery, permission groups discovery\n            - Lateral Movement: Internal spear phishing\n            - Collection: Email collection, data from network shared drive\n            - Command and Control: Web protocols, DNS tunneling\n            - Exfiltration: Exfiltration over C2 channel\n            \n            Indicators of Compromise:\n            - Custom PowerShell-based backdoors\n            - Web shell file patterns\n            - Tunneling tool signatures\n            - Spear phishing email templates",
+    "confidence": 84,
+    "severity": "medium",
+    "published": true,
+    "analysis_status": "complete",
+    "indicators": [
+      {
+        "id": "attr-1",
+        "type": "domain",
+        "value": "energy-sector-portal.com",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "Fake energy sector portal",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-2",
+        "type": "domain",
+        "value": "government-doc-share.net",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "Phishing infrastructure",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-3",
+        "type": "domain",
+        "value": "oilrig-dns-tunnel.org",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "DNS tunneling domain",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-4",
+        "type": "sha256",
+        "value": "def456abc789012def345abc678901def234abc567890def123abc456789012def",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "OilRig backdoor hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-5",
+        "type": "md5",
+        "value": "456def789abc012345def678abc90123",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "Web shell hash",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-6",
+        "type": "sha1",
+        "value": "012def345abc678901def234abc567890def1234",
+        "category": "Payload delivery",
+        "confidence": 85,
+        "comment": "PowerShell backdoor",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-7",
+        "type": "ip-dst",
+        "value": "62.109.23.145",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "C2 infrastructure",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      },
+      {
+        "id": "attr-8",
+        "type": "ip-dst",
+        "value": "37.48.115.227",
+        "category": "Network activity",
+        "confidence": 80,
+        "comment": "Web shell hosting server",
+        "first_seen": "1759562943",
+        "source": "MISP"
+      }
+    ],
+    "threat_actors": [
+      "oilrig",
+      "apt34",
+      "helix kitten"
+    ],
+    "malware_families": [
+      "bondupdater",
+      "twoface",
+      "powerton"
+    ],
+    "attack_patterns": [
+      {
+        "source": "tag",
+        "name": "attack-pattern:\"Spear Phishing\"",
+        "technique_id": ""
+      },
+      {
+        "name": "Phishing: Spearphishing via Service",
+        "technique_id": "T1566.003",
+        "source": "object"
+      }
+    ],
+    "tags": [
+      "misp-galaxy:threat-actor=\"OilRig\"",
+      "misp-galaxy:malware=\"BondUpdater\"",
+      "attack-pattern:\"Spear Phishing\"",
+      "type:OSINT",
+      "region:middle-east",
+      "sector:energy",
+      "sector:government"
+    ],
+    "source_url": null,
+    "collection_timestamp": "2025-10-04T14:29:03.345141Z",
+    "raw_data": {
+      "id": "mock-event-10",
+      "uuid": "event-uuid-10",
+      "info": "OilRig - Middle East Targeted Espionage",
+      "date": "2025-09-26",
+      "timestamp": "1758882943",
+      "published": true,
+      "analysis": "2",
+      "threat_level_id": "2",
+      "org_id": "1",
+      "orgc_id": "1",
+      "distribution": "3",
+      "comment": "OilRig espionage campaign targeting Middle East",
+      "Attribute": [],
+      "Tag": [],
+      "RelatedEvent": [],
+      "Object": []
+    }
   }
 ]
