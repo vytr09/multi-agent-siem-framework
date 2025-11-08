@@ -343,14 +343,12 @@
 #         import traceback
 #         traceback.print_exc()
 
-
 """
-Test script for RuleGen Agent with LLM
+Test script for RuleGen Agent with LLM - FIXED VERSION
 """
 
 import sys
 from pathlib import Path
-
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -367,18 +365,27 @@ import json
 import os
 
 # Now imports should work
-from agents.rulegen.agent import RuleGenerationAgentWithLLM
+# Try different import paths based on project structure
+try:
+    from agents.rulegen.llm_sigma_generator import LLMSigmaGenerator
+except ModuleNotFoundError:
+    try:
+        from agents.rulegen.llm_sigma_generator import LLMSigmaGenerator
+    except ModuleNotFoundError:
+        # Direct import from file location
+        sys.path.insert(0, str(project_root / "agents" / "rulegen"))
+        from agents.rulegen.llm_sigma_generator import LLMSigmaGenerator
 
 
 async def test_llm_rule_generation():
-    """Test RuleGen agent with LLM-based Sigma generation"""
+    """Test LLM-based Sigma rule generation"""
     
     print("\n" + "="*80)
     print("[TEST] TESTING RULEGEN AGENT WITH LLM")
     print("="*80)
     
     # Load extraction data
-    data_path = project_root / "data" / "extracted" / "hybrid_extraction_results.json"
+    data_path = project_root / "data" / "processed" / "test_hybrid_multi_extraction_gemini-2.0-flash-lite.json"
     
     if not data_path.exists():
         print(f"[ERROR] Data file not found: {data_path}")
@@ -390,97 +397,196 @@ async def test_llm_rule_generation():
     with open(data_path, 'r', encoding='utf-8') as f:
         extraction_data = json.load(f)
     
-    # Get hybrid extraction results
-    hybrid_data = extraction_data.get('hybrid', {})
+    # FIXED: Access the correct structure - per_report_results
+    per_report_results = extraction_data.get('per_report_results', [])
     
-    if not hybrid_data:
+    if not per_report_results:
         print("[ERROR] No hybrid extraction data found")
         return
     
-    # Configure agent with LLM
+    # Extract TTPs from all reports
+    all_ttps = []
+    for report_result in per_report_results:
+        extraction = report_result.get('extraction', {})
+        extracted_ttps = extraction.get('extracted_ttps', [])
+        
+        # Filter by confidence threshold
+        for ttp in extracted_ttps:
+            if ttp.get('confidence_score', 0) >= 0.6:  # Lowered threshold
+                all_ttps.append(ttp)
+    
+    print(f"[OK] Found {len(all_ttps)} TTPs from {len(per_report_results)} reports")
+    
+    # Limit to first 10 TTPs for testing
+    test_ttps = all_ttps[:10]
+    
+    print(f"\n[INFO] Testing with {len(test_ttps)} TTPs:")
+    for idx, ttp in enumerate(test_ttps, 1):
+        print(f"  {idx}. {ttp.get('attack_id', 'UNKNOWN')}: {ttp.get('technique_name', 'Unknown')}")
+        print(f"     Confidence: {ttp.get('confidence_score', 0):.2f}")
+        print(f"     Tactic: {ttp.get('tactic', 'Unknown')}")
+    
+    # Configure LLM
     config = {
-        'platforms': ['splunk', 'elasticsearch'],
-        'optimize_rules': True,
-        'validate_rules': True,
-        'min_confidence_threshold': 0.7,
-        'llm': {
-            'enabled': True,
-            'api_key': os.getenv('GEMINI_API_KEY'),
-            'model': 'gemini-2.0-flash-lite',
-            'temperature': 0.3,
-            'max_retries': 3
-        },
-        'sigma': {},
-        'optimizer': {},
-        'splunk': {},
-        'elasticsearch': {}
+        'api_key': os.getenv('GEMINI_API_KEY'),
+        'model': 'gemini-2.0-flash-lite',
+        'temperature': 0.3,
+        'max_retries': 3
     }
     
     # Check API key
-    if not config['llm']['api_key']:
-        print("\n[WARN] GEMINI_API_KEY not found in environment")
-        print("   LLM generation will fall back to manual generation")
+    if not config['api_key']:
+        print("\n[ERROR] GEMINI_API_KEY not found in environment")
+        print("   Please set: export GEMINI_API_KEY='your-key'")
+        return
     
-    # Initialize agent
-    print("\n[INIT] Initializing RuleGen Agent...")
-    agent = RuleGenerationAgentWithLLM(config)
-    await agent.initialize()
+    print(f"\n[OK] API Key found: {config['api_key'][:10]}...")
     
-    # Process extraction data
-    print("\n[RUN] Starting rule generation...")
-    result = await agent.process(hybrid_data)
+    # Initialize LLM generator
+    print("\n[INIT] Initializing LLM Generator...")
+    try:
+        generator = LLMSigmaGenerator(config)
+        print("[OK] Generator initialized successfully")
+    except Exception as e:
+        print(f"[ERROR] Failed to initialize generator: {e}")
+        return
+    
+    # Process TTPs
+    print("\n" + "="*80)
+    print("[RUN] GENERATING SIGMA RULES")
+    print("="*80)
+    
+    results = []
+    successful = 0
+    failed = 0
+    
+    for idx, ttp in enumerate(test_ttps, 1):
+        print(f"\n[{idx}/{len(test_ttps)}] Processing: {ttp.get('attack_id')} - {ttp.get('technique_name')}")
+        print("-" * 80)
+        
+        try:
+            # Generate Sigma rule
+            sigma_rule = await generator.generate_sigma_rule(ttp)
+            
+            if sigma_rule:
+                print(f"[OK] Generated: {sigma_rule.get('title', 'Untitled')}")
+                print(f"  - ID: {sigma_rule.get('id', 'N/A')}")
+                print(f"  - Level: {sigma_rule.get('level', 'N/A')}")
+                print(f"  - Status: {sigma_rule.get('status', 'N/A')}")
+                
+                # Show detection logic
+                detection = sigma_rule.get('detection', {})
+                if detection:
+                    print(f"  - Condition: {detection.get('condition', 'N/A')}")
+                    selection_count = sum(1 for k in detection.keys() if k.startswith('selection'))
+                    print(f"  - Selections: {selection_count}")
+                
+                results.append({
+                    'ttp_id': ttp.get('ttp_id'),
+                    'attack_id': ttp.get('attack_id'),
+                    'technique_name': ttp.get('technique_name'),
+                    'tactic': ttp.get('tactic'),
+                    'confidence_score': ttp.get('confidence_score'),
+                    'sigma_rule': sigma_rule,
+                    'status': 'success'
+                })
+                
+                successful += 1
+            else:
+                print(f"[WARN] No rule generated (returned None)")
+                failed += 1
+                
+        except Exception as e:
+            print(f"[ERROR] Failed to generate rule: {type(e).__name__}: {str(e)}")
+            failed += 1
+            
+            results.append({
+                'ttp_id': ttp.get('ttp_id'),
+                'attack_id': ttp.get('attack_id'),
+                'status': 'failed',
+                'error': str(e)
+            })
+        
+        # Rate limiting
+        if idx < len(test_ttps):
+            await asyncio.sleep(2)
     
     # Save output
     output_dir = project_root / "data" / "generated_rules"
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    output_path = output_dir / "rulegen_llm_output.json"
+    output_data = {
+        'test_timestamp': extraction_data.get('test_timestamp'),
+        'input_file': str(data_path.name),
+        'total_ttps_tested': len(test_ttps),
+        'successful': successful,
+        'failed': failed,
+        'success_rate': (successful / len(test_ttps) * 100) if test_ttps else 0,
+        'llm_config': {
+            'model': config['model'],
+            'temperature': config['temperature']
+        },
+        'results': results
+    }
+    
+    output_path = output_dir / "rulegen_llm_test_output.json"
     
     with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
+        json.dump(output_data, f, indent=2, ensure_ascii=False)
     
     file_size = output_path.stat().st_size / 1024
     
+    # Save individual Sigma rules
+    if successful > 0:
+        sigma_dir = output_dir / "sigma_rules_llm"
+        sigma_dir.mkdir(exist_ok=True)
+        
+        for result in results:
+            if result.get('status') == 'success':
+                attack_id = result['attack_id']
+                sigma_rule = result['sigma_rule']
+                
+                rule_path = sigma_dir / f"{attack_id}_llm_generated.json"
+                with open(rule_path, 'w', encoding='utf-8') as f:
+                    json.dump(sigma_rule, f, indent=2, ensure_ascii=False)
+                
+                print(f"[SAVE] Sigma rule: {attack_id}_llm_generated.json")
+    
     # Print summary
     print("\n" + "="*80)
-    print("[DONE] RULE GENERATION COMPLETE")
+    print("[DONE] TEST COMPLETE")
     print("="*80)
     print(f"\n[FILE] Output saved to: {output_path}")
     print(f"[INFO] File size: {file_size:.2f} KB")
-
-    summary = result.get('summary', {})
-    print(f"\n[SUMMARY] Summary:")
-    print(f"  - TTPs processed: {summary.get('total_ttps_processed', 0)}")
-    print(f"  - Rules generated: {summary.get('total_rules_generated', 0)}")
-    print(f"  - Successful: {summary.get('successful', 0)}")
-    print(f"  - Failed: {summary.get('failed', 0)}")
-    print(f"  - LLM generations: {summary.get('llm_generations', 0)}")
-    print(f"  - Fallback generations: {summary.get('fallback_generations', 0)}")
-    print(f"  - Processing time: {summary.get('processing_time', 0):.2f}s")
     
-    # Platform statistics
-    platform_stats = result.get('platform_statistics', {})
-    if platform_stats:
-        print(f"\n[INFO] Platform Statistics:")
-        for platform, stats in platform_stats.items():
-            print(f"  - {platform.upper()}:")
-            print(f"  {platform.upper()}:")
-            print(f"    - Total: {stats.get('total', 0)}")
-            print(f"    - Successful: {stats.get('successful', 0)}")
-            print(f"    - Validated: {stats.get('validated', 0)}")
-            print(f"    - Failed: {stats.get('failed', 0)}")
+    print(f"\n[SUMMARY] Results:")
+    print(f"  - TTPs tested: {len(test_ttps)}")
+    print(f"  - Successful: {successful}")
+    print(f"  - Failed: {failed}")
+    print(f"  - Success rate: {(successful / len(test_ttps) * 100):.1f}%")
+    print(f"  - LLM model: {config['model']}")
+    
+    if successful > 0:
+        print(f"\n[INFO] Sigma rules saved to: {sigma_dir}")
     
     # Show errors if any
-    errors = result.get('errors')
+    errors = [r for r in results if r.get('status') == 'failed']
     if errors:
-        print(f"\n[WARN] Errors encountered: {len(errors)}")
-        for error in errors[:3]:  # Show first 3 errors
+        print(f"\n[WARN] Failed generations: {len(errors)}")
+        for error in errors[:3]:
             print(f"  - {error.get('attack_id', 'UNKNOWN')}: {error.get('error', 'Unknown error')}")
     
-    await agent.shutdown()
-    
-    print("\n[OK] Test completed successfully!")
+    print("\n" + "="*80)
+    print("[OK] Test completed!")
+    print("="*80 + "\n")
 
 
 if __name__ == "__main__":
-    asyncio.run(test_llm_rule_generation())
+    try:
+        asyncio.run(test_llm_rule_generation())
+    except KeyboardInterrupt:
+        print("\n\n[CANCEL] Operation cancelled by user")
+    except Exception as e:
+        print(f"\n\n[ERROR] Fatal error: {e}")
+        import traceback
+        traceback.print_exc()

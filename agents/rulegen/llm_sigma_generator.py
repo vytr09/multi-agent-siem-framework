@@ -1,5 +1,5 @@
 """
-LLM-based Sigma Rule Generator using Gemini API (google-genai) - FIXED VERSION
+LLM-based Sigma Rule Generator using Gemini API - FIXED VERSION
 Generates Sigma rules from TTP data using LLM
 """
 
@@ -7,17 +7,14 @@ import os
 import json
 import re
 from typing import Dict, List, Any, Optional
-# from google import genai
-# from google.genai import types
 import google.generativeai as genai
-from google.generativeai import types
 from datetime import datetime
 import uuid
 import asyncio
 
 
 class LLMSigmaGenerator:
-    """Generate Sigma rules using LLM (Gemini) with google-genai SDK"""
+    """Generate Sigma rules using LLM (Gemini) with google-generativeai SDK"""
     
     def __init__(self, config: Optional[Dict] = None):
         """
@@ -37,48 +34,49 @@ class LLMSigmaGenerator:
         if not self.api_key:
             raise ValueError("Gemini API key not found. Set GEMINI_API_KEY environment variable or pass in config")
         
-        # Initialize google-genai client
+        # Configure the API key
         try:
-            self.client = genai.Client(api_key=self.api_key)
-            print(f"🔍 Debug: Gemini client initialized successfully")
+            genai.configure(api_key=self.api_key)
+            print(f"🔍 Debug: Gemini API configured successfully")
         except Exception as e:
-            print(f"🔍 Debug: Failed to initialize: {type(e).__name__}: {str(e)}")
-            raise ValueError(f"Failed to initialize Gemini client: {str(e)}")
+            print(f"🔍 Debug: Failed to configure: {type(e).__name__}: {str(e)}")
+            raise ValueError(f"Failed to configure Gemini API: {str(e)}")
         
         # Model configuration
         self.model_name = self.config.get('model', 'gemini-2.0-flash-lite')
         self.temperature = self.config.get('temperature', 0.3)
         self.max_retries = self.config.get('max_retries', 3)
         
-        print(f"✓ LLM Generator initialized with model: {self.model_name}")
-    
-    def _get_generation_config(self) -> types.GenerationConfig:
-        """Create generation configuration object"""
-        return types.GenerationConfig(
-            temperature=self.temperature,
-            top_p=0.95,
-            top_k=40,
-            max_output_tokens=4096,
-            # Safety settings for security research content
+        # Initialize the model
+        self.model = genai.GenerativeModel(
+            model_name=self.model_name,
+            generation_config={
+                'temperature': self.temperature,
+                'top_p': 0.95,
+                'top_k': 40,
+                'max_output_tokens': 4096,
+            },
             safety_settings=[
-                types.SafetySetting(
-                    category='HARM_CATEGORY_HARASSMENT',
-                    threshold='BLOCK_NONE'
-                ),
-                types.SafetySetting(
-                    category='HARM_CATEGORY_HATE_SPEECH',
-                    threshold='BLOCK_NONE'
-                ),
-                types.SafetySetting(
-                    category='HARM_CATEGORY_SEXUALLY_EXPLICIT',
-                    threshold='BLOCK_NONE'
-                ),
-                types.SafetySetting(
-                    category='HARM_CATEGORY_DANGEROUS_CONTENT',
-                    threshold='BLOCK_NONE'
-                ),
+                {
+                    "category": "HARM_CATEGORY_HARASSMENT",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_HATE_SPEECH",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "threshold": "BLOCK_NONE"
+                },
             ]
         )
+        
+        print(f"✅ LLM Generator initialized with model: {self.model_name}")
     
     def _build_sigma_prompt(self, ttp_data: Dict[str, Any]) -> str:
         """Build prompt for Sigma rule generation"""
@@ -169,7 +167,7 @@ Generate the Sigma rule now:"""
     
     async def generate_sigma_rule(self, ttp_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Generate Sigma rule using LLM with google-genai
+        Generate Sigma rule using LLM
         
         Args:
             ttp_data: TTP information dict
@@ -190,8 +188,8 @@ Generate the Sigma rule now:"""
             try:
                 print(f"   Attempt {attempt + 1}/{self.max_retries}...")
                 
-                # Generate response using google-genai
-                response = await self._generate_with_client(prompt)
+                # Generate response
+                response = await self._generate_with_model(prompt)
                 
                 # Extract JSON from response
                 sigma_rule = self._extract_json_from_response(response)
@@ -200,7 +198,7 @@ Generate the Sigma rule now:"""
                     # Validate and enhance
                     sigma_rule = self._validate_and_enhance(sigma_rule, ttp_data)
                     
-                    print(f"   ✓ Generated: {sigma_rule.get('title', 'Untitled')}")
+                    print(f"   ✅ Generated: {sigma_rule.get('title', 'Untitled')}")
                     return sigma_rule
                 else:
                     print(f"   ⚠️ Failed to extract valid JSON, retrying...")
@@ -215,41 +213,11 @@ Generate the Sigma rule now:"""
         
         return self._generate_fallback_rule(ttp_data)
     
-    async def _generate_with_client(self, prompt: str) -> str:
-        """Generate response using google-genai client"""
+    async def _generate_with_model(self, prompt: str) -> str:
+        """Generate response using Gemini model"""
         def _generate_sync():
-            config = self._get_generation_config()
-            
-            # CORRECT API CALL for google-genai
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=config
-            )
-            
-            # Extract text from response
-            if hasattr(response, 'text') and response.text:
-                return response.text
-            
-            # Fallback: extract from candidates/parts structure
-            if hasattr(response, "candidates") and response.candidates:
-                candidate = response.candidates[0]
-                if hasattr(candidate, 'content'):
-                    content = candidate.content
-                    if hasattr(content, "parts") and content.parts:
-                        texts = []
-                        for part in content.parts:
-                            if hasattr(part, "text") and part.text:
-                                texts.append(part.text)
-                        if texts:
-                            return ''.join(texts)
-                
-                # Direct text in candidate
-                if hasattr(candidate, "text") and candidate.text:
-                    return candidate.text
-            
-            print("🔍 Debug: No text found in response")
-            return ""
+            response = self.model.generate_content(prompt)
+            return response.text
         
         # Run in thread pool to maintain async interface
         loop = asyncio.get_event_loop()

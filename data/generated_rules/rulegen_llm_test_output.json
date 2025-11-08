@@ -1,0 +1,1095 @@
+{
+  "test_timestamp": "2025-11-07T17:34:23.051001",
+  "input_file": "test_hybrid_multi_extraction_gemini-2.0-flash-lite.json",
+  "total_ttps_tested": 10,
+  "successful": 10,
+  "failed": 0,
+  "success_rate": 100.0,
+  "llm_config": {
+    "model": "gemini-2.0-flash-lite",
+    "temperature": 0.3
+  },
+  "results": [
+    {
+      "ttp_id": "9fc34857-5a34-4d1c-90e8-3b5d7536276c",
+      "attack_id": "T1566.001",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "confidence_score": 0.7,
+      "sigma_rule": {
+        "title": "Phishing Activity Detected via NLP Pattern Matching (Lazarus Group)",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects potential phishing activity based on NLP pattern matching of email subject lines and body content, focusing on Lazarus Group tactics. This rule analyzes email content for keywords and phrases commonly used in phishing campaigns, such as urgency, password reset requests, and links to external domains. It also looks for the execution of suspicious processes after email interaction, such as Office applications spawning child processes.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.t1566.001",
+          "attack.initial_access"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "ParentImage|endswith": [
+              "\\WINWORD.EXE",
+              "\\EXCEL.EXE",
+              "\\POWERPNT.EXE",
+              "\\OUTLOOK.EXE"
+            ],
+            "Image|endswith": [
+              "\\cmd.exe",
+              "\\powershell.exe",
+              "\\rundll32.exe",
+              "\\regsvr32.exe",
+              "\\mshta.exe"
+            ],
+            "CommandLine|contains": [
+              "powershell.exe -enc",
+              "cmd.exe /c start",
+              "rundll32.exe javascript:",
+              "regsvr32.exe /s /i:",
+              "mshta.exe javascript:"
+            ]
+          },
+          "filter": {
+            "CommandLine|contains": [
+              "\"C:\\Program Files\\Microsoft Office\"",
+              "\"C:\\Program Files (x86)\\Microsoft Office\"",
+              "\\AppData\\Local\\Microsoft\\Windows\\INetCache",
+              "\\AppData\\Local\\Temp"
+            ],
+            "Image|endswith": [
+              "\\cmd.exe",
+              "\\powershell.exe",
+              "\\rundll32.exe",
+              "\\regsvr32.exe",
+              "\\mshta.exe"
+            ],
+            "ParentImage|endswith": [
+              "\\WINWORD.EXE",
+              "\\EXCEL.EXE",
+              "\\POWERPNT.EXE",
+              "\\OUTLOOK.EXE"
+            ]
+          },
+          "condition": "selection and not filter"
+        },
+        "falsepositives": [
+          "Legitimate use of Office applications opening documents or spreadsheets.",
+          "Users opening legitimate emails with attachments or links.",
+          "Software updates or installations that use similar command-line patterns."
+        ],
+        "level": "medium",
+        "metadata": {
+          "ttp_id": "9fc34857-5a34-4d1c-90e8-3b5d7536276c",
+          "technique_id": "T1566.001",
+          "confidence": 0.7,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "c87a7baa-abe2-4d2a-b296-0c6ec13c4d46",
+      "attack_id": "T1059.001",
+      "technique_name": "PowerShell",
+      "tactic": "Execution",
+      "confidence_score": 0.7,
+      "sigma_rule": {
+        "title": "Lazarus Group PowerShell Activity - Mimikatz Indicators",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects PowerShell activity associated with Lazarus Group, specifically focusing on Mimikatz-related indicators, encoded commands, and download cradles. This rule aims to identify potential credential dumping attempts and malicious PowerShell execution.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.t1059.001",
+          "attack.execution"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "CommandLine|contains": [
+              "-enc ",
+              "Invoke-WebRequest",
+              "IEX (New-Object Net.WebClient).DownloadString",
+              "powershell.exe -nop -w hidden -c",
+              "powershell.exe -ep bypass",
+              "Invoke-Expression",
+              "cmd.exe /c powershell",
+              "powershell.exe -ExecutionPolicy Bypass"
+            ]
+          },
+          "selection_mimikatz": {
+            "CommandLine|contains": [
+              "sekurlsa::logonpasswords",
+              "privilege::debug",
+              "lsadump::sam",
+              "kerberos::tgt",
+              "mimikatz"
+            ]
+          },
+          "filter": {
+            "ParentImage|endswith": [
+              "\\Windows\\System32\\conhost.exe",
+              "\\Windows\\explorer.exe",
+              "\\Windows\\System32\\svchost.exe",
+              "\\Windows\\System32\\cmd.exe",
+              "\\Windows\\System32\\rundll32.exe",
+              "\\Windows\\System32\\consent.exe"
+            ],
+            "CommandLine|contains": [
+              "Get-Help",
+              "Get-Process",
+              "Get-Date",
+              "Get-ChildItem",
+              "Get-Content",
+              "Get-WmiObject",
+              "Get-NetAdapter",
+              "Get-NetIPAddress",
+              "Get-NetRoute",
+              "Get-Service",
+              "Get-ItemProperty",
+              "Test-Path",
+              "New-Object -comobject",
+              "New-Object -com",
+              "New-Object -comobject wscript.shell",
+              "New-Object -comobject shell.application",
+              "Get-AuthenticodeSignature",
+              "Set-Location",
+              "Out-File",
+              "Start-Process",
+              "Stop-Process",
+              "Remove-Item",
+              "Rename-Item",
+              "Copy-Item",
+              "Move-Item",
+              "Add-Content",
+              "Remove-Content",
+              "Format-Table",
+              "Format-List",
+              "Write-Host",
+              "Write-Output",
+              "Clear-Host",
+              "Read-Host",
+              "ConvertFrom-Json",
+              "ConvertTo-Json",
+              "Out-GridView",
+              "Invoke-RestMethod",
+              "Invoke-WebRequest",
+              "Get-Clipboard",
+              "Set-Clipboard",
+              "Get-Random",
+              "Get-Variable",
+              "Set-Variable",
+              "Get-History",
+              "Clear-History",
+              "Get-PSDrive",
+              "Get-PSProvider",
+              "Get-Module",
+              "Import-Module",
+              "Export-ModuleMember",
+              "New-Module",
+              "Remove-Module",
+              "Get-Command",
+              "Get-Alias",
+              "Set-Alias",
+              "New-Alias",
+              "Remove-Alias",
+              "Get-Content",
+              "Get-Item",
+              "Get-ItemProperty",
+              "Get-ChildItem",
+              "Get-Date",
+              "Get-Location",
+              "Set-Location",
+              "Push-Location",
+              "Pop-Location",
+              "Get-Help",
+              "Get-Member",
+              "Select-Object",
+              "Where-Object",
+              "ForEach-Object",
+              "Sort-Object",
+              "Group-Object",
+              "Measure-Object",
+              "Out-File",
+              "Out-String",
+              "ConvertTo-Html",
+              "ConvertTo-Csv",
+              "ConvertTo-Json",
+              "ConvertFrom-Json",
+              "Invoke-Expression",
+              "Invoke-WebRequest",
+              "IEX (New-Object Net.WebClient).DownloadString",
+              "powershell.exe -nop -w hidden -c",
+              "powershell.exe -ep bypass",
+              "cmd.exe /c powershell",
+              "powershell.exe -ExecutionPolicy Bypass",
+              "Get-Process",
+              "Get-WmiObject",
+              "Get-NetAdapter",
+              "Get-NetIPAddress",
+              "Get-NetRoute",
+              "Get-Service",
+              "Get-ItemProperty",
+              "Test-Path",
+              "New-Object -comobject",
+              "New-Object -com",
+              "New-Object -comobject wscript.shell",
+              "New-Object -comobject shell.application",
+              "Get-AuthenticodeSignature",
+              "Set-Location",
+              "Out-File",
+              "Start-Process",
+              "Stop-Process",
+              "Remove-Item",
+              "Rename-Item",
+              "Copy-Item",
+              "Move-Item",
+              "Add-Content",
+              "Remove-Content",
+              "Format-Table",
+              "Format-List",
+              "Write-Host",
+              "Write-Output",
+              "Clear-Host",
+              "Read-Host",
+              "ConvertFrom-Json",
+              "ConvertTo-Json",
+              "Out-GridView",
+              "Invoke-RestMethod",
+              "Invoke-WebRequest",
+              "Get-Clipboard",
+              "Set-Clipboard",
+              "Get-Random",
+              "Get-Variable",
+              "Set-Variable",
+              "Get-History",
+              "Clear-History",
+              "Get-PSDrive",
+              "Get-PSProvider",
+              "Get-Module",
+              "Import-Module",
+              "Export-ModuleMember",
+              "New-Module",
+              "Remove-Module",
+              "Get-Command",
+              "Get-Alias",
+              "Set-Alias",
+              "New-Alias",
+              "Remove-Alias",
+              "Get-Content",
+              "Get-Item",
+              "Get-ItemProperty",
+              "Get-ChildItem",
+              "Get-Date",
+              "Get-Location",
+              "Set-Location",
+              "Push-Location",
+              "Pop-Location",
+              "Get-Help",
+              "Get-Member",
+              "Select-Object",
+              "Where-Object",
+              "ForEach-Object",
+              "Sort-Object",
+              "Group-Object",
+              "Measure-Object",
+              "Out-File",
+              "Out-String",
+              "ConvertTo-Html",
+              "ConvertTo-Csv",
+              "ConvertTo-Json"
+            ]
+          },
+          "condition": "selection and not filter or selection_mimikatz"
+        },
+        "falsepositives": [
+          "Legitimate use of PowerShell for system administration tasks.",
+          "Scripts signed by trusted vendors.",
+          "User-initiated PowerShell scripts for legitimate purposes."
+        ],
+        "level": "high",
+        "metadata": {
+          "ttp_id": "c87a7baa-abe2-4d2a-b296-0c6ec13c4d46",
+          "technique_id": "T1059.001",
+          "confidence": 0.7,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "ce16e8b9-df3f-412d-b5c3-8cd253724379",
+      "attack_id": "T1547.001",
+      "technique_name": "Registry Run Keys",
+      "tactic": "Persistence",
+      "confidence_score": 0.7,
+      "sigma_rule": {
+        "title": "Suspicious Registry Run Key Creation via NLP Pattern Matching",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects suspicious Registry Run Key creation events using NLP pattern matching to identify potential persistence mechanisms. This rule focuses on identifying patterns associated with malware persistence, specifically targeting techniques used by threat actors like Lazarus Group.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.t1547.001",
+          "attack.persistence"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "EventID": "1",
+            "Image": "*\\reg.exe",
+            "CommandLine|contains|all": [
+              "ADD",
+              "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+              "/v",
+              "/t",
+              "/d"
+            ]
+          },
+          "filter": {
+            "CommandLine|contains": [
+              "\"C:\\Program Files\\\"",
+              "\"C:\\Windows\\\"",
+              "\"C:\\ProgramData\\\"",
+              "\"C:\\Users\\Public\\\"",
+              "\"C:\\Users\\Default\\\"",
+              "\"C:\\Users\\All Users\\\"",
+              "\"C:\\Program Files (x86)\\"
+            ],
+            "CommandLine|re": [
+              "\"C:\\\\Program Files\\\\.*\\\\.*\\\\.*.exe\" /d",
+              "\"C:\\\\Program Files (x86)\\\\.*\\\\.*\\\\.*.exe\" /d"
+            ]
+          },
+          "condition": "selection and not filter"
+        },
+        "falsepositives": [
+          "Legitimate software installation or updates that create run keys.",
+          "User-installed applications that add themselves to the startup."
+        ],
+        "level": "medium",
+        "metadata": {
+          "ttp_id": "ce16e8b9-df3f-412d-b5c3-8cd253724379",
+          "technique_id": "T1547.001",
+          "confidence": 0.7,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "8410c7a2-4eb1-463b-bc7d-b2dafd0580f8",
+      "attack_id": "T1003",
+      "technique_name": "OS Credential Dumping",
+      "tactic": "Credential Access",
+      "confidence_score": 0.7,
+      "sigma_rule": {
+        "title": "OS Credential Dumping via Mimikatz and Procdump",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects OS Credential Dumping activity using Mimikatz and Procdump, focusing on process creation patterns and command-line arguments. This rule specifically targets the Lazarus Group's known usage of these tools.",
+        "references": [
+          "https://attack.mitre.org/techniques/T1003/",
+          "https://www.fireeye.com/blog/threat-research/2017/04/north-korea-lazarus-group.html"
+        ],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/02/29",
+        "modified": "2024/02/29",
+        "tags": [
+          "attack.t1003",
+          "attack.credential_access",
+          "attack.t1059.001",
+          "attack.t1566"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "EventID": "1",
+            "Image|endswith": [
+              "\\mimikatz.exe",
+              "\\procdump.exe"
+            ],
+            "CommandLine|contains": [
+              "\"sekurlsa::logonpasswords\"",
+              "\"sekurlsa::ekeys\"",
+              "\"lsass.exe\""
+            ]
+          },
+          "selection_powershell": {
+            "EventID": "1",
+            "ParentImage|endswith": [
+              "\\powershell.exe",
+              "\\powershell_ise.exe"
+            ],
+            "CommandLine|contains": [
+              "-enc ",
+              "Invoke-WebRequest",
+              "IEX (New-Object Net.WebClient).DownloadString",
+              "bypass",
+              "DownloadString"
+            ]
+          },
+          "selection_office": {
+            "EventID": "1",
+            "ParentImage|endswith": [
+              "\\WINWORD.EXE",
+              "\\EXCEL.EXE",
+              "\\POWERPNT.EXE"
+            ],
+            "Image|endswith": [
+              "\\cmd.exe",
+              "\\powershell.exe"
+            ]
+          },
+          "filter": {
+            "Image|endswith": [
+              "\\conhost.exe",
+              "\\svchost.exe",
+              "\\consent.exe"
+            ],
+            "CommandLine|contains": [
+              "\"/c echo off\"",
+              "\"/c timeout\"",
+              "\"/c ping\"",
+              "\"/c tasklist\""
+            ],
+            "ParentImage|endswith": [
+              "\\explorer.exe",
+              "\\cmd.exe",
+              "\\powershell.exe"
+            ]
+          },
+          "condition": "(selection or selection_powershell or selection_office) and not filter"
+        },
+        "falsepositives": [
+          "Legitimate use of procdump for debugging purposes (rare).",
+          "Security tools performing legitimate credential scanning (e.g., vulnerability scanners).",
+          "Users running legitimate PowerShell scripts that happen to contain similar command-line arguments (rare)."
+        ],
+        "level": "high",
+        "metadata": {
+          "ttp_id": "8410c7a2-4eb1-463b-bc7d-b2dafd0580f8",
+          "technique_id": "T1003",
+          "confidence": 0.7,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "2a905a2d-30b0-4e59-a901-8a79ef0cda6e",
+      "attack_id": "T1021.001",
+      "technique_name": "Remote Desktop Protocol",
+      "tactic": "Lateral Movement",
+      "confidence_score": 0.7,
+      "sigma_rule": {
+        "title": "Remote Desktop Protocol Activity Detected via NLP Pattern Matching",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects Remote Desktop Protocol (RDP) activity based on NLP pattern matching of process command lines, focusing on indicators of potential lateral movement and credential access attempts. This rule analyzes process creation and network connections for RDP-related keywords and behaviors, potentially indicating malicious activity.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.t1021.001",
+          "attack.lateral_movement"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "EventID": "1",
+            "CommandLine|contains": [
+              "mstsc.exe",
+              "Remote Desktop Connection",
+              "/v:",
+              "/admin",
+              "/console"
+            ],
+            "Image|endswith": "mstsc.exe"
+          },
+          "filter": {
+            "CommandLine|contains": [
+              "\"C:\\Program Files\\Remote Desktop Connection\\mstsc.exe\"",
+              "\"C:\\Windows\\System32\\mstsc.exe\""
+            ],
+            "ParentImage|contains": [
+              "explorer.exe",
+              "svchost.exe",
+              "winlogon.exe"
+            ],
+            "User": "NT AUTHORITY\\SYSTEM"
+          },
+          "condition": "selection and not filter"
+        },
+        "falsepositives": [
+          "Legitimate use of Remote Desktop Connection by administrators.",
+          "User initiated RDP sessions to internal servers."
+        ],
+        "level": "medium",
+        "metadata": {
+          "ttp_id": "2a905a2d-30b0-4e59-a901-8a79ef0cda6e",
+          "technique_id": "T1021.001",
+          "confidence": 0.7,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "f595ad3f-4580-416a-ace3-0e0b1c1aa69d",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Windows Management Instrumentation",
+      "tactic": "Execution",
+      "confidence_score": 0.6,
+      "sigma_rule": {
+        "title": "Suspicious WMI Execution via NLP Pattern Matching",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects suspicious Windows Management Instrumentation (WMI) activity based on NLP pattern matching. This rule identifies potentially malicious WMI commands by analyzing the command line for keywords and phrases commonly associated with malicious activities, such as credential dumping, PowerShell execution, and file downloads. This rule leverages a simplified NLP approach to identify suspicious patterns, focusing on common indicators of compromise (IOCs) and techniques used by threat actors.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.unmapped",
+          "attack.execution"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": [
+            {
+              "Image|endswith": "wmic.exe"
+            },
+            {
+              "CommandLine|contains": [
+                "process call create",
+                "process call terminate",
+                "process where name",
+                "service call start",
+                "service call stop",
+                "get process where name",
+                "shadowcopy call create",
+                "shadowcopy call delete"
+              ]
+            },
+            {
+              "CommandLine|contains": [
+                "powershell.exe",
+                "cmd.exe /c",
+                "rundll32.exe",
+                "regsvr32.exe",
+                "bitsadmin.exe",
+                "certutil.exe",
+                "mshta.exe"
+              ]
+            },
+            {
+              "CommandLine|contains": [
+                "Invoke-WebRequest",
+                "IEX",
+                "downloadstring",
+                "Invoke-Expression",
+                "http://",
+                "https://"
+              ]
+            },
+            {
+              "CommandLine|contains": [
+                "mimikatz",
+                "procdump",
+                "lsass.exe",
+                "sekurlsa::",
+                "privilege::",
+                "dpapi::",
+                "kerberos::"
+              ]
+            }
+          ],
+          "filter": {
+            "CommandLine|contains": [
+              "wmic.exe /node:",
+              "wmic.exe /namespace:",
+              "wmic.exe /user:",
+              "wmic.exe /password:",
+              "wmic.exe /format:",
+              "wmic.exe /output:",
+              "wmic.exe /interactive",
+              "wmic.exe /failfast",
+              "wmic.exe /? "
+            ]
+          },
+          "condition": "(selection and not filter)"
+        },
+        "falsepositives": [
+          "Legitimate system administration tasks using WMI.",
+          "Scripts or tools used for legitimate monitoring or management."
+        ],
+        "level": "medium",
+        "metadata": {
+          "ttp_id": "f595ad3f-4580-416a-ace3-0e0b1c1aa69d",
+          "technique_id": "UNMAPPED",
+          "confidence": 0.6,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "2497d583-5891-4957-8f82-00df825225f4",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Scheduled Task/Job",
+      "tactic": "Persistence",
+      "confidence_score": 0.6,
+      "sigma_rule": {
+        "title": "Scheduled Task/Job Creation Detected via NLP Pattern Matching (Lazarus Group)",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects scheduled task/job creation activity using NLP pattern matching, potentially indicative of Lazarus Group activity. This rule focuses on identifying suspicious task names and command lines associated with persistence.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.unmapped",
+          "attack.persistence"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "security"
+        },
+        "detection": {
+          "selection": [
+            {
+              "EventID": "4688",
+              "NewProcessName|contains": [
+                "\\schtasks.exe",
+                "\\at.exe"
+              ]
+            },
+            {
+              "CommandLine|contains": [
+                "schtasks /create",
+                "at /create"
+              ]
+            },
+            {
+              "CommandLine|re": [
+                "(/TN\\s+\"(?:[a-zA-Z0-9_\\s\\-]+\\s*(?:[a-zA-Z0-9_\\s\\-]+)?)\")",
+                "(/SC\\s+ONCE\\s+/ST\\s+\\d{2}:\\d{2})",
+                "(/SC\\s+DAILY\\s+/ST\\s+\\d{2}:\\d{2})",
+                "(/SC\\s+WEEKLY\\s+/D\\s+\\d+)",
+                "(/SC\\s+MONTHLY\\s+/D\\s+\\d+)"
+              ]
+            }
+          ],
+          "filter": {
+            "CommandLine|contains": [
+              "\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoProfile -ExecutionPolicy Bypass -EncodedCommand",
+              "\"C:\\Windows\\System32\\cmd.exe\" /c start",
+              "\"C:\\Windows\\System32\\cmd.exe\" /c timeout",
+              "\"C:\\Windows\\System32\\cmd.exe\" /c ping",
+              "\"C:\\Windows\\System32\\cmd.exe\" /c echo",
+              "\"C:\\Windows\\System32\\cmd.exe\" /c net start",
+              "\"C:\\Windows\\System32\\cmd.exe\" /c net stop",
+              "\"C:\\Program Files\\Microsoft Security Client\\MsMpEng.exe\"",
+              "\"C:\\Program Files\\Windows Defender\\MSASCui.exe\"",
+              "\"C:\\Program Files\\Windows Defender\\MpCmdRun.exe\"",
+              "\"C:\\Program Files\\WindowsApps\\Microsoft.Windows.Photos_2023.23070.1000.0_x64__8wekyb3d8bbwe\\Microsoft.Photos.exe\"",
+              "\"C:\\Windows\\System32\\wbem\\WmiPrvSE.exe\"",
+              "\"C:\\Windows\\System32\\svchost.exe\" -k netsvcs",
+              "\"C:\\Windows\\System32\\conhost.exe\""
+            ]
+          },
+          "condition": "all of selection and not filter"
+        },
+        "falsepositives": [
+          "Legitimate scheduled tasks created by system administrators or software installations.",
+          "Tasks created by security software for scheduled scans or updates."
+        ],
+        "level": "medium",
+        "metadata": {
+          "ttp_id": "2497d583-5891-4957-8f82-00df825225f4",
+          "technique_id": "UNMAPPED",
+          "confidence": 0.6,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "1107ac1d-891f-4bb9-8056-51fd0c265480",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Process Injection",
+      "tactic": "Defense Evasion",
+      "confidence_score": 0.6,
+      "sigma_rule": {
+        "title": "Process Injection Detected via NLP Pattern Matching (Lazarus Group)",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects potential process injection activity based on NLP pattern matching, focusing on Lazarus Group tactics. This rule analyzes process creation events for suspicious command-line arguments and process relationships, indicative of code injection techniques.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.unmapped",
+          "attack.defense_evasion"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "EventID": "1",
+            "CommandLine|contains": [
+              "CreateRemoteThread",
+              "VirtualAllocEx",
+              "WriteProcessMemory",
+              "NtCreateThreadEx",
+              "QueueUserAPC",
+              "RtlCreateUserThread"
+            ]
+          },
+          "filter": {
+            "ParentImage|endswith": [
+              "\\svchost.exe",
+              "\\services.exe",
+              "\\lsass.exe",
+              "\\winlogon.exe",
+              "\\explorer.exe"
+            ],
+            "Image|endswith": [
+              "\\powershell.exe",
+              "\\cmd.exe",
+              "\\rundll32.exe"
+            ],
+            "CommandLine|contains": [
+              "powershell.exe -nop -w hidden -c",
+              "cmd.exe /c start",
+              "rundll32.exe",
+              "regsvr32.exe /s"
+            ]
+          },
+          "condition": "selection and not filter"
+        },
+        "falsepositives": [
+          "Legitimate applications using CreateRemoteThread or similar APIs for debugging or legitimate functionality.",
+          "Software installers that may use these APIs."
+        ],
+        "level": "medium",
+        "metadata": {
+          "ttp_id": "1107ac1d-891f-4bb9-8056-51fd0c265480",
+          "technique_id": "UNMAPPED",
+          "confidence": 0.6,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "35f8f96d-6112-46de-a8f5-f360309e42aa",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "confidence_score": 0.6,
+      "sigma_rule": {
+        "title": "Lazarus Group - Remote Services Activity via NLP Pattern Matching",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects potential Remote Services activity associated with the Lazarus Group, focusing on credential dumping and PowerShell execution patterns, identified via NLP pattern matching. This rule leverages process creation events and command-line analysis to identify suspicious behavior.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.unmapped",
+          "attack.lateral_movement"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": [
+            {
+              "Image|endswith": [
+                "mimikatz.exe",
+                "procdump.exe"
+              ]
+            },
+            {
+              "CommandLine|contains": [
+                "sekurlsa::logonpasswords",
+                "sekurlsa::ekeys",
+                "privilege::debug",
+                "lsadump::sam",
+                "lsadump::secrets"
+              ]
+            },
+            {
+              "ParentImage|endswith": [
+                "powershell.exe",
+                "cmd.exe"
+              ],
+              "CommandLine|contains": [
+                "-enc",
+                "Invoke-WebRequest",
+                "IEX",
+                "powershell.exe -nop -w hidden -c",
+                "bypass",
+                "downloadstring"
+              ]
+            }
+          ],
+          "filter": {
+            "Image|endswith": [
+              "powershell.exe",
+              "cmd.exe",
+              "conhost.exe"
+            ],
+            "CommandLine|contains": [
+              "\"C:\\Program Files\\\"",
+              "\"C:\\Windows\\\"",
+              "\"C:\\Users\\\"",
+              "\"C:\\ProgramData\\\"",
+              "\"C:\\Temp\\\"",
+              "\"C:\\Users\\Public\\\"",
+              "\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\"",
+              "\"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe\""
+            ],
+            "ParentImage|endswith": [
+              "explorer.exe",
+              "svchost.exe",
+              "services.exe",
+              "winlogon.exe"
+            ]
+          },
+          "condition": "(selection and not filter)"
+        },
+        "falsepositives": [
+          "Legitimate use of PowerShell scripts for system administration tasks.",
+          "Security tools or scripts that may use similar command-line arguments.",
+          "False positives can occur if legitimate software is misidentified as malicious."
+        ],
+        "level": "high",
+        "metadata": {
+          "ttp_id": "35f8f96d-6112-46de-a8f5-f360309e42aa",
+          "technique_id": "UNMAPPED",
+          "confidence": 0.6,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    },
+    {
+      "ttp_id": "4c03fe5a-c620-48ab-b2dc-107b98c26b8d",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Archive Collected Data",
+      "tactic": "Collection",
+      "confidence_score": 0.6,
+      "sigma_rule": {
+        "title": "Suspicious Data Archiving Activity Detected via NLP Pattern Matching",
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "status": "experimental",
+        "description": "Detects suspicious data archiving activity using NLP pattern matching to identify potential data exfiltration attempts. This rule focuses on identifying patterns indicative of archiving sensitive data, potentially for exfiltration, based on Lazarus Group TTPs.",
+        "references": [],
+        "author": "Multi-Agent SIEM Framework",
+        "date": "2024/10/27",
+        "modified": "2024/10/27",
+        "tags": [
+          "attack.unmapped",
+          "attack.collection"
+        ],
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "CommandLine|contains": [
+              "archive",
+              "backup",
+              "compress",
+              "zip",
+              "rar",
+              "7z",
+              "tar",
+              "gzip",
+              "bzip2"
+            ],
+            "Image|endswith": [
+              "7z.exe",
+              "zip.exe",
+              "rar.exe",
+              "tar.exe",
+              "gzip.exe",
+              "bzip2.exe"
+            ]
+          },
+          "filter": {
+            "CommandLine|contains": [
+              "\\Program Files\\",
+              "\\Windows\\",
+              "\\System32\\",
+              "\\SysWOW64\\",
+              "-help",
+              "-version",
+              "--help",
+              "--version"
+            ],
+            "ParentImage|contains": [
+              "explorer.exe",
+              "cmd.exe",
+              "powershell.exe",
+              "conhost.exe"
+            ]
+          },
+          "condition": "selection and not filter"
+        },
+        "falsepositives": [
+          "Legitimate archiving tools used for regular backups or file compression within standard directories.",
+          "Software installers using archiving tools."
+        ],
+        "level": "medium",
+        "metadata": {
+          "ttp_id": "4c03fe5a-c620-48ab-b2dc-107b98c26b8d",
+          "technique_id": "UNMAPPED",
+          "confidence": 0.6,
+          "extraction_method": "nlp",
+          "threat_actor": "lazarus group",
+          "malware": [
+            "mimikatz",
+            "Mimikatz"
+          ],
+          "tools": [],
+          "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+          "generated_by": "llm",
+          "llm_model": "gemini-2.0-flash-lite"
+        }
+      },
+      "status": "success"
+    }
+  ]
+}
