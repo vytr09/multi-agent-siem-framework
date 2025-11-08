@@ -185,7 +185,7 @@ async def test_hybrid_with_mock():
     print("=" * 80)
     
     # Load test data first
-    with open("data/normalized/full_pipeline.json", encoding='utf-8') as f:
+    with open("data/normalized/cti_reports_20251004_212903.json", encoding='utf-8') as f:
         test_reports = json.load(f)
     
     total_reports = len(test_reports)
@@ -224,7 +224,7 @@ async def test_hybrid_with_mock():
         "llm": {
             "api_key": os.getenv("GEMINI_API_KEY"),
             "use_mock": False,  # Set to True for testing without API
-            "model": "gemini-2.0-flash-exp",
+            "model": "gemini-2.0-flash-lite",
             "temperature": 0.3,
             "max_tokens": 1000
         },
@@ -360,7 +360,7 @@ async def test_hybrid_with_mock():
                   f"{result_item['processing_time_ms']:<10.0f}")
         
         # Save all results
-        output_path = Path("data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-exp.json")
+        output_path = Path("data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
         final_output = {
@@ -408,7 +408,7 @@ async def test_nlp_component():
     from agents.extractor.nlp.entity_extractor import EntityExtractor
     
     # Load test data
-    with open("data/normalized/cti_reports_20251004_212903.json") as f:
+    with open("data/normalized/cti_reports_20251004_212903.json", encoding='utf-8') as f:
         test_reports = json.load(f)
     
     test_report = test_reports[0]
@@ -474,7 +474,7 @@ async def test_batch_hybrid():
     config = {
         "llm": {
             "use_mock": False,
-            "model": "gemini-2.0-flash-exp",
+            "model": "gemini-2.0-flash-lite",
             "temperature": 0.3,
             "max_tokens": 1000
         },
@@ -490,7 +490,7 @@ async def test_batch_hybrid():
         await agent.start()
         
         # Load all reports
-        with open("data/normalized/full_pipeline.json") as f:
+        with open("data/normalized/cti_reports_20251004_212903.json", encoding='utf-8') as f:
             test_reports = json.load(f)
         
         print(f"\nProcessing {len(test_reports)} reports with hybrid NLP+Gemini...")
@@ -533,7 +533,7 @@ async def main():
     print("\n")
     
     # Check test data
-    test_data_path = Path("data/normalized/full_pipeline.json")
+    test_data_path = Path("data/normalized/cti_reports_20251004_212903.json")
     if not test_data_path.exists():
         print(f"[ERROR] Test data not found: {test_data_path}")
         return
