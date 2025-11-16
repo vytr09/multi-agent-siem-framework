@@ -354,7 +354,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-project_root = Path(__file__).resolve().parents[2]
+project_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(project_root))
 
 print(f"Project root: {project_root}")

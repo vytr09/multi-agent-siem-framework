@@ -10,7 +10,7 @@ load_dotenv()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Fix imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.collector.clients.misp_client import create_misp_client
 
 async def test_real_misp_full():
