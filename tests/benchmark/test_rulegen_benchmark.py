@@ -22,18 +22,18 @@
 #     """Run RuleGen benchmark evaluation"""
     
 #     print("\n" + "="*80)
-#     print("🎯 RULEGEN BENCHMARK EVALUATION")
+#     print("RULEGEN BENCHMARK EVALUATION")
 #     print("="*80)
     
 #     # Load RuleGen output
 #     output_file = Path("data/generated_rules/rulegen_llm_test_output.json")
     
 #     if not output_file.exists():
-#         print(f"❌ Output file not found: {output_file}")
+#         print(f"Output file not found: {output_file}")
 #         print("   Please run RuleGen agent first")
 #         return
     
-#     print(f"\n📂 Loading RuleGen output: {output_file}")
+#     print(f"\nLoading RuleGen output: {output_file}")
     
 #     with open(output_file, 'r', encoding='utf-8') as f:
 #         rulegen_output = json.load(f)
@@ -63,43 +63,43 @@
     
 #     # Check API key
 #     if not config["llm_judge"]["api_key"]:
-#         print("\n⚠️  Warning: GEMINI_API_KEY not found")
+#         print("\n Warning: GEMINI_API_KEY not found")
 #         print("   Falling back to heuristic evaluation (lower quality)")
 #         config["llm_judge"]["enabled"] = False
     
 #     # Initialize benchmark
-#     print("\n🔧 Initializing RuleGen Benchmark...")
+#     print("\nInitializing RuleGen Benchmark...")
 #     benchmark = RuleGenBenchmark(config)
     
-#     print(f"   ✓ Initialized with {len(benchmark.metrics)} metrics")
-#     print(f"   ✓ LLM Judge: {'Enabled' if benchmark.use_llm_judge else 'Disabled'}")
+#     print(f"   Initialized with {len(benchmark.metrics)} metrics")
+#     print(f"   LLM Judge: {'Enabled' if benchmark.use_llm_judge else 'Disabled'}")
     
 #     # Evaluate all rules
-#     print("\n🚀 Starting evaluation...")
+#     print("\nStarting evaluation...")
 #     print("-" * 80)
     
 #     results = await benchmark.evaluate_batch(rules)
     
 #     # Print results summary
 #     print("\n" + "="*80)
-#     print("📊 EVALUATION RESULTS")
+#     print("EVALUATION RESULTS")
 #     print("="*80)
     
 #     # Overall statistics
 #     stats = benchmark.get_statistics()
     
-#     print(f"\n📈 Overall Statistics:")
+#     print(f"\nOverall Statistics:")
 #     print(f"   Total Evaluations:     {stats['total_evaluations']}")
 #     print(f"   Average Score:         {stats['average_score']:.3f}/1.0 ({get_grade(stats['average_score'])})")
     
 #     # Category scores
-#     print(f"\n📊 Category Averages:")
+#     print(f"\nCategory Averages:")
 #     for category, score in sorted(stats['category_averages'].items(), key=lambda x: x[1], reverse=True):
 #         bar = create_bar(score, 40)
 #         print(f"   {category:20} {score:.3f} {bar}")
     
 #     # Top metrics
-#     print(f"\n🎯 Metric Averages (Top 10):")
+#     print(f"\nMetric Averages (Top 10):")
 #     sorted_metrics = sorted(
 #         stats['metric_averages'].items(), 
 #         key=lambda x: x[1], 
@@ -111,23 +111,23 @@
 #         print(f"   {metric:35} {score:.3f} {bar}")
     
 #     # Score distribution
-#     print(f"\n📊 Score Distribution:")
+#     print(f"\nScore Distribution:")
 #     for label, count in stats['score_distribution'].items():
 #         percentage = (count / stats['total_evaluations'] * 100) if stats['total_evaluations'] > 0 else 0
 #         bar = create_bar(percentage / 100, 40)
 #         print(f"   {label:20} {count:3} rules ({percentage:5.1f}%) {bar}")
     
 #     # Top and bottom performers
-#     print(f"\n🏆 Top 3 Rules:")
+#     print(f"\nTop 3 Rules:")
 #     for i, result in enumerate(benchmark.get_top_performers(3), 1):
 #         print(f"   {i}. {result.metadata['attack_id']:12} Score: {result.overall_score:.3f} - {result.metadata['technique_name']}")
     
-#     print(f"\n⚠️  Bottom 3 Rules (Need Improvement):")
+#     print(f"\n Bottom 3 Rules (Need Improvement):")
 #     for i, result in enumerate(benchmark.get_bottom_performers(3), 1):
 #         print(f"   {i}. {result.metadata['attack_id']:12} Score: {result.overall_score:.3f} - {result.metadata['technique_name']}")
     
 #     # Individual rule summaries
-#     print(f"\n📝 Individual Rule Summaries:")
+#     print(f"\nIndividual Rule Summaries:")
 #     print("-" * 80)
 #     for result in results:
 #         print(f"\n{result.metadata['attack_id']} - {result.metadata['technique_name']}")
@@ -152,25 +152,25 @@
 #     benchmark.export_results_with_recommendations(str(results_file))
     
 #     print(f"\n" + "="*80)
-#     print(f"✅ BENCHMARK COMPLETE")
+#     print(f"BENCHMARK COMPLETE")
 #     print("="*80)
-#     print(f"\n📁 Detailed results saved to: {results_file}")
-#     print(f"📊 File size: {results_file.stat().st_size / 1024:.2f} KB")
+#     print(f"\nDetailed results saved to: {results_file}")
+#     print(f"File size: {results_file.stat().st_size / 1024:.2f} KB")
     
 #     # Final grade
 #     final_grade = get_grade(stats['average_score'])
 #     grade_emoji = {
-#         "A": "🌟",
-#         "B": "✨",
-#         "C": "⭐",
-#         "D": "💫",
-#         "F": "⚠️"
-#     }.get(final_grade[0], "📊")
+#         "A": "A",
+#         "B": "B",
+#         "C": "C",
+#         "D": "D",
+#         "F": "F"
+#     }.get(final_grade[0], "Score")
     
 #     print(f"\n{grade_emoji} Final Grade: {final_grade}")
-#     print(f"🎯 Overall Score: {stats['average_score']:.3f}/1.0")
+#     print(f"Overall Score: {stats['average_score']:.3f}/1.0")
     
-#     print("\n✨ Evaluation complete!")
+#     print("\nEvaluation complete!")
 
 
 # def get_grade(score: float) -> str:
@@ -223,18 +223,18 @@ async def main():
     """Run RuleGen benchmark evaluation"""
     
     print("\n" + "="*80)
-    print("🎯 RULEGEN BENCHMARK EVALUATION")
+    print("RULEGEN BENCHMARK EVALUATION")
     print("="*80)
     
     # Load RuleGen output
     output_file = Path("data/generated_rules/rulegen_llm_test_output.json")
     
     if not output_file.exists():
-        print(f"❌ Output file not found: {output_file}")
+        print(f"Output file not found: {output_file}")
         print("   Please run RuleGen agent first")
         return
     
-    print(f"\n📂 Loading RuleGen output: {output_file}")
+    print(f"\nLoading RuleGen output: {output_file}")
     
     with open(output_file, 'r', encoding='utf-8') as f:
         rulegen_output = json.load(f)
@@ -250,7 +250,7 @@ async def main():
     print(f"   Valid rules to evaluate: {len(valid_rules)}")
     
     if not valid_rules:
-        print("\n❌ No valid rules found to evaluate!")
+        print("\nNo valid rules found to evaluate!")
         print("   Check that RuleGen output contains 'sigma_rule' field")
         return
     
@@ -274,47 +274,47 @@ async def main():
     
     # Check API key
     if not config["llm_judge"]["api_key"]:
-        print("\n⚠️  Warning: GEMINI_API_KEY not found")
+        print("\n Warning: GEMINI_API_KEY not found")
         print("   Falling back to heuristic evaluation (lower quality)")
         config["llm_judge"]["enabled"] = False
     else:
-        print(f"\n✅ API Key configured: {config['llm_judge']['api_key'][:10]}...")
+        print(f"\nAPI Key configured: {config['llm_judge']['api_key'][:10]}...")
     
     # Initialize benchmark
-    print("\n🔧 Initializing RuleGen Benchmark...")
+    print("\nInitializing RuleGen Benchmark...")
     benchmark = RuleGenBenchmark(config)
     
-    print(f"   ✓ Initialized with {len(benchmark.metrics)} metrics")
-    print(f"   ✓ LLM Judge: {'Enabled' if benchmark.use_llm_judge else 'Disabled'}")
+    print(f"   Initialized with {len(benchmark.metrics)} metrics")
+    print(f"   LLM Judge: {'Enabled' if benchmark.use_llm_judge else 'Disabled'}")
     
     # Evaluate all rules
-    print("\n🚀 Starting evaluation...")
+    print("\nStarting evaluation...")
     print("-" * 80)
     
     results = await benchmark.evaluate_batch(valid_rules)
     
     # Print results summary
     print("\n" + "="*80)
-    print("📊 EVALUATION RESULTS")
+    print("EVALUATION RESULTS")
     print("="*80)
     
     # Overall statistics
     stats = benchmark.get_statistics()
     
-    print(f"\n📈 Overall Statistics:")
+    print(f"\nOverall Statistics:")
     print(f"   Total Evaluations:     {stats['total_evaluations']}")
     print(f"   Average Score:         {stats['average_score']:.3f}/1.0 ({get_grade(stats['average_score'])})")
     
     # Category scores
     if stats.get('category_averages'):
-        print(f"\n📊 Category Averages:")
+        print(f"\nCategory Averages:")
         for category, score in sorted(stats['category_averages'].items(), key=lambda x: x[1], reverse=True):
             bar = create_bar(score, 40)
             print(f"   {category:20} {score:.3f} {bar}")
     
     # Top metrics
     if stats.get('metric_averages'):
-        print(f"\n🎯 Metric Averages (Top 10):")
+        print(f"\nMetric Averages (Top 10):")
         sorted_metrics = sorted(
             stats['metric_averages'].items(), 
             key=lambda x: x[1], 
@@ -327,7 +327,7 @@ async def main():
     
     # Score distribution
     if stats.get('score_distribution'):
-        print(f"\n📊 Score Distribution:")
+        print(f"\nScore Distribution:")
         for label, count in stats['score_distribution'].items():
             percentage = (count / stats['total_evaluations'] * 100) if stats['total_evaluations'] > 0 else 0
             bar = create_bar(percentage / 100, 40)
@@ -335,20 +335,20 @@ async def main():
     
     # Top and bottom performers
     if results:
-        print(f"\n🏆 Top 3 Rules:")
+        print(f"\nTop 3 Rules:")
         for i, result in enumerate(benchmark.get_top_performers(3), 1):
             attack_id = result.metadata.get('attack_id', 'UNKNOWN')
             technique = result.metadata.get('technique_name', 'Unknown')
             print(f"   {i}. {attack_id:12} Score: {result.overall_score:.3f} - {technique}")
         
-        print(f"\n⚠️  Bottom 3 Rules (Need Improvement):")
+        print(f"\n Bottom 3 Rules (Need Improvement):")
         for i, result in enumerate(benchmark.get_bottom_performers(3), 1):
             attack_id = result.metadata.get('attack_id', 'UNKNOWN')
             technique = result.metadata.get('technique_name', 'Unknown')
             print(f"   {i}. {attack_id:12} Score: {result.overall_score:.3f} - {technique}")
     
     # Individual rule summaries
-    print(f"\n📝 Individual Rule Summaries:")
+    print(f"\nIndividual Rule Summaries:")
     print("-" * 80)
     for result in results[:5]:  # Show first 5
         attack_id = result.metadata.get('attack_id', 'UNKNOWN')
@@ -379,33 +379,33 @@ async def main():
     benchmark.export_results_with_recommendations(str(results_file))
     
     print(f"\n" + "="*80)
-    print(f"✅ BENCHMARK COMPLETE")
+    print(f"BENCHMARK COMPLETE")
     print("="*80)
-    print(f"\n📁 Detailed results saved to: {results_file}")
-    print(f"📊 File size: {results_file.stat().st_size / 1024:.2f} KB")
+    print(f"\nDetailed results saved to: {results_file}")
+    print(f"File size: {results_file.stat().st_size / 1024:.2f} KB")
     
     # Final grade
     final_grade = get_grade(stats['average_score'])
     grade_emoji = {
-        "A": "🌟",
-        "B": "✨",
-        "C": "⭐",
-        "D": "💫",
-        "F": "⚠️"
-    }.get(final_grade[0], "📊")
+        "A": "A",
+        "B": "B", 
+        "C": "C",
+        "D": "D",
+        "F": "F"
+    }.get(final_grade[0], "Score")
     
     print(f"\n{grade_emoji} Final Grade: {final_grade}")
-    print(f"🎯 Overall Score: {stats['average_score']:.3f}/1.0")
+    print(f"Overall Score: {stats['average_score']:.3f}/1.0")
     
     # Show improvement areas
     if stats.get('metric_averages'):
         weak_metrics = [(m, s) for m, s in stats['metric_averages'].items() if s < 0.6]
         if weak_metrics:
-            print(f"\n⚠️  Areas for Improvement:")
+            print(f"\n Areas for Improvement:")
             for metric, score in sorted(weak_metrics, key=lambda x: x[1])[:5]:
                 print(f"   • {metric}: {score:.3f}")
     
-    print("\n✨ Evaluation complete!")
+    print("\nEvaluation complete!")
 
 
 def get_grade(score: float) -> str:
@@ -433,8 +433,8 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("\n\n⚠️  Evaluation cancelled by user")
+        print("\n\n Evaluation cancelled by user")
     except Exception as e:
-        print(f"\n\n❌ Error: {e}")
+        print(f"\n\nError: {e}")
         import traceback
         traceback.print_exc()

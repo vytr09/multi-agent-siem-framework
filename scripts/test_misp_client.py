@@ -24,7 +24,7 @@ async def test_real_misp_full():
 
     client = create_misp_client(config, use_mock=False)
     connected = await client.test_connection()
-    print(f"Connection: {'✅ Success' if connected else '❌ Failed'}")
+    print(f"Connection: {'Success' if connected else 'Failed'}")
     if not connected:
         return
 

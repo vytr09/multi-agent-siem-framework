@@ -14,7 +14,7 @@ from benchmark.benchmark_base import (
 from benchmark.llm_judge import LLMJudge
 
 from benchmark.attackgen_benchmark import AttackGenBenchmark
-from benchmark.rulegen_benchmark import RuleGenBenchmark  # ✅ Added
+from benchmark.rulegen_benchmark import RuleGenBenchmark  # Added
 
 # RuleGen benchmark is placeholder for now
 # from benchmark.rulegen_benchmark import RuleGenBenchmark

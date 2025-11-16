@@ -106,11 +106,11 @@ class GeminiClient:
         
         # Initialize google-genai client
         try:
-            print(f"🔍 Debug: Initializing Gemini client with model: {self.model_name}")
+            print(f"Debug: Initializing Gemini client with model: {self.model_name}")
             self.client = genai.Client(api_key=self.api_key)
-            print(f"🔍 Debug: Gemini client initialized successfully")
+            print(f"Debug: Gemini client initialized successfully")
         except Exception as e:
-            print(f"🔍 Debug: Failed to initialize: {type(e).__name__}: {str(e)}")
+            print(f"Debug: Failed to initialize: {type(e).__name__}: {str(e)}")
             raise ValueError(f"Failed to initialize Gemini client: {str(e)}")
     
     def _get_generation_config(self, max_tokens: Optional[int] = None, 
@@ -172,7 +172,7 @@ class GeminiClient:
             return response
             
         except Exception as e:
-            print(f"🔍 Debug: Generate error: {type(e).__name__}: {str(e)}")
+            print(f"Debug: Generate error: {type(e).__name__}: {str(e)}")
             import traceback
             traceback.print_exc()
             raise LLMException(f"Gemini API error: {str(e)}")
@@ -212,24 +212,24 @@ class GeminiClient:
                     return candidate.text
             
             # If no text found, return empty string
-            print("🔍 Debug: No text found in response")
+            print("Debug: No text found in response")
             return ""
             
         except Exception as e:
-            print(f"🔍 Debug: _generate_sync error: {type(e).__name__}: {str(e)}")
+            print(f"Debug: _generate_sync error: {type(e).__name__}: {str(e)}")
             raise Exception(f"Generation failed: {str(e)}")
     
     async def test_connection(self) -> bool:
         """Test google-genai API connection"""
         try:
-            print("🔍 Debug: Testing connection...")
+            print("Debug: Testing connection...")
             test_prompt = "Respond with 'OK' only"
             response = await self.generate(test_prompt, max_tokens=10)
             success = "OK" in response or len(response) > 0
-            print(f"🔍 Debug: Connection test {'passed' if success else 'failed'}")
+            print(f"Debug: Connection test {'passed' if success else 'failed'}")
             return success
         except Exception as e:
-            print(f"🔍 Debug: Connection test error: {type(e).__name__}: {str(e)}")
+            print(f"Debug: Connection test error: {type(e).__name__}: {str(e)}")
             return False
 
 

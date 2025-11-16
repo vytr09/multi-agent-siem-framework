@@ -56,14 +56,14 @@ class LLMJudge:
             response = await self._generate(test_prompt, max_retries=2)
             
             if response and len(response.strip()) > 0:
-                print("[LLM Judge] ✓ Connection successful")
+                print("[LLM Judge] Connection successful")
                 return True
             else:
-                print("[LLM Judge] ✗ Empty response from API")
+                print("[LLM Judge] Empty response from API")
                 return False
                 
         except Exception as e:
-            print(f"[LLM Judge] ✗ Connection failed: {e}")
+            print(f"[LLM Judge] Connection failed: {e}")
             return False
     
     def _get_generation_config(self) -> types.GenerateContentConfig:

@@ -306,13 +306,13 @@
 #                     with open(rule_path, 'w', encoding='utf-8') as f:
 #                         json.dump(platform_rule_data, f, indent=2, ensure_ascii=False)
                     
-#                     print(f"✓ {platform.upper()} rule: {attack_id}_{platform}_llm.json")
+#                     print(f" {platform.upper()} rule: {attack_id}_{platform}_llm.json")
     
 #     # Final summary
 #     print("\n" + "="*80)
-#     print("✅ RULE GENERATION COMPLETE!")
+#     print("RULE GENERATION COMPLETE!")
 #     print("="*80)
-#     print(f"\n📊 Summary:")
+#     print(f"\nSummary:")
 #     print(f"  • Processing time: {processing_time:.2f}s")
 #     print(f"  • TTPs processed: {summary['total_ttps_processed']}")
 #     print(f"  • Successful: {summary['successful']}")
@@ -320,12 +320,12 @@
 #     print(f"  • Total rules generated: {summary['total_rules_generated']}")
 #     print(f"  • LLM model: {summary['llm_model']}")
     
-#     print(f"\n📈 Platform Statistics:")
+#     print(f"\nPlatform Statistics:")
 #     for platform, stats in platform_stats.items():
 #         success_rate = (stats['successful'] / stats['total'] * 100) if stats['total'] > 0 else 0
 #         print(f"  • {platform.upper()}: {stats['successful']}/{stats['total']} ({success_rate:.1f}%)")
     
-#     print(f"\n📁 Output location: {output_dir}")
+#     print(f"\nOutput location: {output_dir}")
 #     print(f"  • Main: rulegen_llm_output.json")
 #     print(f"  • Sigma: sigma_rules_llm/")
 #     print(f"  • Splunk: splunk_rules_llm/")
@@ -337,9 +337,9 @@
 #     try:
 #         asyncio.run(generate_rules_with_llm())
 #     except KeyboardInterrupt:
-#         print("\n\n⚠️  Operation cancelled by user")
+#         print("\n\n Operation cancelled by user")
 #     except Exception as e:
-#         print(f"\n\n❌ Fatal error: {e}")
+#         print(f"\n\nFatal error: {e}")
 #         import traceback
 #         traceback.print_exc()
 

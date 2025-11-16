@@ -73,7 +73,7 @@ class ElasticsearchConverter:
         """Initialize the converter"""
         logger.info("Elasticsearch Converter initialized")
         
-    # ✅ THÊM METHOD NÀY VÀO ĐÂY
+    # ADD THIS METHOD HERE
     def get_syntax_name(self) -> str:
         """Get the syntax name for this converter"""
         return self.syntax_type
