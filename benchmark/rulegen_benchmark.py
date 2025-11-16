@@ -212,7 +212,7 @@ class RuleGenBenchmark(BaseBenchmark):
         Returns:
             BenchmarkResult with detailed evaluation
         """
-        print(f"\n🔍 Evaluating rule: {item.get('attack_id', 'UNKNOWN')}")
+        print(f"\nEvaluating rule: {item.get('attack_id', 'UNKNOWN')}")
         
         metric_results = []
         
@@ -270,7 +270,7 @@ class RuleGenBenchmark(BaseBenchmark):
             }
         )
         
-        print(f"   ✓ Score: {overall_score:.2f}/1.0")
+        print(f"   Score: {overall_score:.2f}/1.0")
         
         return result
     
@@ -519,7 +519,7 @@ class RuleGenBenchmark(BaseBenchmark):
                     ))
             
         except Exception as e:
-            print(f"   ⚠️ LLM Sigma evaluation failed: {e}")
+            print(f"   LLM Sigma evaluation failed: {e}")
             results = self._fallback_sigma_evaluation(sigma_rule)
         
         return results
@@ -735,7 +735,7 @@ class RuleGenBenchmark(BaseBenchmark):
                             ))
                 
                 except Exception as e:
-                    print(f"   ⚠️ LLM platform evaluation failed for {platform}: {e}")
+                    print(f"   LLM platform evaluation failed for {platform}: {e}")
                     # Fallback to heuristic if LLM fails
                     platform_results = self._evaluate_platform_query_heuristic(
                         platform, query, rule_data
@@ -877,7 +877,7 @@ class RuleGenBenchmark(BaseBenchmark):
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
         
-        print(f"\n📁 Results exported to: {filepath}")
+        print(f"\nResults exported to: {filepath}")
     
     def _generate_aggregate_recommendations(self) -> List[Dict[str, Any]]:
         """Generate actionable recommendations across all evaluated rules"""
@@ -1088,13 +1088,13 @@ class RuleGenBenchmark(BaseBenchmark):
         Returns:
             List of BenchmarkResults
         """
-        print(f"\n🚀 Evaluating {len(items)} rules...")
+        print(f"\nEvaluating {len(items)} rules...")
         
         for item in items:
             result = await self.evaluate_item(item)
             self.results.append(result)
         
-        print(f"\n✅ Evaluation complete: {len(self.results)} rules evaluated")
+        print(f"\nEvaluation complete: {len(self.results)} rules evaluated")
         
         return self.results
     
@@ -1102,29 +1102,29 @@ class RuleGenBenchmark(BaseBenchmark):
         """Print a comprehensive summary report to console"""
         
         if not self.results:
-            print("\n⚠️  No results to report")
+            print("\n No results to report")
             return
         
         stats = self.get_statistics()
         
         print("\n" + "="*80)
-        print("📊 RULEGEN BENCHMARK SUMMARY REPORT")
+        print("RULEGEN BENCHMARK SUMMARY REPORT")
         print("="*80)
         
         # Overall statistics
-        print(f"\n📈 Overall Statistics:")
+        print(f"\nOverall Statistics:")
         print(f"   Total Evaluations:     {stats['total_evaluations']}")
         print(f"   Average Score:         {stats['average_score']:.3f}/1.0")
         
         # Score distribution
-        print(f"\n📊 Score Distribution:")
+        print(f"\nScore Distribution:")
         dist = stats.get('score_distribution', {})
         for grade, count in dist.items():
-            bar = "█" * int(count * 40 / max(dist.values(), 1))
+            bar = "█" * int(count * 40 / max(dist.values()) if dist else 0)
             print(f"   {grade:20s} {count:2d} {bar}")
         
         # Category averages
-        print(f"\n🎯 Category Averages:")
+        print(f"\nCategory Averages:")
         cat_avgs = stats.get('category_averages', {})
         for category, avg_score in sorted(cat_avgs.items(), key=lambda x: x[1], reverse=True):
             bar_length = int(avg_score * 40)
@@ -1132,7 +1132,7 @@ class RuleGenBenchmark(BaseBenchmark):
             print(f"   {category:20s} {avg_score:.3f} [{bar}]")
         
         # Top metrics
-        print(f"\n🏆 Top 10 Metrics:")
+        print(f"\nTop 10 Metrics:")
         metric_avgs = stats.get('metric_averages', {})
         sorted_metrics = sorted(metric_avgs.items(), key=lambda x: x[1], reverse=True)[:10]
         for metric, avg_score in sorted_metrics:
@@ -1149,7 +1149,7 @@ class RuleGenBenchmark(BaseBenchmark):
             print(f"   {i}. {attack_id:12s} Score: {result.overall_score:.3f} - {technique}")
         
         # Bottom performers
-        print(f"\n⚠️  Bottom 3 Rules (Need Improvement):")
+        print(f"\n Bottom 3 Rules (Need Improvement):")
         bottom_3 = self.get_bottom_performers(n=3)
         for i, result in enumerate(bottom_3, 1):
             attack_id = result.metadata.get('attack_id', 'UNKNOWN')
@@ -1159,7 +1159,7 @@ class RuleGenBenchmark(BaseBenchmark):
         # Recommendations
         recommendations = self._generate_aggregate_recommendations()
         if recommendations:
-            print(f"\n💡 Top Recommendations:")
+            print(f"\nTop Recommendations:")
             high_priority = [r for r in recommendations if r.get('priority') == 'high'][:3]
             for i, rec in enumerate(high_priority, 1):
                 metric = rec.get('metric', rec.get('category', 'unknown'))
@@ -1167,6 +1167,203 @@ class RuleGenBenchmark(BaseBenchmark):
                 print(f"   {i}. [{metric}] {issue}")
         
         print("\n" + "="*80)
+
+
+# ============================================================
+# FEEDBACK GENERATION METHODS
+# ============================================================
+
+    def generate_feedback(self, 
+                         results: List[BenchmarkResult], 
+                         agent_name: str = "rulegen",
+                         history: Optional[List[Dict]] = None) -> Dict[str, Any]:
+        """
+        Generate feedback based on evaluation results
+        
+        Args:
+            results: List of benchmark results
+            agent_name: Name of the agent to generate feedback for
+            history: Optional history context
+            
+        Returns:
+            Feedback dictionary
+        """
+        if not results:
+            return {
+                'status': 'no_results',
+                'message': 'No evaluation results to generate feedback from'
+            }
+        
+        # Get aggregate statistics
+        stats = self.get_statistics()
+        
+        # Build evaluation summary
+        evaluation = {
+            'overall_score': stats.get('average_score', 0.0),
+            'metrics': stats.get('metric_averages', {}),
+            'category_scores': stats.get('category_averages', {}),
+            'results_count': len(results),
+            'score_distribution': stats.get('score_distribution', {})
+        }
+        
+        # Add history context if provided
+        if history:
+            evaluation['history_context'] = history
+            evaluation['history_size'] = len(history)
+        
+        # Generate feedback using feedback manager (if available)
+        # For now, create basic feedback structure
+        feedback = self._create_feedback_from_evaluation(evaluation, agent_name)
+        
+        return feedback
+    
+    def _create_feedback_from_evaluation(self, 
+                                       evaluation: Dict[str, Any], 
+                                       agent_name: str) -> Dict[str, Any]:
+        """
+        Create feedback from evaluation results
+        
+        Args:
+            evaluation: Evaluation summary
+            agent_name: Target agent name
+            
+        Returns:
+            Feedback dictionary
+        """
+        overall_score = evaluation.get('overall_score', 0.0)
+        metrics = evaluation.get('metrics', {})
+        categories = evaluation.get('category_scores', {})
+        
+        feedback = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'target_agent': agent_name,
+            'evaluation_summary': evaluation,
+            'overall_assessment': self._assess_overall_performance(overall_score),
+            'improvements_needed': [],
+            'actionable_suggestions': [],
+            'strengths': [],
+            'critical_issues': []
+        }
+        
+        # Analyze each metric for improvements
+        for metric_name, score in metrics.items():
+            if score < 0.6:
+                feedback['critical_issues'].append({
+                    'metric': metric_name,
+                    'current_score': score,
+                    'severity': 'critical',
+                    'recommendation': self._get_metric_recommendation(metric_name)
+                })
+            elif score < 0.7:
+                feedback['improvements_needed'].append({
+                    'metric': metric_name,
+                    'current_score': score,
+                    'severity': 'high',
+                    'recommendation': self._get_metric_recommendation(metric_name)
+                })
+            elif score >= 0.8:
+                feedback['strengths'].append({
+                    'metric': metric_name,
+                    'score': score,
+                    'description': f"Strong performance in {metric_name.replace('_', ' ')}"
+                })
+        
+        # Add actionable suggestions based on categories
+        for category, score in categories.items():
+            if score < 0.7:
+                suggestions = self._get_category_actionable_suggestions(category, score)
+                feedback['actionable_suggestions'].extend(suggestions)
+        
+        # Add overall recommendations
+        feedback['overall_recommendations'] = self._generate_overall_recommendations(evaluation)
+        
+        return feedback
+    
+    def _assess_overall_performance(self, score: float) -> str:
+        """Assess overall performance level"""
+        if score >= 0.9:
+            return "excellent"
+        elif score >= 0.8:
+            return "good"
+        elif score >= 0.7:
+            return "fair"
+        elif score >= 0.6:
+            return "poor"
+        else:
+            return "critical"
+    
+    def _get_category_actionable_suggestions(self, category: str, score: float) -> List[str]:
+        """Get actionable suggestions for a category"""
+        suggestions = {
+            "correctness": [
+                "Validate Sigma rule syntax against specification",
+                "Test platform query syntax on actual SIEM instances",
+                "Verify field mappings against platform schemas",
+                "Add automated validation checks to rule generation pipeline"
+            ],
+            "quality": [
+                "Balance detection specificity and sensitivity",
+                "Add more contextual filters to reduce false positives",
+                "Include comprehensive metadata in rule generation",
+                "Optimize queries for better performance"
+            ],
+            "effectiveness": [
+                "Expand attack coverage to include more variations",
+                "Improve false positive resistance with better filters",
+                "Incorporate threat actor TTPs into detection logic",
+                "Add multi-stage detection capabilities"
+            ],
+            "realism": [
+                "Test rules in production-like environments",
+                "Optimize for SIEM performance constraints",
+                "Ensure alerts provide actionable information",
+                "Validate against real threat data"
+            ],
+            "detectability": [
+                "Add evasion-resistant detection patterns",
+                "Implement multi-stage attack detection",
+                "Test against common adversary techniques",
+                "Include behavioral indicators alongside IOCs"
+            ]
+        }
+        
+        return suggestions.get(category, [f"Improve overall {category} performance"])
+    
+    def _generate_overall_recommendations(self, evaluation: Dict[str, Any]) -> List[str]:
+        """Generate overall recommendations"""
+        recommendations = []
+        score = evaluation.get('overall_score', 0.0)
+        
+        if score < 0.6:
+            recommendations.extend([
+                "Major overhaul of rule generation pipeline required",
+                "Consider retraining LLM with better examples and feedback",
+                "Implement comprehensive validation and testing framework",
+                "Review and improve prompt engineering for rule generation"
+            ])
+        elif score < 0.7:
+            recommendations.extend([
+                "Focus on high-priority metrics that scored below 0.7",
+                "Implement iterative improvement based on evaluation feedback",
+                "Add more comprehensive testing and validation",
+                "Consider human expert review for generated rules"
+            ])
+        elif score < 0.8:
+            recommendations.extend([
+                "Fine-tune rule generation for better performance",
+                "Add more sophisticated validation checks",
+                "Implement automated optimization suggestions",
+                "Consider ensemble approaches for rule generation"
+            ])
+        else:
+            recommendations.extend([
+                "Maintain current high performance standards",
+                "Consider expanding to additional platforms or techniques",
+                "Implement advanced features like multi-stage detection",
+                "Share successful patterns with broader community"
+            ])
+        
+        return recommendations
 
 
 # ============================================================
@@ -1251,7 +1448,7 @@ if __name__ == "__main__":
         
         # Access results programmatically
         stats = benchmark.get_statistics()
-        print(f"\n📊 Final Average Score: {stats['average_score']:.3f}")
+        print(f"\nFinal Average Score: {stats['average_score']:.3f}")
     
     # Run
     asyncio.run(main())

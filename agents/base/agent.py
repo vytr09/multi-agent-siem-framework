@@ -6,6 +6,7 @@ import logging
 import asyncio
 from datetime import datetime
 from enum import Enum
+from core.memory import get_memory_manager
 
 class AgentStatus(Enum):
     """Agent status enumeration"""
@@ -40,6 +41,13 @@ class BaseAgent(ABC):
         self.start_time: Optional[datetime] = None
         self.last_activity: Optional[datetime] = None
         self._is_running = False
+
+        # Add memory support
+        self.memory_enabled = config.get('memory_enabled', False)
+        if self.memory_enabled:
+            self.memory_manager = get_memory_manager()
+        else:
+            self.memory_manager = None
         
     def _setup_logger(self) -> logging.Logger:
         """Set up structured logging for the agent"""
@@ -54,17 +62,28 @@ class BaseAgent(ABC):
             logger.setLevel(logging.INFO)
         return logger
     
-    @abstractmethod
     async def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Main execution method for the agent.
+        """Execute with memory tracking"""
+        # Get memory context if enabled
+        context = {}
+        if self.memory_manager:
+            history = self.memory_manager.get_history(self.id, last_n=5)
+            context['history'] = history
         
-        Args:
-            input_data: Input data for the agent to process
-            
-        Returns:
-            Dictionary containing the execution results
-        """
+        # Execute main logic
+        result = await self._execute_with_context(input_data, context)
+        
+        # Save to memory
+        if self.memory_manager:
+            self.memory_manager.save_interaction(self.id, input_data, result)
+        
+        return result
+    
+    @abstractmethod
+    async def _execute_with_context(self, 
+                                    input_data: Dict[str, Any],
+                                    context: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute with memory context - to be implemented by subclasses"""
         pass
     
     @abstractmethod

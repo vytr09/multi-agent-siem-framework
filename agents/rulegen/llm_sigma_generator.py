@@ -7,7 +7,8 @@ import os
 import json
 import re
 from typing import Dict, List, Any, Optional
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from datetime import datetime
 import uuid
 import asyncio
@@ -34,49 +35,25 @@ class LLMSigmaGenerator:
         if not self.api_key:
             raise ValueError("Gemini API key not found. Set GEMINI_API_KEY environment variable or pass in config")
         
-        # Configure the API key
+        # Set API key as environment variable (newer google.genai way)
+        os.environ['GOOGLE_API_KEY'] = self.api_key
+        
+        # No need to configure - just initialize the client
         try:
-            genai.configure(api_key=self.api_key)
-            print(f"🔍 Debug: Gemini API configured successfully")
+            print(f"Debug: Gemini API key set successfully")
         except Exception as e:
-            print(f"🔍 Debug: Failed to configure: {type(e).__name__}: {str(e)}")
+            print(f"Debug: Failed to set API key: {type(e).__name__}: {str(e)}")
             raise ValueError(f"Failed to configure Gemini API: {str(e)}")
+        
+        # Initialize the client with API key
+        self.client = genai.Client(api_key=self.api_key)
         
         # Model configuration
         self.model_name = self.config.get('model', 'gemini-2.0-flash-lite')
         self.temperature = self.config.get('temperature', 0.3)
         self.max_retries = self.config.get('max_retries', 3)
         
-        # Initialize the model
-        self.model = genai.GenerativeModel(
-            model_name=self.model_name,
-            generation_config={
-                'temperature': self.temperature,
-                'top_p': 0.95,
-                'top_k': 40,
-                'max_output_tokens': 4096,
-            },
-            safety_settings=[
-                {
-                    "category": "HARM_CATEGORY_HARASSMENT",
-                    "threshold": "BLOCK_NONE"
-                },
-                {
-                    "category": "HARM_CATEGORY_HATE_SPEECH",
-                    "threshold": "BLOCK_NONE"
-                },
-                {
-                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                    "threshold": "BLOCK_NONE"
-                },
-                {
-                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                    "threshold": "BLOCK_NONE"
-                },
-            ]
-        )
-        
-        print(f"✅ LLM Generator initialized with model: {self.model_name}")
+        print(f"LLM Generator initialized with model: {self.model_name}")
     
     def _build_sigma_prompt(self, ttp_data: Dict[str, Any]) -> str:
         """Build prompt for Sigma rule generation"""
@@ -96,9 +73,28 @@ class LLMSigmaGenerator:
         # IOCs
         iocs = ttp_data.get('iocs', {})
         
+        # Feedback context (if available)
+        feedback_context = ttp_data.get('feedback_context')
+        feedback_section = ""
+        if feedback_context:
+            improvements = feedback_context.get('improvements_needed', [])
+            suggestions = feedback_context.get('actionable_suggestions', [])
+            
+            if improvements or suggestions:
+                feedback_section = "\n\n## Previous Evaluation Feedback:\n"
+                feedback_section += "Please improve the rule based on this feedback:\n"
+                
+                for imp in improvements:
+                    feedback_section += f"- {imp.get('metric', 'General')}: {imp.get('suggestion', '')}\n"
+                
+                for sug in suggestions:
+                    feedback_section += f"- {sug}\n"
+                
+                feedback_section += "\nIncorporate these improvements into the new rule generation.\n"
+        
         prompt = f"""You are a cybersecurity expert specializing in SIEM detection rules and Sigma rule creation.
 
-Generate a high-quality Sigma detection rule for the following MITRE ATT&CK technique:
+Generate a high-quality Sigma detection rule for the following MITRE ATT&CK technique:{feedback_section}
 
 **Technique Information:**
 - ATT&CK ID: {attack_id}
@@ -198,17 +194,17 @@ Generate the Sigma rule now:"""
                     # Validate and enhance
                     sigma_rule = self._validate_and_enhance(sigma_rule, ttp_data)
                     
-                    print(f"   ✅ Generated: {sigma_rule.get('title', 'Untitled')}")
+                    print(f"   Generated: {sigma_rule.get('title', 'Untitled')}")
                     return sigma_rule
                 else:
-                    print(f"   ⚠️ Failed to extract valid JSON, retrying...")
+                    print(f"   Failed to extract valid JSON, retrying...")
                     
             except Exception as e:
-                print(f"   ❌ Error: {type(e).__name__}: {str(e)}")
+                print(f"   Error: {type(e).__name__}: {str(e)}")
                 if attempt < self.max_retries - 1:
                     await asyncio.sleep(2 ** attempt)  # Exponential backoff
                 else:
-                    print(f"   ❌ Max retries reached, using fallback")
+                    print(f"   Max retries reached, using fallback")
                     return self._generate_fallback_rule(ttp_data)
         
         return self._generate_fallback_rule(ttp_data)
@@ -216,7 +212,11 @@ Generate the Sigma rule now:"""
     async def _generate_with_model(self, prompt: str) -> str:
         """Generate response using Gemini model"""
         def _generate_sync():
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt
+                # Removed config parameter as it may not be supported in current version
+            )
             return response.text
         
         # Run in thread pool to maintain async interface
@@ -287,7 +287,7 @@ Generate the Sigma rule now:"""
         
         # Validate detection section
         if 'detection' not in sigma_rule or not sigma_rule['detection']:
-            print(f"   ⚠️ Invalid detection section, using fallback")
+            print(f"   Invalid detection section, using fallback")
             return self._generate_fallback_rule(ttp_data)
         
         return sigma_rule
@@ -419,7 +419,7 @@ async def generate_sigma_rules_batch(ttp_list: List[Dict], config: Optional[Dict
     sigma_rules = []
     for i, result in enumerate(results):
         if isinstance(result, Exception):
-            print(f"❌ Failed to generate rule for TTP {i+1}: {result}")
+            print(f"Failed to generate rule for TTP {i+1}: {result}")
             # Use fallback
             sigma_rules.append(generator._generate_fallback_rule(ttp_list[i]))
         else:
