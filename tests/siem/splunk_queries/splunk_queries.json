@@ -1,0 +1,408 @@
+[
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Phishing Activity Detected via NLP Pattern Matching (Lazarus Group)",
+    "description": "Detects potential phishing activity based on NLP pattern matching of email subject lines and body content, focusing on Lazarus Group tactics. This rule analyzes email content for keywords and phrases commonly used in phishing campaigns, such as urgency, password reset requests, and links to external domains. It also looks for the execution of suspicious processes after email interaction, such as Office applications spawning child processes.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "medium",
+    "tags": [
+      "attack.t1566.001",
+      "attack.initial_access"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK.EXE\") AND (New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\rundll32.exe\" OR New_Process_Name=\"*\\regsvr32.exe\" OR New_Process_Name=\"*\\mshta.exe\") AND (Process_Command_Line=\"*powershell.exe -enc*\" OR Process_Command_Line=\"*cmd.exe /c start*\" OR Process_Command_Line=\"*rundll32.exe javascript:*\" OR Process_Command_Line=\"*regsvr32.exe /s /i:*\" OR Process_Command_Line=\"*mshta.exe javascript:*\")) NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\Microsoft Office\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Program Files (x86)\\Microsoft Office\\\"*\" OR Process_Command_Line=\"*\\AppData\\Local\\Microsoft\\Windows\\INetCache*\" OR Process_Command_Line=\"*\\AppData\\Local\\Temp*\") AND (New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\rundll32.exe\" OR New_Process_Name=\"*\\regsvr32.exe\" OR New_Process_Name=\"*\\mshta.exe\") AND (Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK.EXE\")) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search ((Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK.EXE\") AND (New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\rundll32.exe\" OR New_Process_Name=\"*\\regsvr32.exe\" OR New_Process_Name=\"*\\mshta.exe\") AND (Process_Command_Line=\"*powershell.exe -enc*\" OR Process_Command_Line=\"*cmd.exe /c start*\" OR Process_Command_Line=\"*rundll32.exe javascript:*\" OR Process_Command_Line=\"*regsvr32.exe /s /i:*\" OR Process_Command_Line=\"*mshta.exe javascript:*\")) NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\Microsoft Office\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Program Files (x86)\\Microsoft Office\\\"*\" OR Process_Command_Line=\"*\\AppData\\Local\\Microsoft\\Windows\\INetCache*\" OR Process_Command_Line=\"*\\AppData\\Local\\Temp*\") AND (New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\rundll32.exe\" OR New_Process_Name=\"*\\regsvr32.exe\" OR New_Process_Name=\"*\\mshta.exe\") AND (Parent_Process_Name=\"*\\WINWORD.EXE\" OR Parent_Process_Name=\"*\\EXCEL.EXE\" OR Parent_Process_Name=\"*\\POWERPNT.EXE\" OR Parent_Process_Name=\"*\\OUTLOOK.EXE\"))",
+    "metadata": {
+      "ttp_id": "9fc34857-5a34-4d1c-90e8-3b5d7536276c",
+      "technique_id": "T1566.001",
+      "confidence": 0.7,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "T1566.001",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access"
+    },
+    "falsepositives": [
+      "Legitimate use of Office applications opening documents or spreadsheets.",
+      "Users opening legitimate emails with attachments or links.",
+      "Software updates or installations that use similar command-line patterns."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Lazarus Group PowerShell Activity - Mimikatz Indicators",
+    "description": "Detects PowerShell activity associated with Lazarus Group, specifically focusing on Mimikatz-related indicators, encoded commands, and download cradles. This rule aims to identify potential credential dumping attempts and malicious PowerShell execution.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "high",
+    "tags": [
+      "attack.t1059.001",
+      "attack.execution"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search New_Process_Name=\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" AND (Process_Command_Line=\"*-enc *\" OR Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX (New-Object Net.WebClient).DownloadString*\" OR Process_Command_Line=\"*powershell.exe -nop -w hidden -c*\" OR Process_Command_Line=\"*powershell.exe -ep bypass*\" OR Process_Command_Line=\"*Invoke-Expression*\" OR Process_Command_Line=\"*cmd.exe /c powershell*\" OR Process_Command_Line=\"*powershell.exe -ExecutionPolicy Bypass*\") | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search New_Process_Name=\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" AND (Process_Command_Line=\"*-enc *\" OR Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX (New-Object Net.WebClient).DownloadString*\" OR Process_Command_Line=\"*powershell.exe -nop -w hidden -c*\" OR Process_Command_Line=\"*powershell.exe -ep bypass*\" OR Process_Command_Line=\"*Invoke-Expression*\" OR Process_Command_Line=\"*cmd.exe /c powershell*\" OR Process_Command_Line=\"*powershell.exe -ExecutionPolicy Bypass*\")",
+    "metadata": {
+      "ttp_id": "c87a7baa-abe2-4d2a-b296-0c6ec13c4d46",
+      "technique_id": "T1059.001",
+      "confidence": 0.7,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "T1059.001",
+      "technique_name": "PowerShell",
+      "tactic": "Execution"
+    },
+    "falsepositives": [
+      "Legitimate use of PowerShell for system administration tasks.",
+      "Scripts signed by trusted vendors.",
+      "User-initiated PowerShell scripts for legitimate purposes."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Suspicious Registry Run Key Creation via NLP Pattern Matching",
+    "description": "Detects suspicious Registry Run Key creation events using NLP pattern matching to identify potential persistence mechanisms. This rule focuses on identifying patterns associated with malware persistence, specifically targeting techniques used by threat actors like Lazarus Group.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "medium",
+    "tags": [
+      "attack.t1547.001",
+      "attack.persistence"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search (New_Process_Name=\"*\\reg.exe\" AND (Process_Command_Line=\"*ADD*\" OR Process_Command_Line=\"*HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*\" OR Process_Command_Line=\"*/v*\" OR Process_Command_Line=\"*/t*\" OR Process_Command_Line=\"*/d*\")) NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Windows\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\ProgramData\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\Public\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\Default\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\All Users\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Program Files (x86)\\*\") AND ((Process_Command_Line LIKE \"\"C:\\\\Program Files\\\\.*\\\\.*\\\\.*.exe\" /d\") OR (Process_Command_Line LIKE \"\"C:\\\\Program Files (x86)\\\\.*\\\\.*\\\\.*.exe\" /d\"))) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search (New_Process_Name=\"*\\reg.exe\" AND (Process_Command_Line=\"*ADD*\" OR Process_Command_Line=\"*HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*\" OR Process_Command_Line=\"*/v*\" OR Process_Command_Line=\"*/t*\" OR Process_Command_Line=\"*/d*\")) NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Windows\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\ProgramData\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\Public\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\Default\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Users\\All Users\\\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Program Files (x86)\\*\") AND ((Process_Command_Line LIKE \"\"C:\\\\Program Files\\\\.*\\\\.*\\\\.*.exe\" /d\") OR (Process_Command_Line LIKE \"\"C:\\\\Program Files (x86)\\\\.*\\\\.*\\\\.*.exe\" /d\")))",
+    "metadata": {
+      "ttp_id": "ce16e8b9-df3f-412d-b5c3-8cd253724379",
+      "technique_id": "T1547.001",
+      "confidence": 0.7,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "T1547.001",
+      "technique_name": "Registry Run Keys",
+      "tactic": "Persistence"
+    },
+    "falsepositives": [
+      "Legitimate software installation or updates that create run keys.",
+      "User-installed applications that add themselves to the startup."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "OS Credential Dumping via Mimikatz and Procdump",
+    "description": "Detects OS Credential Dumping activity using Mimikatz and Procdump, focusing on process creation patterns and command-line arguments. This rule specifically targets the Lazarus Group's known usage of these tools.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "high",
+    "tags": [
+      "attack.t1003",
+      "attack.credential_access",
+      "attack.t1059.001",
+      "attack.t1566"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search (((Parent_Process_Name=\"*\\powershell.exe\" OR Parent_Process_Name=\"*\\powershell_ise.exe\") AND (Process_Command_Line=\"*-enc *\" OR Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX (New-Object Net.WebClient).DownloadString*\" OR Process_Command_Line=\"*bypass*\" OR Process_Command_Line=\"*DownloadString*\"))) NOT ((New_Process_Name=\"*\\conhost.exe\" OR New_Process_Name=\"*\\svchost.exe\" OR New_Process_Name=\"*\\consent.exe\") AND (Process_Command_Line=\"*\\\"/c echo off\\\"*\" OR Process_Command_Line=\"*\\\"/c timeout\\\"*\" OR Process_Command_Line=\"*\\\"/c ping\\\"*\" OR Process_Command_Line=\"*\\\"/c tasklist\\\"*\") AND (Parent_Process_Name=\"*\\explorer.exe\" OR Parent_Process_Name=\"*\\cmd.exe\" OR Parent_Process_Name=\"*\\powershell.exe\")) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search (((Parent_Process_Name=\"*\\powershell.exe\" OR Parent_Process_Name=\"*\\powershell_ise.exe\") AND (Process_Command_Line=\"*-enc *\" OR Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX (New-Object Net.WebClient).DownloadString*\" OR Process_Command_Line=\"*bypass*\" OR Process_Command_Line=\"*DownloadString*\"))) NOT ((New_Process_Name=\"*\\conhost.exe\" OR New_Process_Name=\"*\\svchost.exe\" OR New_Process_Name=\"*\\consent.exe\") AND (Process_Command_Line=\"*\\\"/c echo off\\\"*\" OR Process_Command_Line=\"*\\\"/c timeout\\\"*\" OR Process_Command_Line=\"*\\\"/c ping\\\"*\" OR Process_Command_Line=\"*\\\"/c tasklist\\\"*\") AND (Parent_Process_Name=\"*\\explorer.exe\" OR Parent_Process_Name=\"*\\cmd.exe\" OR Parent_Process_Name=\"*\\powershell.exe\"))",
+    "metadata": {
+      "ttp_id": "8410c7a2-4eb1-463b-bc7d-b2dafd0580f8",
+      "technique_id": "T1003",
+      "confidence": 0.7,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "T1003",
+      "technique_name": "OS Credential Dumping",
+      "tactic": "Credential Access"
+    },
+    "falsepositives": [
+      "Legitimate use of procdump for debugging purposes (rare).",
+      "Security tools performing legitimate credential scanning (e.g., vulnerability scanners).",
+      "Users running legitimate PowerShell scripts that happen to contain similar command-line arguments (rare)."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Remote Desktop Protocol Activity Detected via NLP Pattern Matching",
+    "description": "Detects Remote Desktop Protocol (RDP) activity based on NLP pattern matching of process command lines, focusing on indicators of potential lateral movement and credential access attempts. This rule analyzes process creation and network connections for RDP-related keywords and behaviors, potentially indicating malicious activity.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "medium",
+    "tags": [
+      "attack.t1021.001",
+      "attack.lateral_movement"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*mstsc.exe*\" OR Process_Command_Line=\"*Remote Desktop Connection*\" OR Process_Command_Line=\"*/v:*\" OR Process_Command_Line=\"*/admin*\" OR Process_Command_Line=\"*/console*\") AND New_Process_Name=\"*mstsc.exe\") NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\Remote Desktop Connection\\mstsc.exe\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Windows\\System32\\mstsc.exe\\\"*\") AND (Parent_Process_Name=\"*explorer.exe*\" OR Parent_Process_Name=\"*svchost.exe*\" OR Parent_Process_Name=\"*winlogon.exe*\") AND Subject_User_Name=\"NT AUTHORITY\\SYSTEM\") | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*mstsc.exe*\" OR Process_Command_Line=\"*Remote Desktop Connection*\" OR Process_Command_Line=\"*/v:*\" OR Process_Command_Line=\"*/admin*\" OR Process_Command_Line=\"*/console*\") AND New_Process_Name=\"*mstsc.exe\") NOT ((Process_Command_Line=\"*\\\"C:\\Program Files\\Remote Desktop Connection\\mstsc.exe\\\"*\" OR Process_Command_Line=\"*\\\"C:\\Windows\\System32\\mstsc.exe\\\"*\") AND (Parent_Process_Name=\"*explorer.exe*\" OR Parent_Process_Name=\"*svchost.exe*\" OR Parent_Process_Name=\"*winlogon.exe*\") AND Subject_User_Name=\"NT AUTHORITY\\SYSTEM\")",
+    "metadata": {
+      "ttp_id": "2a905a2d-30b0-4e59-a901-8a79ef0cda6e",
+      "technique_id": "T1021.001",
+      "confidence": 0.7,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "T1021.001",
+      "technique_name": "Remote Desktop Protocol",
+      "tactic": "Lateral Movement"
+    },
+    "falsepositives": [
+      "Legitimate use of Remote Desktop Connection by administrators.",
+      "User initiated RDP sessions to internal servers."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Suspicious WMI Execution via NLP Pattern Matching",
+    "description": "Detects suspicious Windows Management Instrumentation (WMI) activity based on NLP pattern matching. This rule identifies potentially malicious WMI commands by analyzing the command line for keywords and phrases commonly associated with malicious activities, such as credential dumping, PowerShell execution, and file downloads. This rule leverages a simplified NLP approach to identify suspicious patterns, focusing on common indicators of compromise (IOCs) and techniques used by threat actors.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "medium",
+    "tags": [
+      "attack.unmapped",
+      "attack.execution"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search (New_Process_Name=\"*wmic.exe\") OR ((Process_Command_Line=\"*process call create*\" OR Process_Command_Line=\"*process call terminate*\" OR Process_Command_Line=\"*process where name*\" OR Process_Command_Line=\"*service call start*\" OR Process_Command_Line=\"*service call stop*\" OR Process_Command_Line=\"*get process where name*\" OR Process_Command_Line=\"*shadowcopy call create*\" OR Process_Command_Line=\"*shadowcopy call delete*\")) OR ((Process_Command_Line=\"*powershell.exe*\" OR Process_Command_Line=\"*cmd.exe /c*\" OR Process_Command_Line=\"*rundll32.exe*\" OR Process_Command_Line=\"*regsvr32.exe*\" OR Process_Command_Line=\"*bitsadmin.exe*\" OR Process_Command_Line=\"*certutil.exe*\" OR Process_Command_Line=\"*mshta.exe*\")) OR ((Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX*\" OR Process_Command_Line=\"*downloadstring*\" OR Process_Command_Line=\"*Invoke-Expression*\" OR Process_Command_Line=\"*http://*\" OR Process_Command_Line=\"*https://*\")) OR ((Process_Command_Line=\"*mimikatz*\" OR Process_Command_Line=\"*procdump*\" OR Process_Command_Line=\"*lsass.exe*\" OR Process_Command_Line=\"*sekurlsa::*\" OR Process_Command_Line=\"*privilege::*\" OR Process_Command_Line=\"*dpapi::*\" OR Process_Command_Line=\"*kerberos::*\")) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search (New_Process_Name=\"*wmic.exe\") OR ((Process_Command_Line=\"*process call create*\" OR Process_Command_Line=\"*process call terminate*\" OR Process_Command_Line=\"*process where name*\" OR Process_Command_Line=\"*service call start*\" OR Process_Command_Line=\"*service call stop*\" OR Process_Command_Line=\"*get process where name*\" OR Process_Command_Line=\"*shadowcopy call create*\" OR Process_Command_Line=\"*shadowcopy call delete*\")) OR ((Process_Command_Line=\"*powershell.exe*\" OR Process_Command_Line=\"*cmd.exe /c*\" OR Process_Command_Line=\"*rundll32.exe*\" OR Process_Command_Line=\"*regsvr32.exe*\" OR Process_Command_Line=\"*bitsadmin.exe*\" OR Process_Command_Line=\"*certutil.exe*\" OR Process_Command_Line=\"*mshta.exe*\")) OR ((Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX*\" OR Process_Command_Line=\"*downloadstring*\" OR Process_Command_Line=\"*Invoke-Expression*\" OR Process_Command_Line=\"*http://*\" OR Process_Command_Line=\"*https://*\")) OR ((Process_Command_Line=\"*mimikatz*\" OR Process_Command_Line=\"*procdump*\" OR Process_Command_Line=\"*lsass.exe*\" OR Process_Command_Line=\"*sekurlsa::*\" OR Process_Command_Line=\"*privilege::*\" OR Process_Command_Line=\"*dpapi::*\" OR Process_Command_Line=\"*kerberos::*\"))",
+    "metadata": {
+      "ttp_id": "f595ad3f-4580-416a-ace3-0e0b1c1aa69d",
+      "technique_id": "UNMAPPED",
+      "confidence": 0.6,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Windows Management Instrumentation",
+      "tactic": "Execution"
+    },
+    "falsepositives": [
+      "Legitimate system administration tasks using WMI.",
+      "Scripts or tools used for legitimate monitoring or management."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Scheduled Task/Job Creation Detected via NLP Pattern Matching (Lazarus Group)",
+    "description": "Detects scheduled task/job creation activity using NLP pattern matching, potentially indicative of Lazarus Group activity. This rule focuses on identifying suspicious task names and command lines associated with persistence.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "medium",
+    "tags": [
+      "attack.unmapped",
+      "attack.persistence"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "security"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search ((New_Process_Name=\"*\\schtasks.exe*\" OR New_Process_Name=\"*\\at.exe*\")) OR ((Process_Command_Line=\"*schtasks /create*\" OR Process_Command_Line=\"*at /create*\")) OR (((Process_Command_Line LIKE \"(/TN\\s+\"(?:[a-zA-Z0-9_\\s\\-]+\\s*(?:[a-zA-Z0-9_\\s\\-]+)?)\")\") OR (Process_Command_Line LIKE \"(/SC\\s+ONCE\\s+/ST\\s+\\d{2}:\\d{2})\") OR (Process_Command_Line LIKE \"(/SC\\s+DAILY\\s+/ST\\s+\\d{2}:\\d{2})\") OR (Process_Command_Line LIKE \"(/SC\\s+WEEKLY\\s+/D\\s+\\d+)\") OR (Process_Command_Line LIKE \"(/SC\\s+MONTHLY\\s+/D\\s+\\d+)\"))) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search ((New_Process_Name=\"*\\schtasks.exe*\" OR New_Process_Name=\"*\\at.exe*\")) OR ((Process_Command_Line=\"*schtasks /create*\" OR Process_Command_Line=\"*at /create*\")) OR (((Process_Command_Line LIKE \"(/TN\\s+\"(?:[a-zA-Z0-9_\\s\\-]+\\s*(?:[a-zA-Z0-9_\\s\\-]+)?)\")\") OR (Process_Command_Line LIKE \"(/SC\\s+ONCE\\s+/ST\\s+\\d{2}:\\d{2})\") OR (Process_Command_Line LIKE \"(/SC\\s+DAILY\\s+/ST\\s+\\d{2}:\\d{2})\") OR (Process_Command_Line LIKE \"(/SC\\s+WEEKLY\\s+/D\\s+\\d+)\") OR (Process_Command_Line LIKE \"(/SC\\s+MONTHLY\\s+/D\\s+\\d+)\")))",
+    "metadata": {
+      "ttp_id": "2497d583-5891-4957-8f82-00df825225f4",
+      "technique_id": "UNMAPPED",
+      "confidence": 0.6,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Scheduled Task/Job",
+      "tactic": "Persistence"
+    },
+    "falsepositives": [
+      "Legitimate scheduled tasks created by system administrators or software installations.",
+      "Tasks created by security software for scheduled scans or updates."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Process Injection Detected via NLP Pattern Matching (Lazarus Group)",
+    "description": "Detects potential process injection activity based on NLP pattern matching, focusing on Lazarus Group tactics. This rule analyzes process creation events for suspicious command-line arguments and process relationships, indicative of code injection techniques.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "medium",
+    "tags": [
+      "attack.unmapped",
+      "attack.defense_evasion"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*CreateRemoteThread*\" OR Process_Command_Line=\"*VirtualAllocEx*\" OR Process_Command_Line=\"*WriteProcessMemory*\" OR Process_Command_Line=\"*NtCreateThreadEx*\" OR Process_Command_Line=\"*QueueUserAPC*\" OR Process_Command_Line=\"*RtlCreateUserThread*\")) NOT ((Parent_Process_Name=\"*\\svchost.exe\" OR Parent_Process_Name=\"*\\services.exe\" OR Parent_Process_Name=\"*\\lsass.exe\" OR Parent_Process_Name=\"*\\winlogon.exe\" OR Parent_Process_Name=\"*\\explorer.exe\") AND (New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\rundll32.exe\") AND (Process_Command_Line=\"*powershell.exe -nop -w hidden -c*\" OR Process_Command_Line=\"*cmd.exe /c start*\" OR Process_Command_Line=\"*rundll32.exe*\" OR Process_Command_Line=\"*regsvr32.exe /s*\")) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*CreateRemoteThread*\" OR Process_Command_Line=\"*VirtualAllocEx*\" OR Process_Command_Line=\"*WriteProcessMemory*\" OR Process_Command_Line=\"*NtCreateThreadEx*\" OR Process_Command_Line=\"*QueueUserAPC*\" OR Process_Command_Line=\"*RtlCreateUserThread*\")) NOT ((Parent_Process_Name=\"*\\svchost.exe\" OR Parent_Process_Name=\"*\\services.exe\" OR Parent_Process_Name=\"*\\lsass.exe\" OR Parent_Process_Name=\"*\\winlogon.exe\" OR Parent_Process_Name=\"*\\explorer.exe\") AND (New_Process_Name=\"*\\powershell.exe\" OR New_Process_Name=\"*\\cmd.exe\" OR New_Process_Name=\"*\\rundll32.exe\") AND (Process_Command_Line=\"*powershell.exe -nop -w hidden -c*\" OR Process_Command_Line=\"*cmd.exe /c start*\" OR Process_Command_Line=\"*rundll32.exe*\" OR Process_Command_Line=\"*regsvr32.exe /s*\"))",
+    "metadata": {
+      "ttp_id": "1107ac1d-891f-4bb9-8056-51fd0c265480",
+      "technique_id": "UNMAPPED",
+      "confidence": 0.6,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Process Injection",
+      "tactic": "Defense Evasion"
+    },
+    "falsepositives": [
+      "Legitimate applications using CreateRemoteThread or similar APIs for debugging or legitimate functionality.",
+      "Software installers that may use these APIs."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Lazarus Group - Remote Services Activity via NLP Pattern Matching",
+    "description": "Detects potential Remote Services activity associated with the Lazarus Group, focusing on credential dumping and PowerShell execution patterns, identified via NLP pattern matching. This rule leverages process creation events and command-line analysis to identify suspicious behavior.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "high",
+    "tags": [
+      "attack.unmapped",
+      "attack.lateral_movement"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search ((New_Process_Name=\"*mimikatz.exe\" OR New_Process_Name=\"*procdump.exe\")) OR ((Process_Command_Line=\"*sekurlsa::logonpasswords*\" OR Process_Command_Line=\"*sekurlsa::ekeys*\" OR Process_Command_Line=\"*privilege::debug*\" OR Process_Command_Line=\"*lsadump::sam*\" OR Process_Command_Line=\"*lsadump::secrets*\")) OR ((Parent_Process_Name=\"*powershell.exe\" OR Parent_Process_Name=\"*cmd.exe\") AND (Process_Command_Line=\"*-enc*\" OR Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX*\" OR Process_Command_Line=\"*powershell.exe -nop -w hidden -c*\" OR Process_Command_Line=\"*bypass*\" OR Process_Command_Line=\"*downloadstring*\")) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search ((New_Process_Name=\"*mimikatz.exe\" OR New_Process_Name=\"*procdump.exe\")) OR ((Process_Command_Line=\"*sekurlsa::logonpasswords*\" OR Process_Command_Line=\"*sekurlsa::ekeys*\" OR Process_Command_Line=\"*privilege::debug*\" OR Process_Command_Line=\"*lsadump::sam*\" OR Process_Command_Line=\"*lsadump::secrets*\")) OR ((Parent_Process_Name=\"*powershell.exe\" OR Parent_Process_Name=\"*cmd.exe\") AND (Process_Command_Line=\"*-enc*\" OR Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*IEX*\" OR Process_Command_Line=\"*powershell.exe -nop -w hidden -c*\" OR Process_Command_Line=\"*bypass*\" OR Process_Command_Line=\"*downloadstring*\"))",
+    "metadata": {
+      "ttp_id": "35f8f96d-6112-46de-a8f5-f360309e42aa",
+      "technique_id": "UNMAPPED",
+      "confidence": 0.6,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Remote Services",
+      "tactic": "Lateral Movement"
+    },
+    "falsepositives": [
+      "Legitimate use of PowerShell scripts for system administration tasks.",
+      "Security tools or scripts that may use similar command-line arguments.",
+      "False positives can occur if legitimate software is misidentified as malicious."
+    ]
+  },
+  {
+    "rule_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "Suspicious Data Archiving Activity Detected via NLP Pattern Matching",
+    "description": "Detects suspicious data archiving activity using NLP pattern matching to identify potential data exfiltration attempts. This rule focuses on identifying patterns indicative of archiving sensitive data, potentially for exfiltration, based on Lazarus Group TTPs.",
+    "author": "Multi-Agent SIEM Framework",
+    "level": "medium",
+    "tags": [
+      "attack.unmapped",
+      "attack.collection"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows",
+      "service": "sysmon"
+    },
+    "splunk_query": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*archive*\" OR Process_Command_Line=\"*backup*\" OR Process_Command_Line=\"*compress*\" OR Process_Command_Line=\"*zip*\" OR Process_Command_Line=\"*rar*\" OR Process_Command_Line=\"*7z*\" OR Process_Command_Line=\"*tar*\" OR Process_Command_Line=\"*gzip*\" OR Process_Command_Line=\"*bzip2*\") AND (New_Process_Name=\"*7z.exe\" OR New_Process_Name=\"*zip.exe\" OR New_Process_Name=\"*rar.exe\" OR New_Process_Name=\"*tar.exe\" OR New_Process_Name=\"*gzip.exe\" OR New_Process_Name=\"*bzip2.exe\")) NOT ((Process_Command_Line=\"*\\Program Files\\*\" OR Process_Command_Line=\"*\\Windows\\*\" OR Process_Command_Line=\"*\\System32\\*\" OR Process_Command_Line=\"*\\SysWOW64\\*\" OR Process_Command_Line=\"*-help*\" OR Process_Command_Line=\"*-version*\" OR Process_Command_Line=\"*--help*\" OR Process_Command_Line=\"*--version*\") AND (Parent_Process_Name=\"*explorer.exe*\" OR Parent_Process_Name=\"*cmd.exe*\" OR Parent_Process_Name=\"*powershell.exe*\" OR Parent_Process_Name=\"*conhost.exe*\")) | table _time, ComputerName, New_Process_Name, Parent_Process_Name, Process_Command_Line, Process_ID, Subject_User_Name",
+    "splunk_query_no_table": "index=* sourcetype=\"WinEventLog:Security\" | search ((Process_Command_Line=\"*archive*\" OR Process_Command_Line=\"*backup*\" OR Process_Command_Line=\"*compress*\" OR Process_Command_Line=\"*zip*\" OR Process_Command_Line=\"*rar*\" OR Process_Command_Line=\"*7z*\" OR Process_Command_Line=\"*tar*\" OR Process_Command_Line=\"*gzip*\" OR Process_Command_Line=\"*bzip2*\") AND (New_Process_Name=\"*7z.exe\" OR New_Process_Name=\"*zip.exe\" OR New_Process_Name=\"*rar.exe\" OR New_Process_Name=\"*tar.exe\" OR New_Process_Name=\"*gzip.exe\" OR New_Process_Name=\"*bzip2.exe\")) NOT ((Process_Command_Line=\"*\\Program Files\\*\" OR Process_Command_Line=\"*\\Windows\\*\" OR Process_Command_Line=\"*\\System32\\*\" OR Process_Command_Line=\"*\\SysWOW64\\*\" OR Process_Command_Line=\"*-help*\" OR Process_Command_Line=\"*-version*\" OR Process_Command_Line=\"*--help*\" OR Process_Command_Line=\"*--version*\") AND (Parent_Process_Name=\"*explorer.exe*\" OR Parent_Process_Name=\"*cmd.exe*\" OR Parent_Process_Name=\"*powershell.exe*\" OR Parent_Process_Name=\"*conhost.exe*\"))",
+    "metadata": {
+      "ttp_id": "4c03fe5a-c620-48ab-b2dc-107b98c26b8d",
+      "technique_id": "UNMAPPED",
+      "confidence": 0.6,
+      "extraction_method": "nlp",
+      "threat_actor": "lazarus group",
+      "malware": [
+        "mimikatz",
+        "Mimikatz"
+      ],
+      "tools": [],
+      "campaign": "Lazarus Group - Credential Harvesting Campaign Using Mimikatz",
+      "generated_by": "llm",
+      "llm_model": "gemini-2.0-flash-lite",
+      "attack_id": "UNMAPPED",
+      "technique_name": "Archive Collected Data",
+      "tactic": "Collection"
+    },
+    "falsepositives": [
+      "Legitimate archiving tools used for regular backups or file compression within standard directories.",
+      "Software installers using archiving tools."
+    ]
+  }
+]
