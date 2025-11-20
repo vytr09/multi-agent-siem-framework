@@ -4,6 +4,11 @@ Test LangChain Replacement - Memory System Integration Test
 Tests that our custom memory implementation works correctly
 """
 
+
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[2]))
+
 import asyncio
 import json
 import os

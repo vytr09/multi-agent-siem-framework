@@ -3,6 +3,11 @@
 Test Feedback Loop Without SIEM Integration
 Tests the complete feedback loop: RuleGen -> Evaluator -> Feedback -> RuleGen (iterative)
 """
+
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[2]))
+
 import asyncio
 import json
 import os
