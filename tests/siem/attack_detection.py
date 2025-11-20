@@ -758,10 +758,11 @@ def main():
     """Main orchestrator"""
 
     BASE_DIR = Path(__file__).parent
+    project_root = BASE_DIR.parent.parent
 
-    attack_commands_file = BASE_DIR / "extracted_commands" / "test_scripts" / "test_windows_attacks.bat"
-    splunk_queries_file = BASE_DIR / "splunk_queries" / "test_queries.txt"
-    output_file = BASE_DIR / "evaluation_dataset.json"
+    attack_commands_file = project_root / "data" / "siem" / "extracted_commands" / "test_scripts" / "test_windows_attacks.bat"
+    splunk_queries_file = project_root / "data" / "siem" / "splunk_queries" / "test_queries.txt"
+    output_file = project_root / "data" / "siem" / "evaluation_dataset.json"
     
     # Verify files exist
     if not attack_commands_file.exists():

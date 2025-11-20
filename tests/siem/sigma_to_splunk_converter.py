@@ -1358,7 +1358,7 @@ def main():
     
     print_summary(splunk_queries)
     
-    output_dir = script_dir / "splunk_queries"
+    output_dir = project_root / "data" / "siem" / "splunk_queries"
     print(f"\nĐang lưu outputs vào {output_dir}...")
     save_splunk_queries(splunk_queries, output_dir)
     

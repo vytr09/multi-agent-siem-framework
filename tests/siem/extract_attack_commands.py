@@ -183,8 +183,8 @@ def main():
     # In summary
     print_summary(commands)
     
-    # Tạo output directory (trong tests/siem/)
-    output_dir = script_dir / "extracted_commands"
+    # Tạo output directory dưới project data/siem/
+    output_dir = project_root / "data" / "siem" / "extracted_commands"
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Lưu vào các format khác nhau
@@ -199,7 +199,7 @@ def main():
     print("\n" + "="*60)
     print("HOÀN THÀNH!")
     print("="*60)
-    print(f"\nCác file đã được tạo trong thư mục '{output_dir.relative_to(script_dir)}':")
+    print(f"\nCác file đã được tạo trong thư mục '{output_dir.relative_to(project_root)}':")
     print("  - attack_commands.csv: Danh sách commands dạng CSV")
     print("  - attack_commands.json: Danh sách commands dạng JSON")
     print("  - test_scripts/test_windows_attacks.bat: Script test cho Windows")
