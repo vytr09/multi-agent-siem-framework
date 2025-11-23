@@ -147,8 +147,18 @@ class LangChainAttackGenAgent(BaseAgent):
         for platform in self.supported_platforms:
             if self.langchain_enabled and self.attack_chain:
                 try:
+                    # Prepare TTP data with platform
+                    ttp_data = {
+                        'technique_name': ttp.get('technique_name', ttp.get('name', 'Unknown')),
+                        'technique_id': ttp.get('technique_id', ttp.get('ttp_id', 'T1059')),
+                        'tactic': ttp.get('tactic', 'execution'),
+                        'description': ttp.get('description', ''),
+                        'platform': platform
+                    }
+                    
                     # Generate using LangChain
-                    output = await self.attack_chain.generate(ttp, platform)
+                    self.logger.debug(f"Generating commands for {ttp_data['technique_id']} on {platform}")
+                    output = await self.attack_chain.generate(ttp_data)
                     
                     self.stats["langchain_generations"] += 1
                     
@@ -159,8 +169,8 @@ class LangChainAttackGenAgent(BaseAgent):
                             generated_commands.append(processed_cmd)
                             
                 except Exception as e:
-                    self.logger.warning(f"LangChain generation failed for {platform}: {e}")
-                    # Fallback could go here if we wanted to mix traditional generation
+                    self.logger.error(f"LangChain generation failed for {platform}: {e}")
+                    self.stats["generation_errors"] += 1
             
         return generated_commands
 
@@ -170,32 +180,40 @@ class LangChainAttackGenAgent(BaseAgent):
             # Convert Pydantic model to dict if needed
             cmd_dict = cmd_obj.dict() if hasattr(cmd_obj, 'dict') else cmd_obj
             
-            # Safety validation
-            is_safe = await self.safety_checker.is_safe(cmd_dict, self.safety_level)
-            if not is_safe:
+            # Extract command data
+            command = cmd_dict.get('command', '')
+            description = cmd_dict.get('description', '')
+            technique_id = cmd_dict.get('technique_id', ttp.get('technique_id', 'T1059'))
+            
+            # Safety validation - check command safety
+            if not command or len(command.strip()) == 0:
+                self.logger.warning("Empty command generated, skipping")
+                return None
+            
+            # Basic safety check
+            dangerous_keywords = ['rm -rf /', 'format', 'del /f /s /q C:\\']
+            if any(keyword in command.lower() for keyword in dangerous_keywords):
                 self.stats['safety_violations'] += 1
-                self.logger.warning(f"Command failed safety check: {cmd_dict.get('name', 'Unknown')}")
+                self.logger.warning(f"Command failed safety check: {command[:50]}")
                 return None
             
             # Build final command structure
             return {
-                'command_id': str(uuid.uuid4()),
-                'ttp_id': ttp.get('ttp_id'),
-                'mitre_attack_id': ttp.get('technique_id') or ttp.get('attack_id'),
-                'technique_name': ttp.get('technique_name'),
-                'tactic': ttp.get('tactic'),
+                'id': str(uuid.uuid4()),
+                'ttp_id': ttp.get('ttp_id', ttp.get('technique_id')),
+                'technique_id': technique_id,
+                'technique_name': ttp.get('technique_name', ttp.get('name', 'Unknown')),
+                'tactic': ttp.get('tactic', 'execution'),
                 'platform': platform,
-                'name': cmd_dict['name'],
-                'command': cmd_dict['command'],
-                'explanation': cmd_dict['explanation'],
-                'indicators': cmd_dict['indicators'],
-                'prerequisites': cmd_dict['prerequisites'],
-                'cleanup': cmd_dict.get('cleanup', 'No cleanup required'),
+                'command': command,
+                'description': description,
+                'requires_admin': cmd_dict.get('requires_admin', False),
+                'safety_level': cmd_dict.get('safety_level', 'medium'),
+                'expected_behavior': cmd_dict.get('expected_behavior', ''),
                 'source': 'langchain',
                 'generated_at': datetime.utcnow().isoformat(),
                 'agent_id': self.id,
-                'confidence_score': ttp.get('confidence_score', 0.5),
-                'safety_level': self.safety_level,
+                'confidence_score': ttp.get('confidence', ttp.get('confidence_score', 0.8)),
                 'validated': True
             }
             

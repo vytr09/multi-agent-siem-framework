@@ -101,7 +101,17 @@ class BaseRuleGenAgent(BaseAgent):
         
         # Load recent feedback
         recent_feedback = None
-        if self.use_feedback:
+        
+        # Check for direct feedback in input (Priority)
+        if "feedback" in input_data:
+            recent_feedback = input_data["feedback"]
+        elif "evaluation_result" in input_data:
+            recent_feedback = input_data["evaluation_result"]
+        elif "verification_results" in input_data:
+             recent_feedback = {"verification_results": input_data["verification_results"]}
+            
+        # Fallback to history if enabled and no direct feedback
+        if not recent_feedback and self.use_feedback:
             feedback_history = self.feedback_manager.get_feedback_history("rulegen", last_n=1)
             if feedback_history:
                 recent_feedback = feedback_history[-1]

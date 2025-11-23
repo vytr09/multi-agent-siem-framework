@@ -47,18 +47,32 @@ class SigmaRuleOutput(BaseModel):
 
 
 class AttackCommandOutput(BaseModel):
-    """Structured output for Attack Command"""
-    name: str = Field(description="Descriptive name of the command")
-    command: str = Field(description="The actual executable command")
-    explanation: str = Field(description="Explanation of what the command does")
-    indicators: List[str] = Field(default_factory=list, description="Expected detection indicators")
-    prerequisites: List[str] = Field(default_factory=list, description="Prerequisites for execution")
-    cleanup: str = Field(description="Cleanup instructions", default="No cleanup required")
+    """Structured output for a single attack command"""
+    command: str = Field(description="The executable attack command")
+    platform: str = Field(description="Target platform: windows, linux, macos")
+    description: str = Field(description="What this command does")
+    technique_id: str = Field(description="MITRE ATT&CK technique ID")
+    requires_admin: bool = Field(default=False, description="Requires elevated privileges")
+    safety_level: str = Field(default="medium", description="Safety level: low, medium, high")
+    expected_behavior: str = Field(description="Expected execution behavior")
 
 
 class AttackCommandListOutput(BaseModel):
-    """List of generated attack commands"""
-    commands: List[AttackCommandOutput] = Field(description="List of attack commands")
+    """List of attack commands"""
+    commands: List[AttackCommandOutput] = Field(description="List of generated attack commands")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
+
+
+class RuleEvaluationOutput(BaseModel):
+    """Structured output for rule evaluation"""
+    detection_coverage: float = Field(description="Detection coverage score (0-10)", ge=0.0, le=10.0)
+    false_positive_rate: float = Field(description="False positive rate score (0-10)", ge=0.0, le=10.0)
+    performance: float = Field(description="Performance score (0-10)", ge=0.0, le=10.0)
+    completeness: float = Field(description="Completeness score (0-10)", ge=0.0, le=10.0)
+    overall_score: float = Field(description="Overall average score (0-10)", ge=0.0, le=10.0)
+    strengths: List[str] = Field(default_factory=list, description="List of strengths")
+    weaknesses: List[str] = Field(default_factory=list, description="List of weaknesses")
+    suggestions: List[str] = Field(default_factory=list, description="Improvement suggestions")
 
 
 # ============================================================================
@@ -132,10 +146,10 @@ class TTPExtractionChain:
     """Chain for extracting TTPs from text"""
     
     def __init__(self, llm_wrapper: LangChainLLMWrapper):
-        self.llm = llm_wrapper.llm
-        self.output_parser = PydanticOutputParser(pydantic_object=TTPListOutput)
+        # Use structured output with Gemini
+        self.llm = llm_wrapper.llm.with_structured_output(TTPListOutput)
         
-        # Create prompt template
+        # Create prompt template (no format_instructions needed)
         self.prompt = PromptTemplate(
             template="""You are a cybersecurity expert analyzing threat intelligence reports.
 
@@ -148,14 +162,12 @@ For each TTP, identify:
 
 Text: {text}
 
-{format_instructions}
-""",
-            input_variables=["text"],
-            partial_variables={"format_instructions": self.output_parser.get_format_instructions()}
+Return a structured list of extracted TTPs.""",
+            input_variables=["text"]
         )
         
         # Create chain (LCEL style)
-        self.chain = self.prompt | self.llm | self.output_parser
+        self.chain = self.prompt | self.llm
         
         print("[OK] TTP Extraction Chain created")
     
@@ -177,13 +189,12 @@ class SigmaRuleChain:
     """Chain for generating Sigma rules"""
     
     def __init__(self, llm_wrapper: LangChainLLMWrapper):
-        self.llm = llm_wrapper.llm
-        self.parser = PydanticOutputParser(pydantic_object=SigmaRuleOutput)
+        # Use structured output with Gemini
+        self.llm = llm_wrapper.llm.with_structured_output(SigmaRuleOutput)
         
-        # Create prompt template
+        # Create prompt template (no format_instructions needed)
         self.prompt = PromptTemplate(
             input_variables=["ttp_name", "ttp_id", "tactic", "description", "indicators", "feedback"],
-            partial_variables={"format_instructions": self.parser.get_format_instructions()},
             template="""You are a SIEM detection engineer creating Sigma rules.
 
 **MITRE ATT&CK Technique:**
@@ -199,20 +210,31 @@ class SigmaRuleChain:
 {feedback}
 
 Create a comprehensive Sigma rule with:
-1. Clear title and description
-2. Appropriate log source
-3. Effective detection logic
-4. Common false positives
-5. Proper severity level
-6. Relevant tags
 
-{format_instructions}
+**1. Log Source (MANDATORY):**
+   - category: process_creation (or network_connection, file_event, etc.)
+   - product: windows (or linux, macos)
+   - service: sysmon (if using Sysmon events)
+   Example: {{"category": "process_creation", "product": "windows"}}
 
-Return valid JSON only."""
+**2. Detection Logic (SPECIFIC):**
+   - Use field names: Image, CommandLine, ParentImage, User, DestinationIp
+   - Add multiple selection criteria for accuracy
+   - Use 'contains', 'endswith', 'startswith' operators
+   - Example: {{"selection": {{"Image|endswith": "\\\\powershell.exe", "CommandLine|contains": "Invoke-WebRequest"}}, "condition": "selection"}}
+
+**3. False Positives:**
+   - List legitimate scenarios that might trigger
+
+**4. Severity:** low, medium, high, or critical
+
+**5. Tags:** Include attack.{ttp_id} tag
+
+Generate a complete, valid Sigma rule that will actually detect this technique."""
         )
         
         # Create chain (LCEL style)
-        self.chain = self.prompt | self.llm | self.parser
+        self.chain = self.prompt | self.llm
         
         print("[OK] Sigma Rule Chain created")
     
@@ -248,6 +270,87 @@ Return valid JSON only."""
 
 
 # ============================================================================
+# Attack Command Generation Chain
+# ============================================================================
+
+class AttackCommandGenerationChain:
+    """LangChain chain for generating attack commands"""
+    
+    def __init__(self, llm_wrapper: LangChainLLMWrapper):
+        """Initialize attack command generation chain"""
+        # Use structured output with Gemini
+        self.llm = llm_wrapper.llm.with_structured_output(AttackCommandListOutput)
+        
+        # Create prompt template (no format_instructions needed)
+        self.prompt = PromptTemplate(
+            input_variables=["technique_name", "technique_id", "tactic", "platform", "description"],
+            template="""You are a red team operator creating attack commands for testing detection rules.
+
+**MITRE ATT&CK Technique:**
+- ID: {technique_id}
+- Name: {technique_name}
+- Tactic: {tactic}
+- Platform: {platform}
+- Description: {description}
+
+Generate 2-3 realistic attack commands that demonstrate this technique on {platform}.
+
+**Requirements:**
+1. Commands must be executable and realistic
+2. Include variations (basic, intermediate, advanced)
+3. Specify if admin/root privileges required
+4. Describe expected behavior
+5. Mark safety level appropriately
+
+**Safety Guidelines:**
+- Use test/benign strings where possible
+- Avoid actual malicious payloads
+- Mark destructive commands as high safety risk
+- All commands are for TESTING ONLY in isolated environments
+
+Return a list of attack commands with metadata."""
+        )
+        
+        # Create chain (LCEL style)
+        self.chain = self.prompt | self.llm
+        
+        print("[OK] Attack Command Generation Chain created")
+    
+    async def generate(self, ttp_data: Dict[str, Any]) -> AttackCommandListOutput:
+        """Generate attack commands for a TTP"""
+        try:
+            platform = ttp_data.get('platform', 'windows')
+            
+            result = await self.chain.ainvoke({
+                "technique_name": ttp_data.get('technique_name', ttp_data.get('name', 'Unknown')),
+                "technique_id": ttp_data.get('technique_id', 'T1059'),
+                "tactic": ttp_data.get('tactic', 'execution'),
+                "platform": platform,
+                "description": ttp_data.get('description', '')[:500]
+            })
+            
+            return result
+            
+        except Exception as e:
+            print(f"Attack generation error: {e}")
+            # Return safe default command on error
+            return AttackCommandListOutput(
+                commands=[
+                    AttackCommandOutput(
+                        command="echo 'test_command'",
+                        platform=ttp_data.get('platform', 'windows'),
+                        description="Default test command (generation failed)",
+                        technique_id=ttp_data.get('technique_id', 'T1059'),
+                        requires_admin=False,
+                        safety_level="low",
+                        expected_behavior="Prints test string to console"
+                    )
+                ],
+                metadata={"error": str(e), "fallback": True}
+            )
+
+
+# ============================================================================
 # Rule Evaluation Chain
 # ============================================================================
 
@@ -256,9 +359,10 @@ class RuleEvaluationChain:
     
     def __init__(self, llm_wrapper: LangChainLLMWrapper):
         """Initialize evaluation chain"""
-        self.llm = llm_wrapper.llm
+        # Use structured output with Gemini
+        self.llm = llm_wrapper.llm.with_structured_output(RuleEvaluationOutput)
         
-        # Create prompt
+        # Create prompt (no JSON format instructions needed)
         self.prompt = PromptTemplate(
             input_variables=["rule_content", "ttp_info"],
             template="""You are a detection engineering expert evaluating SIEM rules.
@@ -271,23 +375,18 @@ Evaluate this Sigma rule for quality and effectiveness:
 **Target TTP:**
 {ttp_info}
 
-Evaluate on these criteria:
-1. Detection Coverage: Does it catch the technique? (0-10)
-2. False Positive Rate: Low false positives? (0-10)
-3. Performance: Efficient query? (0-10)
-4. Completeness: All necessary fields? (0-10)
+Evaluate on these criteria (score each 0-10):
+1. Detection Coverage: Does it catch the technique?
+2. False Positive Rate: Low false positives? (higher score = fewer false positives)
+3. Performance: Efficient query?
+4. Completeness: All necessary fields?
 
-Respond in JSON format:
-{{
-    "detection_coverage": <score>,
-    "false_positive_rate": <score>,
-    "performance": <score>,
-    "completeness": <score>,
-    "overall_score": <average>,
-    "strengths": ["list", "of", "strengths"],
-    "weaknesses": ["list", "of", "weaknesses"],
-    "suggestions": ["improvement", "suggestions"]
-}}"""
+Provide:
+- Scores for each criterion (0-10)
+- Overall score (average of all criteria)
+- List of strengths
+- List of weaknesses  
+- List of improvement suggestions"""
         )
         
         # Create chain (LCEL style)
@@ -307,10 +406,10 @@ Respond in JSON format:
                 }, indent=2)
             })
             
-            # Parse JSON response (result is now AIMessage)
-            if hasattr(result, 'content'):
-                return json.loads(result.content)
-            return json.loads(result)
+            # Convert Pydantic model to dict
+            if isinstance(result, RuleEvaluationOutput):
+                return result.model_dump()
+            return result
             
         except Exception as e:
             print(f"Evaluation error: {e}")
@@ -324,69 +423,6 @@ Respond in JSON format:
                 "weaknesses": [f"Evaluation failed: {str(e)}"],
                 "suggestions": []
             }
-
-
-# ============================================================================
-# Attack Command Generation Chain
-# ============================================================================
-
-class AttackCommandGenerationChain:
-    """Chain for generating attack commands"""
-    
-    def __init__(self, llm_wrapper: LangChainLLMWrapper):
-        self.llm = llm_wrapper.llm
-        self.parser = PydanticOutputParser(pydantic_object=AttackCommandListOutput)
-        
-        # Create prompt template
-        self.prompt = PromptTemplate(
-            input_variables=["technique_name", "technique_id", "tactic", "platform", "description", "confidence"],
-            partial_variables={"format_instructions": self.parser.get_format_instructions()},
-            template="""You are a cybersecurity expert specializing in MITRE ATT&CK techniques.
-
-Generate realistic and safe attack commands for testing purposes.
-
-**Technique Details:**
-- Name: {technique_name}
-- ID: {technique_id}
-- Tactic: {tactic}
-- Platform: {platform}
-- Description: {description}
-- Confidence: {confidence}
-
-**Requirements:**
-1. Commands must be SAFE for testing environments
-2. Include realistic execution methods for {platform}
-3. Provide clear explanations and expected artifacts
-4. Include prerequisites and cleanup instructions
-
-{format_instructions}
-
-Return valid JSON only."""
-        )
-        
-        # Create chain (LCEL style)
-        self.chain = self.prompt | self.llm | self.parser
-        
-        print("[OK] Attack Command Generation Chain created")
-    
-    async def generate(self, ttp_data: Dict[str, Any], platform: str) -> AttackCommandListOutput:
-        """Generate attack commands"""
-        try:
-            result = await self.chain.ainvoke({
-                "technique_name": ttp_data.get('technique_name', ''),
-                "technique_id": ttp_data.get('technique_id', '') or ttp_data.get('ttp_id', ''),
-                "tactic": ttp_data.get('tactic', ''),
-                "platform": platform,
-                "description": ttp_data.get('description', '')[:500],
-                "confidence": ttp_data.get('confidence_score', 0.5)
-            })
-            
-            return result
-            
-        except Exception as e:
-            print(f"Attack generation error: {e}")
-            # Return empty list on error
-            return AttackCommandListOutput(commands=[])
 
 
 # ============================================================================
@@ -437,8 +473,8 @@ class LangChainManager:
         # Create chains
         self.ttp_chain = create_ttp_extraction_chain(self.llm_wrapper)
         self.sigma_chain = create_sigma_rule_chain(self.llm_wrapper)
+        self.attack_chain = create_attack_gen_chain(self.llm_wrapper)
         self.evaluation_chain = create_evaluation_chain(self.llm_wrapper)
-        self.attack_gen_chain = create_attack_gen_chain(self.llm_wrapper)
         
         print("\n[OK] LangChain Integration Ready")
         print("="*80 + "\n")
