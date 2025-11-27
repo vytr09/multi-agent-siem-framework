@@ -27,8 +27,16 @@ async def test_feedback_loop():
     print("="*100)
 
     # Load test data
-    project_root = Path(__file__).resolve().parent
-    data_path = project_root / "data" / "extracted" / "hybrid_extraction_results.json"
+    # Resolve repository root (two levels up from this file)
+    repo_root = Path(__file__).resolve().parents[2]
+    # Allow optional override via TEST_DATA_ROOT env var
+    base_path = Path(os.getenv("TEST_DATA_ROOT", repo_root))
+    data_path = (
+        base_path
+        / "data"
+        / "extracted"
+        / "hybrid_extraction_results.json"
+    )
 
     if not data_path.exists():
         print(f"[ERROR] Test data not found: {data_path}")
@@ -80,7 +88,7 @@ async def test_feedback_loop():
     }
 
     # Save config temporarily
-    config_path = project_root / "config" / "test_feedback_config.yaml"
+    config_path = repo_root / "config" / "test_feedback_config.yaml"
     import yaml
     with open(config_path, 'w') as f:
         yaml.dump(orchestrator_config, f)
@@ -216,7 +224,7 @@ async def test_feedback_loop():
             print(f"   • Suggestions: {len(latest.get('actionable_suggestions', []))}")
 
         # Save test results
-        output_dir = project_root / "data" / "benchmark_results"
+        output_dir = repo_root / "data" / "benchmark_results"
         output_dir.mkdir(parents=True, exist_ok=True)
 
         test_result = {
