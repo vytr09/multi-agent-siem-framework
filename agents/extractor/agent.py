@@ -23,8 +23,12 @@ from agents.base.exceptions import ExtractorException, LLMException
 from agents.extractor.llm.gemini_client import create_llm_client
 from agents.extractor.mappers.attack_mapper import ATTACKMapper
 from agents.extractor.mappers.confidence_scorer import ConfidenceScorer
+from agents.extractor.mappers.enhanced_confidence_scorer import EnhancedConfidenceScorer
 from agents.extractor.nlp.pipeline import NLPPipeline
 from agents.extractor.nlp.entity_extractor import EntityExtractor
+from agents.extractor.nlp.tools_ioc_extractor import ToolsAndIndicatorsExtractor
+from agents.extractor.nlp.contextual_extractor import ContextualTextExtractor
+from agents.extractor.validators import AttackIdValidator, IndicatorExtractor, AdvancedTechniqueDiscovery
 from core.logging import get_agent_logger
 
 load_dotenv()
@@ -49,8 +53,16 @@ class ExtractorAgent(BaseAgent):
         self.llm_client = None
         self.attack_mapper = ATTACKMapper()
         self.confidence_scorer = ConfidenceScorer()
+        self.enhanced_scorer = EnhancedConfidenceScorer()
         self.nlp_pipeline = NLPPipeline()
         self.entity_extractor = EntityExtractor()
+        self.tools_ioc_extractor = ToolsAndIndicatorsExtractor()
+        self.contextual_extractor = ContextualTextExtractor()
+        
+        # Initialize validators
+        self.attack_id_validator = AttackIdValidator()
+        self.indicator_extractor = IndicatorExtractor()
+        self.technique_discoverer = AdvancedTechniqueDiscovery()
         
         # Configuration
         self.llm_config = config.get("llm", {})
@@ -115,8 +127,10 @@ class ExtractorAgent(BaseAgent):
             self.set_status(AgentStatus.ERROR, f"Failed to start: {str(e)}")
             raise ExtractorException(f"Failed to start: {str(e)}")
     
-    async def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute TTP extraction with hybrid approach"""
+    async def _execute_with_context(self, 
+                                    input_data: Dict[str, Any],
+                                    context: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute TTP extraction with hybrid approach and memory context"""
         if not self._can_execute:
             return {
                 "agent_id": self.id,
@@ -590,9 +604,10 @@ Your task is to extract ALL Tactics, Techniques, and Procedures (TTPs) from the 
         ttps: List[Dict],
         nlp_results: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
-        """Enrich TTPs with NLP entity context"""
+        """Enrich TTPs with NLP entity context, tools, and IOCs"""
         
         entities = nlp_results.get("entities", {})
+        text = nlp_results.get("processed_text", {}).get("cleaned_text", "")
         
         for ttp in ttps:
             # Add related entities
@@ -602,11 +617,34 @@ Your task is to extract ALL Tactics, Techniques, and Procedures (TTPs) from the 
                 "threat_actors": entities.get("threat_actors", [])
             }
             
-            # Add IOCs correlation
-            if entities.get("ips") or entities.get("domains"):
-                ttp["correlated_iocs"] = {
-                    "network": entities.get("ips", [])[:3] + entities.get("domains", [])[:3]
-                }
+            # Extract tools using improved tool extractor
+            technique_name = ttp.get("technique_name", "")
+            tools_result = self.tools_ioc_extractor.extract_tools(text, entities)
+            ttp["tools"] = tools_result.get("all_tools", [])
+            ttp["tools_by_category"] = tools_result.get("by_category", {})
+            
+            # Extract IOCs
+            iocs = self.tools_ioc_extractor.extract_iocs(text)
+            ttp["extracted_iocs"] = iocs
+            
+            # Correlate IOCs with TTPs
+            ttp = self.tools_ioc_extractor.correlate_iocs_with_ttps([ttp], iocs, text)[0]
+            
+            # Extract full context for description
+            context = self.contextual_extractor.extract_full_context(
+                text, technique_name
+            )
+            ttp["extraction_context"] = context
+            
+            # Enhance short descriptions
+            if len(ttp.get("description", "").split()) < 15:
+                enhanced = self.contextual_extractor.calculate_description_enhancement(
+                    ttp.get("description", ""),
+                    context,
+                    technique_name
+                )
+                ttp["description_enhanced"] = enhanced.get("enhanced", ttp.get("description", ""))
+                ttp["context_confidence_boost"] = context.get("confidence_modifier", 0)
         
         return ttps
     
@@ -640,32 +678,44 @@ Your task is to extract ALL Tactics, Techniques, and Procedures (TTPs) from the 
         return mapped_ttps
     
     def _score_ttps(self, ttps: List[Dict], report: Dict) -> List[Dict[str, Any]]:
-        """Calculate confidence scores"""
+        """Calculate confidence scores using enhanced scoring"""
         scored_ttps = []
+        text = report.get("description", "")
+        
+        # Get NLP entities if available
+        nlp_entities = {}
         
         for ttp in ttps:
             try:
-                # Base score
+                # Use enhanced confidence scorer
+                scoring_result = self.enhanced_scorer.calculate_score(
+                    ttp=ttp,
+                    report=report,
+                    text=text,
+                    nlp_entities=nlp_entities
+                )
+                
+                ttp["confidence_score"] = scoring_result["score"]
+                ttp["confidence_level"] = scoring_result["level"]
+                ttp["confidence_breakdown"] = scoring_result["breakdown"]
+                ttp["confidence_emoji"] = scoring_result["emoji"]
+                
+                scored_ttps.append(ttp)
+                
+            except Exception as e:
+                self.logger.warning(f"Enhanced scoring failed, using fallback: {str(e)}")
+                
+                # Fallback to basic scoring
                 base_score = ttp.get("confidence", 0.5)
                 
-                # Extraction method bonus
-                if ttp.get("extraction_method") == "gemini_llm":
-                    method_bonus = 0.1  # LLM extraction
-                elif ttp.get("extraction_method") == "nlp":
-                    method_bonus = 0.05  # NLP extraction
-                else:
-                    method_bonus = 0.0
-                
-                # Mapping bonus
+                method_bonus = 0.1 if ttp.get("extraction_method") == "gemini_llm" else 0.05
                 mapping_bonus = 0.1 if ttp.get("attack_id") != "UNMAPPED" else 0
-                
-                # Entity correlation bonus
                 entity_bonus = 0.05 if ttp.get("related_entities", {}).get("malware") else 0
                 
                 final_score = min(base_score + method_bonus + mapping_bonus + entity_bonus, 1.0)
                 
                 ttp["confidence_score"] = round(final_score, 3)
-                ttp["confidence_level"] = self.confidence_scorer.get_confidence_level(final_score)
+                ttp["confidence_level"] = "medium"
                 ttp["confidence_breakdown"] = {
                     "base": base_score,
                     "method_bonus": method_bonus,
@@ -674,18 +724,21 @@ Your task is to extract ALL Tactics, Techniques, and Procedures (TTPs) from the 
                 }
                 
                 scored_ttps.append(ttp)
-                
-            except Exception as e:
-                self.logger.warning(f"Scoring error: {str(e)}")
-                ttp["confidence_score"] = ttp.get("confidence", 0.5)
-                ttp["confidence_level"] = "medium"
-                scored_ttps.append(ttp)
         
         scored_ttps.sort(key=lambda x: x.get("confidence_score", 0), reverse=True)
         return scored_ttps
     
     def _format_ttp_for_handoff(self, ttp: Dict[str, Any], report: Dict[str, Any]) -> Dict[str, Any]:
-        """Format TTP for handoff to RuleGen"""
+        """Format TTP for handoff to RuleGen with validation and enhancement"""
+        # Validate and fix Attack ID
+        original_attack_id = ttp.get("attack_id", "")
+        attack_id_fix = self.attack_id_validator.validate_attack_id(original_attack_id)
+        validated_attack_id = attack_id_fix.validated_id if attack_id_fix.is_valid else original_attack_id
+        
+        # Extract indicators from context
+        context_text = ttp.get("description", "") or ttp.get("evidence_text", "")
+        indicators = self.indicator_extractor.extract_indicators(context_text)
+        
         threat_actors = report.get("threat_actors", [])
         primary_threat_actor = threat_actors[0] if threat_actors else None
         
@@ -699,22 +752,31 @@ Your task is to extract ALL Tactics, Techniques, and Procedures (TTPs) from the 
             "ttp_id": str(uuid.uuid4()),
             "report_id": report.get("report_id"),
             "technique_name": ttp.get("technique_name"),
-            "attack_id": ttp.get("attack_id"),
+            "attack_id": validated_attack_id,
+            "attack_id_validated": attack_id_fix.is_valid,
+            "attack_id_confidence": attack_id_fix.confidence,
             "tactic": ttp.get("tactic"),
-            "description": ttp.get("description"),
+            "description": ttp.get("description_enhanced", ttp.get("description")),
+            "description_original": ttp.get("description"),
             "confidence_score": ttp.get("confidence_score"),
             "confidence_level": ttp.get("confidence_level"),
             "confidence_breakdown": ttp.get("confidence_breakdown", {}),
             "evidence_text": ttp.get("description", ""),
             "indicators_supporting": ttp.get("indicators", []),
+            "extracted_indicators": indicators,
+            "indicator_score": self.indicator_extractor.calculate_indicator_score(indicators),
             "context": context,
             "extraction_method": ttp.get("extraction_method", "hybrid"),
             "extraction_source": ttp.get("source", "unknown"),
             "mapped_by": f"{self.model_name}_nlp_hybrid",
             "extracted_timestamp": self.get_timestamp(),
             "tools": ttp.get("tools", []),
+            "tools_by_category": ttp.get("tools_by_category", {}),
+            "extracted_iocs": ttp.get("extracted_iocs", {}),
             "related_entities": ttp.get("related_entities", {}),
             "correlated_iocs": ttp.get("correlated_iocs", {}),
+            "extraction_context": ttp.get("extraction_context", {}),
+            "context_confidence_boost": ttp.get("context_confidence_boost", 0),
             "subtechnique": ttp.get("subtechnique", False),
             "mapping_source": ttp.get("mapping_source", "unknown")
         }
