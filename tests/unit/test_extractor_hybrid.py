@@ -1,6 +1,49 @@
 """
-Test script for Hybrid NLP + Gemini Extractor Agent
-Run with: python test_extractor_hybrid.py
+Test script for Hybrid NLP + Gemini Extractor Agent with Validators
+
+Run with: python tests/unit/test_extractor_hybrid.py
+
+This comprehensive test:
+1. OPTION 1: HYBRID EXTRACTION - Extracts TTPs using NLP + Gemini from normalized reports
+   - Processes multiple reports
+   - Applies validators during extraction (_format_ttp_for_handoff)
+   - Generates complete JSON: data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json
+
+2. OPTION 2: ENHANCEMENT (MANUAL) - Loads existing extraction and applies validators
+   - Loads: data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json
+   - Applies: AttackIdValidator, IndicatorExtractor, AdvancedTechniqueDiscovery
+   - Enhances TTPs with: validation, indicators, discovered techniques
+   - Overwrites same file with enhanced fields
+
+3. OPTION 3: NLP ANALYSIS - Analyzes NLP components separately
+
+4. OPTION 4: BATCH PROCESSING - Tests batch mode with multiple reports
+
+Output JSON Structure:
+{
+  "test_timestamp": "ISO datetime",
+  "total_reports": N,
+  "total_ttps": M,
+  "total_processing_time_seconds": X,
+  "agent_statistics": {...},
+  "per_report_results": [
+    {
+      "report_id": "...",
+      "title": "...",
+      "ttps_count": N,
+      "high_confidence_count": K,
+      "processing_time_ms": T,
+      "extraction": {
+        "report_id": "...",
+        "source_report": {...},
+        "extracted_ttps": [...each TTP with validators applied...],
+        "nlp_analysis": {...},
+        "metadata": {...}
+      }
+    }
+  ],
+  "enhancement_applied": {...}  // Added by OPTION 2 if applied
+}
 """
 
 import asyncio
@@ -15,6 +58,11 @@ load_dotenv()
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from agents.extractor.agent import ExtractorAgent
+from agents.extractor.validators import (
+    AttackIdValidator,
+    IndicatorExtractor,
+    AdvancedTechniqueDiscovery
+)
 
 # async def test_hybrid_with_mock():
 #     """Test hybrid approach with mock Gemini"""
@@ -178,52 +226,61 @@ from agents.extractor.agent import ExtractorAgent
     
 #     return True
 
-async def test_hybrid_with_mock():
-    """Test hybrid approach with mock Gemini - Multi-report support"""
+async def test_hybrid_extraction():
+    """
+    HYBRID EXTRACTION: Generate complete extraction data from scratch
+    
+    Process: Load normalized reports → Extract TTPs → Validate/Enhance → Save JSON
+    Output: data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json
+    """
     print("=" * 80)
-    print("HYBRID NLP + GEMINI EXTRACTOR TEST")
+    print("OPTION 1: HYBRID EXTRACTION WITH VALIDATORS")
     print("=" * 80)
     
-    # Load test data first
-    with open("data/normalized/cti_reports_20251004_212903.json", encoding='utf-8') as f:
+    # Load test data
+    data_file = Path("data/normalized/cti_reports_20251004_212903.json")
+    if not data_file.exists():
+        print(f"\n[ERROR] Test data not found: {data_file}")
+        return False
+    
+    with open(data_file, encoding='utf-8') as f:
         test_reports = json.load(f)
     
     total_reports = len(test_reports)
-    print(f"\nTotal available reports: {total_reports}")
+    print(f"\n[LOAD] Loaded {total_reports} reports from normalized data")
     
     # Ask user how many reports to process
-    print("\nOptions:")
-    print("1. Process single report (first one)")
-    print("2. Process specific number of reports")
-    print("3. Process all reports")
+    print("\nSelect scope:")
+    print("  1. Single report (first one)")
+    print("  2. N reports (specify number)")
+    print("  3. All reports")
     
-    option = input("\nSelect option (1-3): ").strip()
+    option = input("\nChoice (1-3): ").strip()
     
     if option == "1":
         reports_to_process = [test_reports[0]]
-        print(f"Processing 1 report")
+        print(f"→ Processing 1 report")
     elif option == "2":
-        num = input(f"Enter number of reports to process (1-{total_reports}): ").strip()
         try:
-            num = int(num)
-            num = min(num, total_reports)
+            num = int(input(f"Number of reports (1-{total_reports}): ").strip())
+            num = max(1, min(num, total_reports))
             reports_to_process = test_reports[:num]
-            print(f"Processing {num} reports")
-        except ValueError:
-            print("Invalid number, processing first report only")
+            print(f"→ Processing {num} reports")
+        except (ValueError, KeyboardInterrupt):
             reports_to_process = [test_reports[0]]
+            print(f"→ Processing 1 report (default)")
     elif option == "3":
         reports_to_process = test_reports
-        print(f"Processing all {total_reports} reports")
+        print(f"→ Processing all {total_reports} reports")
     else:
-        print("Invalid option, processing first report only")
         reports_to_process = [test_reports[0]]
+        print(f"→ Processing 1 report (default)")
     
-    # Configuration
+    # Configuration - IMPORTANT: Validators are applied in _format_ttp_for_handoff()
     config = {
         "llm": {
             "api_key": os.getenv("GEMINI_API_KEY"),
-            "use_mock": False,  # Set to True for testing without API
+            "use_mock": False,
             "model": "gemini-2.0-flash-lite",
             "temperature": 0.3,
             "max_tokens": 1000
@@ -235,50 +292,52 @@ async def test_hybrid_with_mock():
         "batch_size": 5
     }
     
-    agent = ExtractorAgent(name="hybrid-test-1", config=config)
+    agent = ExtractorAgent(name="hybrid-extraction", config=config)
     
     try:
         print("\n" + "=" * 80)
-        print("INITIALIZING AGENT")
+        print("INITIALIZING EXTRACTOR AGENT")
         print("=" * 80)
         await agent.start()
-        print("[OK] Agent initialized (NLP + Gemini enabled)")
+        print("[✓] Agent initialized with NLP + Gemini")
+        print(f"    Model: {agent.model_name}")
+        print(f"    Min Confidence: {agent.min_confidence_threshold}")
+        print(f"    Validators: AttackIdValidator, IndicatorExtractor, AdvancedTechniqueDiscovery")
         
-        # Storage for all results
+        # Storage for results
         all_extraction_results = []
         total_ttps = 0
         total_processing_time = 0
+        total_high_confidence = 0
         
-        # Process each report
+        # Process reports
         print("\n" + "=" * 80)
         print(f"PROCESSING {len(reports_to_process)} REPORT(S)")
         print("=" * 80)
         
         for idx, test_report in enumerate(reports_to_process, 1):
             print(f"\n{'-' * 80}")
-            print(f"REPORT {idx}/{len(reports_to_process)}")
+            print(f"REPORT {idx}/{len(reports_to_process)}: {test_report.get('title', 'Unknown')[:60]}")
             print(f"{'-' * 80}")
             
-            print(f"Title: {test_report['title']}")
-            print(f"Report ID: {test_report['report_id']}")
-            print(f"Description length: {len(test_report['description'])} chars")
-            print(f"Threat Actors: {', '.join(test_report.get('threat_actors', []))}")
-            print(f"Malware: {', '.join(test_report.get('malware_families', []))}")
+            report_id = test_report.get('report_id', 'unknown')
+            print(f"ID: {report_id}")
+            print(f"Description: {len(test_report.get('description', ''))} chars")
+            print(f"Actors: {', '.join(test_report.get('threat_actors', [])[:3]) if test_report.get('threat_actors') else 'None'}")
+            print(f"Malware: {', '.join(test_report.get('malware_families', [])[:3]) if test_report.get('malware_families') else 'None'}")
             print(f"IOCs: {len(test_report.get('indicators', []))} indicators")
             
             # Extract
+            print(f"\n→ Extracting TTPs...")
             start_time = datetime.utcnow()
             
-            message = {
-                "normalized_reports": [test_report]
-            }
-            
+            message = {"normalized_reports": [test_report]}
             result = await agent.execute(message)
             
             elapsed = (datetime.utcnow() - start_time).total_seconds()
             total_processing_time += elapsed
             
-            # Get summary
+            # Get results
             summary = result.get("extraction_summary", {})
             extraction_results = result.get("extraction_results", [])
             
@@ -287,48 +346,63 @@ async def test_hybrid_with_mock():
                 ttps = extraction.get("extracted_ttps", [])
                 total_ttps += len(ttps)
                 
-                print(f"\n[OK] Extracted {len(ttps)} TTPs")
-                print(f"  Processing Time: {summary.get('processing_time_ms'):.0f}ms")
-                print(f"  High Confidence: {summary.get('high_confidence_ttps', 0)}")
-                print(f"  Gemini API Calls: {summary.get('gemini_api_calls', 0)}")
+                # Count high confidence
+                high_conf = sum(1 for t in ttps if t.get('confidence_score', 0) >= 0.8)
+                total_high_confidence += high_conf
                 
-                # Show NLP analysis summary
+                # Show extraction summary
+                print(f"\n[✓] Extraction Results:")
+                print(f"    TTPs Extracted: {len(ttps)}")
+                print(f"    High Confidence: {high_conf} (≥0.8)")
+                print(f"    Processing Time: {summary.get('processing_time_ms', 0):.0f}ms")
+                print(f"    Gemini Calls: {summary.get('gemini_api_calls', 0)}")
+                
+                # Show NLP analysis
                 nlp_analysis = extraction.get("nlp_analysis", {})
-                entities = nlp_analysis.get("entities", {})
-                print(f"\n  NLP Analysis:")
-                print(f"    Malware: {len(entities.get('malware', []))}")
-                print(f"    Tools: {len(entities.get('tools', []))}")
-                print(f"    Threat Actors: {len(entities.get('threat_actors', []))}")
-                print(f"    IPs: {len(entities.get('ips', []))}")
-                print(f"    Domains: {len(entities.get('domains', []))}")
+                if nlp_analysis:
+                    entities = nlp_analysis.get("entities", {})
+                    print(f"\n    NLP Analysis:")
+                    print(f"      Malware: {len(entities.get('malware', []))}")
+                    print(f"      Tools: {len(entities.get('tools', []))}")
+                    print(f"      Threat Actors: {len(entities.get('threat_actors', []))}")
+                    print(f"      IPs: {len(entities.get('ips', []))}")
+                    print(f"      Domains: {len(entities.get('domains', []))}")
                 
-                # Show top 3 TTPs
+                # Show top TTPs with validation status
                 if ttps:
-                    print(f"\n  Top 3 TTPs:")
+                    print(f"\n    Top 3 TTPs (with validators applied):")
                     for i, ttp in enumerate(ttps[:3], 1):
-                        print(f"    {i}. {ttp.get('technique_name')} ({ttp.get('attack_id')})")
-                        print(f"       Confidence: {ttp.get('confidence_score')} - {ttp.get('extraction_method')}")
+                        technique = ttp.get('technique_name', 'Unknown')
+                        attack_id = ttp.get('attack_id', 'N/A')
+                        validated = ttp.get('attack_id_validated', False)
+                        indicators_count = len(ttp.get('extracted_indicators', {}))
+                        confidence = ttp.get('confidence_score', 0)
+                        
+                        status = "✓" if validated else "!"
+                        print(f"      {i}. {technique} ({attack_id}) {status}")
+                        print(f"         Confidence: {confidence:.2f} | Indicators: {indicators_count} | Method: {ttp.get('extraction_method')}")
                 
-                # Store for final summary
+                # Store for final output
                 all_extraction_results.append({
-                    "report_id": test_report['report_id'],
-                    "title": test_report['title'],
+                    "report_id": report_id,
+                    "title": test_report.get('title', 'Unknown'),
                     "ttps_count": len(ttps),
-                    "high_confidence_count": summary.get('high_confidence_ttps', 0),
+                    "high_confidence_count": high_conf,
                     "processing_time_ms": summary.get('processing_time_ms', 0),
                     "extraction": extraction
                 })
             else:
-                print(f"\n[WARN] No extraction results")
+                print(f"\n[⚠] No extraction results for this report")
         
         # Final Summary
         print("\n" + "=" * 80)
-        print("FINAL SUMMARY")
+        print("EXTRACTION SUMMARY")
         print("=" * 80)
         
         print(f"\nOverall Statistics:")
         print(f"  Total Reports Processed: {len(reports_to_process)}")
         print(f"  Total TTPs Extracted: {total_ttps}")
+        print(f"  High Confidence TTPs: {total_high_confidence}")
         print(f"  Average TTPs per Report: {total_ttps / len(reports_to_process):.1f}")
         print(f"  Total Processing Time: {total_processing_time:.2f}s")
         print(f"  Average Time per Report: {(total_processing_time / len(reports_to_process)):.2f}s")
@@ -346,6 +420,11 @@ async def test_hybrid_with_mock():
         print(f"  Cache Misses: {stats.get('cache_misses')}")
         print(f"  Extraction Errors: {stats.get('extraction_errors')}")
         
+        # Validator statistics
+        print(f"\nValidator Statistics (Applied during extraction):")
+        print(f"  Attack IDs Validated: {len([t for r in all_extraction_results for t in r['extraction'].get('extracted_ttps', []) if t.get('attack_id_validated')])}")
+        print(f"  TTPs with Indicators: {len([t for r in all_extraction_results for t in r['extraction'].get('extracted_ttps', []) if t.get('extracted_indicators')])}")
+        
         # Per-report breakdown
         print(f"\n{'-' * 80}")
         print("PER-REPORT BREAKDOWN:")
@@ -359,7 +438,7 @@ async def test_hybrid_with_mock():
                   f"{result_item['high_confidence_count']:<10} "
                   f"{result_item['processing_time_ms']:<10.0f}")
         
-        # Save all results
+        # Save complete extraction data to JSON
         output_path = Path("data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -367,35 +446,79 @@ async def test_hybrid_with_mock():
             "test_timestamp": datetime.utcnow().isoformat(),
             "total_reports": len(reports_to_process),
             "total_ttps": total_ttps,
+            "total_high_confidence_ttps": total_high_confidence,
             "total_processing_time_seconds": total_processing_time,
             "agent_statistics": stats,
-            "per_report_results": all_extraction_results
+            "per_report_results": all_extraction_results,
+            "metadata": {
+                "extraction_type": "hybrid_nlp_gemini",
+                "model_used": agent.model_name,
+                "min_confidence_threshold": agent.min_confidence_threshold,
+                "nlp_enabled": agent.use_nlp_preprocessing,
+                "validators_applied": [
+                    "AttackIdValidator",
+                    "IndicatorExtractor",
+                    "AdvancedTechniqueDiscovery"
+                ],
+                "validator_integration_point": "_format_ttp_for_handoff()",
+                "output_fields_per_ttp": [
+                    "ttp_id",
+                    "report_id",
+                    "technique_name",
+                    "attack_id",
+                    "attack_id_validated",
+                    "attack_id_confidence",
+                    "tactic",
+                    "description",
+                    "confidence_score",
+                    "extracted_indicators",
+                    "indicator_score",
+                    "extraction_method",
+                    "tools",
+                    "related_entities",
+                    "extracted_timestamp"
+                ]
+            }
         }
         
         with open(output_path, "w", encoding='utf-8') as f:
             json.dump(final_output, f, indent=2, ensure_ascii=False)
         
-        print(f"\n[OK] All results saved to {output_path}")
+        print(f"\n[✓] COMPLETE DATA SAVED:")
+        print(f"    Path: {output_path}")
+        print(f"    Size: {output_path.stat().st_size / 1024:.1f}KB")
+        print(f"    Total TTPs: {total_ttps}")
+        print(f"    With validators: ✓ Applied during extraction")
         
         # Health check
+        print(f"\n[CHECK] Agent Health:")
         health = await agent.health_check()
-        print(f"\nAgent Health: {health.get('health', {}).get('status')}")
-        print(f"  Health Score: {health.get('health', {}).get('score'):.1f}")
+        health_status = health.get('health', {})
+        print(f"    Status: {health_status.get('status')}")
+        print(f"    Score: {health_status.get('score', 0):.1f}")
         
         await agent.shutdown()
-        print("\n[OK] Agent shutdown complete")
+        print("\n[✓] Agent shutdown complete")
         
         print("\n" + "=" * 80)
-        print("[OK] MULTI-REPORT TEST COMPLETED SUCCESSFULLY")
+        print("[SUCCESS] HYBRID EXTRACTION COMPLETED")
         print("=" * 80)
+        print("\nNext Steps:")
+        print("  1. Verify output file: data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json")
+        print("  2. Run OPTION 2 to apply additional validators (if needed)")
+        print("  3. Pass output to rulegen/attackgen agents")
+        
+        return True
         
     except Exception as e:
-        print(f"\n[ERROR] Test failed: {e}")
+        print(f"\n[ERROR] Extraction failed: {e}")
         import traceback
         traceback.print_exc()
+        try:
+            await agent.shutdown()
+        except:
+            pass
         return False
-    
-    return True
 
 
 async def test_nlp_component():
@@ -528,39 +651,267 @@ async def test_batch_hybrid():
     return True
 
 
+async def test_hybrid_extraction_with_validators():
+    """
+    Load existing extraction data and enhance with validators
+    1. Loads: data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json
+    2. Applies: AttackIdValidator, IndicatorExtractor, AdvancedTechniqueDiscovery
+    3. Saves: Back to same file (overwrite with enhanced fields)
+    """
+    print("=" * 80)
+    print("HYBRID EXTRACTION + VALIDATORS ENHANCEMENT")
+    print("=" * 80)
+    
+    # Load existing extraction data
+    data_file = Path("data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json")
+    
+    if not data_file.exists():
+        print(f"\n[ERROR] Data file not found: {data_file}")
+        print("Please run extraction first to generate data.")
+        return False
+    
+    print(f"\n[LOAD] Reading existing extraction data...")
+    with open(data_file, 'r', encoding='utf-8') as f:
+        original_data = json.load(f)
+    
+    print(f"  ✓ Loaded: {data_file.name}")
+    print(f"  ✓ Total reports: {original_data.get('total_reports', 0)}")
+    print(f"  ✓ Total TTPs: {original_data.get('total_ttps', 0)}")
+    
+    # Initialize validators
+    print("\n[INIT] Initializing validators...")
+    attack_id_validator = AttackIdValidator()
+    indicator_extractor = IndicatorExtractor()
+    technique_discoverer = AdvancedTechniqueDiscovery()
+    print("  ✓ AttackIdValidator initialized")
+    print("  ✓ IndicatorExtractor initialized")
+    print("  ✓ AdvancedTechniqueDiscovery initialized")
+    
+    try:
+        print("\n" + "=" * 80)
+        print("ENHANCEMENT PHASE")
+        print("=" * 80)
+        
+        # Track enhancements
+        enhancement_stats = {
+            "total_ttps_processed": 0,
+            "ttps_with_extracted_indicators": 0,
+            "ttps_with_discovered_techniques": 0,
+            "attack_ids_validated": 0,
+            "attack_ids_fixed": 0,
+            "total_indicators_extracted": 0,
+            "total_new_techniques_discovered": 0
+        }
+        
+        print(f"\n[ENHANCE] Processing TTPs with validators...")
+        
+        # Process each report's TTPs
+        for report_result in original_data.get('per_report_results', []):
+            report_title = report_result.get('title', 'Unknown')
+            extraction = report_result.get('extraction', {})
+            ttps = extraction.get('extracted_ttps', [])
+            
+            print(f"\n  Report: {report_title[:50]}...")
+            print(f"  TTPs: {len(ttps)}")
+            
+            for ttp in ttps:
+                enhancement_stats['total_ttps_processed'] += 1
+                
+                # Get context text for validators
+                context_text = ttp.get('description', '')
+                if not context_text:
+                    context_text = ttp.get('evidence_text', '')
+                
+                # 1. Validate Attack ID
+                attack_id = ttp.get('attack_id', '')
+                if attack_id:
+                    validation = attack_id_validator.validate_attack_id(attack_id)
+                    ttp['attack_id_validated'] = validation.is_valid
+                    ttp['attack_id_confidence'] = validation.confidence
+                    enhancement_stats['attack_ids_validated'] += 1
+                    
+                    # Auto-fix if needed
+                    if not validation.is_valid and validation.validated_id != attack_id:
+                        ttp['attack_id_original'] = attack_id
+                        ttp['attack_id'] = validation.validated_id
+                        enhancement_stats['attack_ids_fixed'] += 1
+                
+                # 2. Extract Indicators
+                if context_text:
+                    indicators = indicator_extractor.extract_indicators(context_text)
+                    if indicators and any(indicators.values()):
+                        ttp['extracted_indicators'] = indicators
+                        ttp['indicator_score'] = indicator_extractor.calculate_indicator_score(indicators)
+                        enhancement_stats['ttps_with_extracted_indicators'] += 1
+                        
+                        # Count total indicators
+                        for ind_type, ind_list in indicators.items():
+                            if isinstance(ind_list, dict):
+                                for subtype, items in ind_list.items():
+                                    if items:
+                                        enhancement_stats['total_indicators_extracted'] += len(items)
+                            elif isinstance(ind_list, list):
+                                if ind_list:
+                                    enhancement_stats['total_indicators_extracted'] += len(ind_list)
+                
+                # 3. Discover New Techniques
+                existing_techniques = {ttp.get('attack_id')}
+                tools = []
+                if 'related_entities' in ttp:
+                    tools = ttp['related_entities'].get('tools', [])
+                
+                new_techniques = technique_discoverer.discover_techniques(
+                    text=context_text,
+                    indicators=ttp.get('extracted_indicators', {}),
+                    tools=tools,
+                    existing_techniques=existing_techniques
+                )
+                
+                if new_techniques:
+                    ttp['discovered_techniques'] = [
+                        {
+                            'attack_id': tech.technique_id,
+                            'name': tech.technique_name,
+                            'confidence': tech.confidence,
+                            'evidence': tech.evidence,
+                            'evidence_type': tech.evidence_type
+                        }
+                        for tech in new_techniques
+                    ]
+                    enhancement_stats['ttps_with_discovered_techniques'] += 1
+                    enhancement_stats['total_new_techniques_discovered'] += len(new_techniques)
+        
+        # Add enhancement metadata to original data
+        print(f"\n[METADATA] Adding enhancement information...")
+        original_data['enhancement_applied'] = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "validators_used": ["AttackIdValidator", "IndicatorExtractor", "AdvancedTechniqueDiscovery"],
+            "statistics": enhancement_stats
+        }
+        
+        # Save enhanced data back to same file
+        print(f"\n[SAVE] Saving enhanced data...")
+        with open(data_file, 'w', encoding='utf-8') as f:
+            json.dump(original_data, f, indent=2, ensure_ascii=False)
+        
+        # Display results
+        print("\n" + "=" * 80)
+        print("ENHANCEMENT RESULTS")
+        print("=" * 80)
+        
+        print(f"\n[SUMMARY]")
+        print(f"  Total TTPs Processed: {enhancement_stats['total_ttps_processed']}")
+        print(f"  Attack IDs Validated: {enhancement_stats['attack_ids_validated']}")
+        print(f"  Attack IDs Fixed: {enhancement_stats['attack_ids_fixed']}")
+        print(f"  TTPs with Indicators: {enhancement_stats['ttps_with_extracted_indicators']}")
+        print(f"  Total Indicators Extracted: {enhancement_stats['total_indicators_extracted']}")
+        print(f"  TTPs with New Techniques: {enhancement_stats['ttps_with_discovered_techniques']}")
+        print(f"  Total New Techniques: {enhancement_stats['total_new_techniques_discovered']}")
+        
+        print(f"\n[OUTPUT FILE]")
+        print(f"  File: {data_file}")
+        print(f"  Status: ✓ Enhanced (original data preserved)")
+        print(f"  New Fields Added to Each TTP:")
+        print(f"    ├─ attack_id_validated: boolean")
+        print(f"    ├─ attack_id_confidence: float (0-1)")
+        print(f"    ├─ attack_id_original: string (if fixed)")
+        print(f"    ├─ extracted_indicators: dict with 7 IOC types")
+        print(f"    ├─ indicator_score: float (0-1)")
+        print(f"    └─ discovered_techniques: list with confidence")
+        
+        print(f"\n[READY FOR DOWNSTREAM AGENTS]")
+        print(f"  ✓ Rulegen: Use extracted_indicators for rule generation")
+        print(f"  ✓ Attackgen: Use discovered_techniques for attack generation")
+        print(f"  ✓ Evaluator: Measure improvement metrics")
+        
+        print("\n" + "=" * 80)
+        print("[SUCCESS] Enhancement completed!")
+        print("=" * 80)
+        
+        return True
+        
+    except Exception as e:
+        print(f"\n[ERROR] Extraction failed: {e}")
+        import traceback
+        traceback.print_exc()
+        try:
+            await agent.shutdown()
+        except:
+            pass
+        return False
+
+
 async def main():
-    """Run tests"""
+    """Run tests with improved menu"""
     print("\n")
     
-    # Check test data
-    test_data_path = Path("data/normalized/cti_reports_20251004_212903.json")
-    if not test_data_path.exists():
-        print(f"[ERROR] Test data not found: {test_data_path}")
-        return
-    
-    print("HYBRID NLP + GEMINI EXTRACTOR TEST MENU")
+    print("=" * 80)
+    print("HYBRID NLP + GEMINI EXTRACTOR TEST SUITE")
+    print("=" * 80)
+    print("\nMENU OPTIONS:")
     print("-" * 80)
-    print("1. Hybrid Extraction (Mock Gemini)")
-    print("2. NLP Component Analysis")
-    print("3. Batch Processing")
-    print("4. All tests")
+    print("1. HYBRID EXTRACTION (RECOMMENDED)")
+    print("   - Extracts TTPs from normalized reports")
+    print("   - Applies validators during extraction (_format_ttp_for_handoff)")
+    print("   - Generates: data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json")
     print()
+    print("2. ENHANCE WITH VALIDATORS (POST-PROCESSING)")
+    print("   - Loads existing extraction data")
+    print("   - Applies AttackIdValidator, IndicatorExtractor, AdvancedTechniqueDiscovery")
+    print("   - Overwrites file with enhanced fields")
+    print()
+    print("3. NLP COMPONENT ANALYSIS")
+    print("   - Tests NLP pipeline separately")
+    print("   - Shows entity extraction, TTP indicators, text processing")
+    print()
+    print("4. BATCH PROCESSING TEST")
+    print("   - Tests batch mode with multiple reports")
+    print()
+    print("5. RUN ALL TESTS")
+    print("   - Execute options 1, 3, 4 sequentially")
+    print()
+    print("0. EXIT")
+    print("-" * 80)
     
-    choice = input("Select test (1-4): ").strip()
+    choice = input("\nSelect option (0-5): ").strip()
     
     if choice == "1":
-        await test_hybrid_with_mock()
+        result = await test_hybrid_extraction()
+        if result:
+            print("\n[SUCCESS] Extraction data ready for downstream agents")
     elif choice == "2":
-        await test_nlp_component()
+        result = await test_hybrid_extraction_with_validators()
+        if result:
+            print("\n[SUCCESS] Data enhanced with validators")
     elif choice == "3":
-        await test_batch_hybrid()
-    elif choice == "4":
-        print("\nRunning all tests...\n")
         await test_nlp_component()
-        print("\n")
-        await test_hybrid_with_mock()
-        print("\n")
+    elif choice == "4":
+        result = await test_batch_hybrid()
+        if result:
+            print("\n[SUCCESS] Batch processing test completed")
+    elif choice == "5":
+        print("\nRunning all tests...\n")
+        print("\n" + "=" * 80)
+        print("TEST 1/3: HYBRID EXTRACTION")
+        print("=" * 80)
+        await test_hybrid_extraction()
+        
+        print("\n" + "=" * 80)
+        print("TEST 2/3: NLP ANALYSIS")
+        print("=" * 80)
+        await test_nlp_component()
+        
+        print("\n" + "=" * 80)
+        print("TEST 3/3: BATCH PROCESSING")
+        print("=" * 80)
         await test_batch_hybrid()
+        
+        print("\n" + "=" * 80)
+        print("[COMPLETE] All tests finished")
+        print("=" * 80)
+    elif choice == "0":
+        print("Exiting...")
+        return
     else:
         print("Invalid choice")
 
