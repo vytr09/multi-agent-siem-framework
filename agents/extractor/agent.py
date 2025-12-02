@@ -463,7 +463,7 @@ class ExtractorAgent(BaseAgent):
         nlp_summary = self._build_nlp_summary(entities, processed, ttp_indicators)
         
         prompt = f"""You are a cybersecurity expert specializing in MITRE ATT&CK framework.
-Your task is to extract ALL Tactics, Techniques, and Procedures (TTPs) from the CTI report.
+Your task is to extract EVERY Tactics, Techniques, and Procedures (TTPs) from the CTI report.
 
 **Report Title:** {title}
 
@@ -484,33 +484,67 @@ Your task is to extract ALL Tactics, Techniques, and Procedures (TTPs) from the 
 
 ---
 
-**TASK:** Extract ALL TTPs mentioned or implied. For each TTP provide:
+**TASK:** Extract EVERY TTP - cover all attack phases from initial access to exfiltration.
 
-1. **technique_name** - Specific MITRE ATT&CK technique name
-2. **tactic** - MITRE ATT&CK tactic
+MITRE ATT&CK Tactics to check (minimize to maximize coverage):
+- Initial Access: Phishing, Supply Chain, etc.
+- Execution: Command Execution, PowerShell, Scripts, etc.
+- Persistence: Registry, Scheduled Tasks, DLL Search Order, etc.
+- Privilege Escalation: UAC Bypass, Exploitation, etc.
+- Defense Evasion: Code Obfuscation, Process Injection, etc.
+- Credential Access: Credential Dumping, Keylogging, etc.
+- Discovery: System Information, Process Discovery, etc.
+- Lateral Movement: Remote Services, Pass the Hash, etc.
+- Collection: Screen Capture, Clipboard Data, etc.
+- Command and Control: C2 Protocols, etc.
+- Exfiltration: Data Transfer, etc.
+
+For EACH TTP found, provide:
+1. **technique_name** - MITRE ATT&CK technique name
+2. **tactic** - MITRE ATT&CK tactic name
 3. **description** - HOW the technique is used in THIS attack
-4. **indicators** - Specific IOCs, commands, registry keys
-5. **tools** - Tools/malware used
-6. **confidence** - Your confidence (0.1-1.0)
+4. **indicators** - Specific IOCs, commands, registry keys found
+5. **tools** - Tools/malware used for this technique
+6. **confidence** - Your confidence (0.0-1.0)
 
-**IMPORTANT:**
-- Use NLP analysis above to guide extraction
-- Extract ALL techniques, even if only implied
-- Link to entities found by NLP (malware, tools, actors)
-- Focus on what's actually stated
-- Return ONLY valid JSON
+**CRITICAL RULES:**
+- EXTRACT EVERY TTP - minimum 5-15 techniques
+- Don't skip techniques based on direct mentions - look for implied techniques
+- Cross-reference with NLP findings (malware, tools, tactics)
+- Look for: commands run, network behavior, persistence mechanisms, etc.
+- Each TTP must link to concrete evidence from the report
+- Return MINIMUM 5 techniques, MAXIMUM 20
+- Return ONLY valid JSON array
 
-**OUTPUT (JSON only):**
+**OUTPUT (JSON array with 5+ techniques):**
 [
   {{
-    "technique_name": "technique_name",
-    "tactic": "tactic_name",
-    "description": "how used in this attack",
-    "indicators": ["ioc1", "ioc2"],
-    "tools": ["tool1"],
-    "confidence": 0.9
+    "technique_name": "Spearphishing Attachment",
+    "tactic": "Initial Access",
+    "description": "detailed description of how used",
+    "indicators": ["email1@company.com", "malware.exe"],
+    "tools": ["Outlook"],
+    "confidence": 0.95
+  }},
+  {{
+    "technique_name": "PowerShell",
+    "tactic": "Execution",
+    "description": "PowerShell used to...",
+    "indicators": ["powershell.exe -Command"],
+    "tools": ["PowerShell"],
+    "confidence": 0.88
+  }},
+  {{
+    "technique_name": "Query Registry",
+    "tactic": "Discovery",
+    "description": "Registry queried to...",
+    "indicators": ["reg query HKLM"],
+    "tools": [],
+    "confidence": 0.75
   }}
-]"""
+]
+
+Return ONLY JSON. No markdown, no explanations."""
 
         return prompt
     
