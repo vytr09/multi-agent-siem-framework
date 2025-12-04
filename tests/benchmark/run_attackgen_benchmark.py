@@ -2,6 +2,7 @@
 """
 AttackGen Benchmark Test Script
 Evaluates AttackGen agent outputs using LLM-as-Judge
+Uses configuration from config/agents.yaml
 """
 
 import asyncio
@@ -19,6 +20,7 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from benchmark.attackgen_benchmark import AttackGenBenchmark
+from tests.conftest import get_full_agent_config
 
 
 async def load_attackgen_results(filepath: str) -> dict:
@@ -46,24 +48,31 @@ async def run_benchmark():
     print("[BENCHMARK] ATTACKGEN AGENT BENCHMARK")
     print("="*80)
     
-    # Configuration
+    # Load configuration from agents.yaml
+    evaluator_config = get_full_agent_config("evaluator")
+    llm_judge_config = evaluator_config.get("benchmark", {}).get("llm_judge", {})
+    
+    # Build config for benchmark
     config = {
         "llm_judge": {
             "enabled": True,
-            "api_key": os.getenv("GEMINI_API_KEY"),
-            "model": "gemini-2.0-flash-lite",
-            "temperature": 0.3,
-            "max_tokens": 2000,
+            "api_key": llm_judge_config.get("api_key", ""),
+            "model": llm_judge_config.get("model", "gemini-2.0-flash-lite"),
+            "provider": llm_judge_config.get("provider", "gemini"),
+            "base_url": llm_judge_config.get("base_url"),
+            "temperature": llm_judge_config.get("temperature", 0.3),
+            "max_tokens": llm_judge_config.get("max_tokens", 2000),
             "persona": "expert cybersecurity researcher specializing in offensive security and red team operations",
             "detailed_feedback": True,
             "confidence_scores": True
         }
     }
     
+    print(f"[CONFIG] LLM Judge: {config['llm_judge'].get('provider', 'unknown')} / {config['llm_judge'].get('model', 'unknown')}")
+    
     # Check API key
     if not config["llm_judge"]["api_key"]:
-        print("[ERROR] GEMINI_API_KEY not set")
-        print("   Set it with: export GEMINI_API_KEY='your-api-key'")
+        print("[ERROR] LLM Judge API key not configured in agents.yaml")
         return
     
     # Initialize benchmark

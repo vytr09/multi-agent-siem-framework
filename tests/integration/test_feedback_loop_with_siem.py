@@ -3,22 +3,7 @@
 Test Feedback Loop WITH SIEM Integration (Full LangChain Stack)
 Tests the complete feedback loop using LangChain-powered agents: 
 RuleGen (LC) -> AttackGen (LC) -> SIEM Verification -> Evaluator (LC) -> Feedback -> RuleGen (iterative)
-
-Flow:
-1. LangChain RuleGen generates detection rules from CTI data
-2. LangChain AttackGen generates attack commands for those rules
-3. SIEM Integration executes attacks and verifies rule detection
-4. LangChain Evaluator calculates:
-   - Benchmark metrics (quality, correctness, etc.) via LLM-as-Judge
-   - SIEM metrics (F1, Precision, Recall, Accuracy) from detection results
-5. Feedback is generated and sent back to RuleGen
-6. Loop continues until stopping condition (max iterations or min score threshold)
-
-All agents use LangChain for:
-- Structured outputs with Pydantic models
-- Better prompt engineering and consistency
-- Automatic retries and error handling
-- Unified LLM interaction patterns
+Uses configuration from config/agents.yaml
 """
 
 import sys
@@ -39,6 +24,7 @@ from agents.evaluator.langchain_agent import LangChainEvaluatorAgent
 from agents.evaluator.feedback_manager import FeedbackManager
 from core.siem_integration import SIEMIntegrator, DetectionResult
 from config.settings import settings
+from tests.conftest import get_full_agent_config
 
 
 @dataclass

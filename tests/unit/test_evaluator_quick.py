@@ -2,6 +2,7 @@
 """
 Quick Test Script for Evaluator Agent Flow
 Tests the complete evaluator agent workflow with memory integration
+Uses configuration from config/agents.yaml
 """
 
 import asyncio
@@ -12,12 +13,13 @@ from pathlib import Path
 from datetime import datetime
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agents.evaluator.agent import EvaluatorAgent
 from agents.evaluator.feedback_manager import FeedbackManager
 from core.memory import get_memory_manager
 from core.orchestrator import HybridOrchestrator
+from tests.conftest import get_full_agent_config
 
 
 async def test_evaluator_flow():
@@ -43,17 +45,23 @@ async def test_evaluator_flow():
         orchestrator = HybridOrchestrator()
         print("[SUCCESS] Orchestrator created")
 
-        # Test evaluator agent
+        # Load evaluator configuration from agents.yaml
+        yaml_config = get_full_agent_config("evaluator")
+        
         evaluator_config = {
-            "llm": {
-                "use_mock": True,  # Use mock for testing
+            "llm": yaml_config.get("llm", {
+                "use_mock": True,
                 "model": "gemini-2.0-flash-lite"
-            },
+            }),
             "evaluation": {
                 "metrics": ["accuracy", "coverage", "false_positives"],
                 "benchmark_enabled": False
-            }
+            },
+            "benchmark": yaml_config.get("benchmark", {})
         }
+        
+        print(f"[CONFIG] LLM Provider: {evaluator_config['llm'].get('provider', 'unknown')}")
+        print(f"[CONFIG] LLM Model: {evaluator_config['llm'].get('model', 'unknown')}")
 
         evaluator = EvaluatorAgent("test_evaluator", evaluator_config)
         print("[SUCCESS] Evaluator agent created")

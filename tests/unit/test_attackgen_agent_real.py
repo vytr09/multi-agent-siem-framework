@@ -2,6 +2,7 @@
 """
 AttackGen Agent Tests - NO MOCK/FALLBACK
 Tests ONLY with real AttackGen Agent and real extracted TTP data
+Uses configuration from config/agents.yaml
 """
 
 import pytest
@@ -19,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from agents.attackgen.agent import AttackGenAgent
 from agents.attackgen.config import get_attackgen_config
 from agents.base.agent import AgentStatus
+from tests.conftest import get_full_agent_config
 
 # ================================
 # TEST CLASS - NO MOCK
@@ -29,13 +31,16 @@ class TestRealAttackGenAgent:
     
     @pytest.fixture
     def real_agent_config(self):
-        """Configuration for agent"""
-        config = get_attackgen_config()
+        """Configuration for agent - loaded from agents.yaml"""
+        # Load base config from agents.yaml
+        yaml_config = get_full_agent_config("attackgen")
         
-        # Use Gemini API - NO MOCK
+        # Merge with default config
+        config = get_attackgen_config()
+        config['llm'] = yaml_config.get('llm', config.get('llm', {}))
         config['llm']['use_mock'] = False
-        config['platforms'] = ['windows', 'linux']
-        config['safety_level'] = 'medium'
+        config['platforms'] = yaml_config.get('platforms', ['windows', 'linux'])
+        config['safety_level'] = yaml_config.get('safety_level', 'medium')
         config['max_commands_per_ttp'] = 2
         
         return config
@@ -115,12 +120,13 @@ class TestRealAttackGenAgent:
         env_file = Path('.env')
         assert env_file.exists(), f".env file required: {env_file.absolute()}"
         
-        # MUST have GEMINI_API_KEY
-        api_key = os.getenv('GEMINI_API_KEY')
-        assert api_key is not None, "GEMINI_API_KEY environment variable required"
-        assert len(api_key) > 10, f"GEMINI_API_KEY seems invalid (length: {len(api_key)})"
+        # Check LLM configuration from agents.yaml
+        yaml_config = get_full_agent_config("attackgen")
+        llm_config = yaml_config.get('llm', {})
         
-        print(f"[SUCCESS] GEMINI_API_KEY loaded (length: {len(api_key)})")
+        provider = llm_config.get('provider', 'gemini')
+        print(f"[CONFIG] LLM Provider: {provider}")
+        print(f"[CONFIG] LLM Model: {llm_config.get('model', 'N/A')}")
         
         # MUST have TTP data file (hybrid extraction with context)
         ttp_file = Path('data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-exp.json')

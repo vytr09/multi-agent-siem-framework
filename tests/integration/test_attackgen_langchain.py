@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+Test LangChain AttackGen Agent
+Uses configuration from config/agents.yaml
+"""
 
 import sys
 from pathlib import Path
@@ -8,6 +13,7 @@ import json
 import os
 from dotenv import load_dotenv
 from agents.attackgen.langchain_agent import LangChainAttackGenAgent
+from tests.conftest import get_full_agent_config
 
 async def test_attackgen_langchain():
     print("="*80)
@@ -17,22 +23,16 @@ async def test_attackgen_langchain():
     # Load environment variables
     load_dotenv()
     
-    # Check for API key
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        print("WARNING: GEMINI_API_KEY not found in .env or environment.")
+    # Load configuration from agents.yaml
+    config = get_full_agent_config("attackgen")
     
-    # Configuration
-    config = {
-        "use_langchain": True,
-        "llm": {
-            "model": "gemini-2.0-flash-lite",
-            "temperature": 0.7,
-            "api_key": api_key
-        },
-        "platforms": ["windows", "linux"],
-        "safety_level": "medium"
-    }
+    if not config:
+        print("[ERROR] attackgen configuration not found in agents.yaml")
+        return
+    
+    llm_config = config.get("llm", {})
+    print(f"[CONFIG] Using provider: {llm_config.get('provider', 'unknown')}")
+    print(f"[CONFIG] Using model: {llm_config.get('model', 'unknown')}")
     
     # Initialize Agent
     agent = LangChainAttackGenAgent("test_agent", config)
@@ -47,12 +47,7 @@ async def test_attackgen_langchain():
         else:
              print(f"[VERIFICATION] Model Name: {getattr(llm, 'model_name', 'Unknown')}")
         
-        # Check if it's ChatGoogleGenerativeAI
-        from langchain_google_genai import ChatGoogleGenerativeAI
-        if isinstance(llm, ChatGoogleGenerativeAI):
-            print("[VERIFICATION] CONFIRMED: Using real ChatGoogleGenerativeAI client")
-        else:
-            print(f"[VERIFICATION] WARNING: Using {type(llm)} instead of ChatGoogleGenerativeAI")
+        print(f"[VERIFICATION] LLM type confirmed: {type(llm).__name__}")
     
     # Test Data
     test_ttps = [

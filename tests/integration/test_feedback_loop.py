@@ -2,6 +2,7 @@
 """
 Test Feedback Loop Without SIEM Integration
 Tests the complete feedback loop: RuleGen -> Evaluator -> Feedback -> RuleGen (iterative)
+Uses configuration from config/agents.yaml
 """
 
 import sys
@@ -18,6 +19,7 @@ from core.orchestrator import HybridOrchestrator
 from agents.rulegen.agent import RuleGenerationAgentWithLLM
 from agents.evaluator.agent import EvaluatorAgent
 from agents.evaluator.feedback_manager import FeedbackManager
+from tests.conftest import get_full_agent_config
 
 async def test_feedback_loop():
     """Test the feedback loop with simulated data"""
@@ -27,16 +29,9 @@ async def test_feedback_loop():
     print("="*100)
 
     # Load test data
-    # Resolve repository root (two levels up from this file)
     repo_root = Path(__file__).resolve().parents[2]
-    # Allow optional override via TEST_DATA_ROOT env var
     base_path = Path(os.getenv("TEST_DATA_ROOT", repo_root))
-    data_path = (
-        base_path
-        / "data"
-        / "extracted"
-        / "hybrid_extraction_results.json"
-    )
+    data_path = base_path / "data" / "extracted" / "hybrid_extraction_results.json"
 
     if not data_path.exists():
         print(f"[ERROR] Test data not found: {data_path}")
@@ -47,33 +42,32 @@ async def test_feedback_loop():
 
     hybrid_data = extraction_data.get('hybrid', {})
 
-    # Configure agents with feedback enabled
+    # Load configurations from agents.yaml
+    rulegen_agent_config = get_full_agent_config("rulegen")
+    evaluator_agent_config = get_full_agent_config("evaluator")
+    
+    # Build rulegen config with loaded LLM settings
     rulegen_config = {
         'platforms': ['splunk', 'elasticsearch'],
         'optimize_rules': True,
         'validate_rules': True,
         'min_confidence_threshold': 0.7,
-        'use_feedback': True,  # Enable feedback
-        'llm': {
-            'enabled': True,
-            'api_key': os.getenv('GEMINI_API_KEY'),
-            'model': 'gemini-2.0-flash-lite',
-            'temperature': 0.3,
-            'max_retries': 3
-        },
-        'sigma': {},
+        'use_feedback': True,
+        'llm': rulegen_agent_config.get('llm', {}),
+        'sigma': rulegen_agent_config.get('sigma', {}),
         'optimizer': {},
         'splunk': {},
         'elasticsearch': {}
     }
 
+    # Build evaluator config with loaded LLM settings
     evaluator_config = {
         'platforms': ['splunk', 'elasticsearch'],
-        'benchmark': {
-            'llm_api_key': os.getenv('GEMINI_API_KEY'),
-            'platforms': ['splunk', 'elasticsearch']
-        }
+        'benchmark': evaluator_agent_config.get('benchmark', {})
     }
+    
+    print(f"[CONFIG] RuleGen LLM: {rulegen_config['llm'].get('provider', 'unknown')} / {rulegen_config['llm'].get('model', 'unknown')}")
+    print(f"[CONFIG] Evaluator LLM: {evaluator_config['benchmark'].get('llm_judge', {}).get('provider', 'unknown')}")
 
     # Create orchestrator config
     orchestrator_config = {
@@ -83,7 +77,7 @@ async def test_feedback_loop():
         },
         'feedback': {
             'max_iterations': 3,
-            'minimum_score': 0.8  # Higher threshold to force iterations
+            'minimum_score': 0.8
         }
     }
 
@@ -95,10 +89,6 @@ async def test_feedback_loop():
 
     orchestrator = None
     try:
-        # Initialize only rulegen and evaluator agents for testing
-        from agents.rulegen.agent import RuleGenerationAgentWithLLM
-        from agents.evaluator.agent import EvaluatorAgent
-        
         print("   • Initializing RuleGen agent...")
         rulegen = RuleGenerationAgentWithLLM("rulegen", rulegen_config)
         await rulegen.initialize()
@@ -107,7 +97,7 @@ async def test_feedback_loop():
         evaluator = EvaluatorAgent("evaluator", evaluator_config)
         await evaluator.start()
         
-        # Create a simple test orchestrator that only has rulegen and evaluator
+        # Create a simple test orchestrator
         class TestOrchestrator:
             def __init__(self, rulegen, evaluator, config):
                 self.rulegen = rulegen
@@ -120,7 +110,7 @@ async def test_feedback_loop():
                 """Run test pipeline with pre-extracted data"""
                 print("   • Running test pipeline with pre-extracted data...")
                 
-                # Stage 1: Generate Rules (with feedback)
+                # Stage 1: Generate Rules
                 print("   • Stage 1: Generating rules...")
                 rulegen_result = await self.rulegen.process(extraction_data)
                 
@@ -135,7 +125,6 @@ async def test_feedback_loop():
                 
                 # Stage 2: Evaluate Rules
                 print("   • Stage 2: Evaluating rules...")
-                # Extract the actual rules from RuleGen result
                 rules_to_evaluate = rulegen_result.get('rule_generation_results', [])
                 evaluation_result = await self.evaluator.execute({
                     'rules': rules_to_evaluate
@@ -149,16 +138,9 @@ async def test_feedback_loop():
                 
                 while score < min_score and iteration < max_iterations:
                     print(f"   • Score {score:.3f} < {min_score}, re-running (iteration {iteration+1})...")
-                    
-                    # Re-generate with updated feedback
                     rulegen_result = await self.rulegen.process(extraction_data)
-                    
-                    # Re-evaluate
                     rules_to_evaluate = rulegen_result.get('rule_generation_results', [])
-                    evaluation_result = await self.evaluator.execute({
-                        'rules': rules_to_evaluate
-                    })
-                    
+                    evaluation_result = await self.evaluator.execute({'rules': rules_to_evaluate})
                     score = evaluation_result.get('metrics', {}).get('average_score', 0)
                     iteration += 1
                 
@@ -178,21 +160,11 @@ async def test_feedback_loop():
         
         orchestrator = TestOrchestrator(rulegen, evaluator, orchestrator_config)
 
-        # Create mock CTI reports (we'll use the extraction data directly)
-        # The orchestrator expects CTI reports, but we'll modify it to work with our test data
-        cti_reports = [{
-            'id': 'test_report_1',
-            'title': 'Test CTI Report',
-            'content': 'Mock content for testing',
-            'extraction_data': hybrid_data  # Pass our test data
-        }]
-
         print("\n[START] Starting feedback loop test...")
         print("   • Max iterations: 3")
         print("   • Minimum score threshold: 0.8")
         print("   • Feedback enabled: Yes")
 
-        # Run the test pipeline with feedback loop
         result = await orchestrator.run_test_pipeline(hybrid_data)
 
         print("\n" + "="*100)
@@ -216,13 +188,6 @@ async def test_feedback_loop():
         feedback_history = feedback_manager.get_feedback_history("rulegen")
         print(f"   • Feedback Entries: {len(feedback_history)}")
 
-        if feedback_history:
-            print(f"\n[FEEDBACK] Latest Feedback:")
-            latest = feedback_history[-1]
-            print(f"   • Timestamp: {latest.get('timestamp', 'N/A')}")
-            print(f"   • Improvements: {len(latest.get('improvements_needed', []))}")
-            print(f"   • Suggestions: {len(latest.get('actionable_suggestions', []))}")
-
         # Save test results
         output_dir = repo_root / "data" / "benchmark_results"
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -244,8 +209,8 @@ async def test_feedback_loop():
         print(f"\n[OUTPUT] Test results saved to: {output_path}")
 
     finally:
-        # Cleanup
-        await orchestrator.cleanup()
+        if orchestrator:
+            await orchestrator.cleanup()
         if config_path.exists():
             config_path.unlink()
 
