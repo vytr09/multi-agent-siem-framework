@@ -6,12 +6,17 @@ Provides LangChain wrappers for the Multi-Agent SIEM Framework
 
 from typing import Dict, Any, List, Optional
 from langchain_google_genai import ChatGoogleGenerativeAI
+try:
+    from langchain_openai import ChatOpenAI
+except ImportError:
+    ChatOpenAI = None  # Handle missing dependency gracefully
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.callbacks import BaseCallbackHandler
 from pydantic import BaseModel, Field
 import os
 import json
+import ast
 from datetime import datetime
 
 
@@ -35,12 +40,19 @@ class TTPListOutput(BaseModel):
     ttps: List[TTPOutput] = Field(description="List of extracted TTPs")
 
 
+class LogSourceOutput(BaseModel):
+    """Log source specification"""
+    category: str = Field(description="Event category (e.g., process_creation)")
+    product: str = Field(description="Product (e.g., windows)")
+    service: Optional[str] = Field(default=None, description="Service (e.g., sysmon)")
+
+
 class SigmaRuleOutput(BaseModel):
     """Structured output for Sigma rule"""
     title: str = Field(description="Rule title")
     description: str = Field(description="Rule description")
-    logsource: Dict[str, str] = Field(description="Log source specification")
-    detection: Dict[str, Any] = Field(description="Detection logic")
+    logsource: LogSourceOutput = Field(description="Log source specification")
+    detection: str = Field(description="Detection logic as a valid JSON string. Example: '{\"selection\": {\"Image\": \"cmd.exe\"}, \"condition\": \"selection\"}'")
     falsepositives: List[str] = Field(default_factory=list, description="Known false positives")
     level: str = Field(description="Severity level: low, medium, high, critical")
     tags: List[str] = Field(default_factory=list, description="Rule tags")
@@ -60,7 +72,7 @@ class AttackCommandOutput(BaseModel):
 class AttackCommandListOutput(BaseModel):
     """List of attack commands"""
     commands: List[AttackCommandOutput] = Field(description="List of generated attack commands")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
+    # Removed metadata Dict[str, Any] to avoid schema issues
 
 
 class RuleEvaluationOutput(BaseModel):
@@ -115,18 +127,51 @@ class LangChainLLMWrapper:
         """Initialize LangChain LLM"""
         self.config = config
         
-        # Get API key
-        api_key = config.get('api_key') or os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
+        # Get API key and resolve env vars
+        api_key = config.get('api_key')
+        if api_key and isinstance(api_key, str) and api_key.startswith('${') and api_key.endswith('}'):
+            env_var = api_key[2:-1]
+            api_key = os.getenv(env_var)
+            
         if not api_key:
-            raise ValueError("API key required: set GEMINI_API_KEY or provide in config")
+            # Fallback to env vars based on provider
+            provider = config.get('provider', 'gemini').lower()
+            if provider == 'openai':
+                api_key = os.getenv('OPENAI_API_KEY')
+            else:
+                api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
+                
+        if not api_key:
+            raise ValueError(f"API key required for provider {config.get('provider', 'gemini')}")
         
-        # Create LLM
-        self.llm = ChatGoogleGenerativeAI(
-            model=config.get('model', 'gemini-2.0-flash-lite'),
-            temperature=config.get('temperature', 0.3),
-            max_tokens=config.get('max_output_tokens', 2000),
-            google_api_key=api_key
-        )
+        # Create LLM based on provider
+        provider = config.get('provider', 'gemini').lower()
+        
+        if provider == 'openai':
+            if ChatOpenAI is None:
+                raise ImportError("langchain-openai is not installed. Please run: pip install langchain-openai")
+                
+            llm_kwargs = {
+                'model': config.get('model', 'gpt-4'),
+                'temperature': config.get('temperature', 0.3),
+                'max_tokens': config.get('max_tokens', 2000), # Note: config key might be max_output_tokens or max_tokens
+                'api_key': api_key
+            }
+            
+            # Support custom base_url
+            base_url = config.get('base_url')
+            if base_url:
+                llm_kwargs['base_url'] = base_url
+                
+            self.llm = ChatOpenAI(**llm_kwargs)
+            
+        else: # Default to Gemini
+            self.llm = ChatGoogleGenerativeAI(
+                model=config.get('model', 'gemini-2.0-flash-lite'),
+                temperature=config.get('temperature', 0.3),
+                max_tokens=config.get('max_output_tokens', 2000),
+                google_api_key=api_key
+            )
         
         # Metrics
         self.callback = MetricsCallback()
@@ -253,6 +298,39 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
                 "feedback": feedback_text
             })
             
+            # Post-process: Parse detection JSON string to dict
+            # This is necessary because we changed the model to use str for detection
+            if isinstance(result, SigmaRuleOutput):
+                # Create a new object or modify the existing one (Pydantic models are immutable by default but we can dump to dict)
+                result_dict = result.model_dump()
+                try:
+                    if isinstance(result.detection, str):
+                        # Clean markdown code blocks if present
+                        detection_str = result.detection.strip()
+                        if detection_str.startswith("```"):
+                            detection_str = detection_str.split("```")[1]
+                            if detection_str.startswith("json"):
+                                detection_str = detection_str[4:]
+                        detection_str = detection_str.strip()
+                        
+                        print(f"[DEBUG] Raw detection string: {detection_str}")
+                        try:
+                            parsed_detection = json.loads(detection_str)
+                        except json.JSONDecodeError:
+                            # Try ast.literal_eval for Python dict syntax (single quotes)
+                            try:
+                                parsed_detection = ast.literal_eval(detection_str)
+                            except (ValueError, SyntaxError):
+                                raise  # Re-raise to trigger the outer exception handler
+                        
+                        # Ensure it's a valid JSON string for the Pydantic model
+                        result.detection = json.dumps(parsed_detection)
+                        
+                except (json.JSONDecodeError, ValueError, SyntaxError) as e:
+                    print(f"[ERROR] JSON/AST Decode Error: {e}")
+                    # Fallback if JSON is invalid
+                    result.detection = json.dumps({"selection": {"CommandLine|contains": "suspicious"}, "condition": "selection"})
+            
             return result
             
         except Exception as e:
@@ -261,8 +339,8 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
             return SigmaRuleOutput(
                 title=f"Detection: {ttp_data.get('technique_name', 'Unknown')}",
                 description="Auto-generated rule",
-                logsource={"category": "process_creation", "product": "windows"},
-                detection={"selection": {"CommandLine|contains": "suspicious"}, "condition": "selection"},
+                logsource=LogSourceOutput(category="process_creation", product="windows"),
+                detection=json.dumps({"selection": {"CommandLine|contains": "suspicious"}, "condition": "selection"}),
                 falsepositives=["Unknown"],
                 level="medium",
                 tags=[f"attack.{ttp_data.get('technique_id', 'unknown').lower()}"]
@@ -345,8 +423,7 @@ Return a list of attack commands with metadata."""
                         safety_level="low",
                         expected_behavior="Prints test string to console"
                     )
-                ],
-                metadata={"error": str(e), "fallback": True}
+                ]
             )
 
 

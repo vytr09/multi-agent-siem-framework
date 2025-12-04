@@ -84,7 +84,6 @@ class LangChainEvaluatorAgent(BaseAgent):
         try:
             # Parse input
             rules = input_data.get("rules", [])
-            verification_results = input_data.get("verification_results", [])
             
             if not rules:
                 return {
@@ -99,7 +98,7 @@ class LangChainEvaluatorAgent(BaseAgent):
             
             for rule in rules:
                 try:
-                    result = await self._evaluate_rule(rule, verification_results)
+                    result = await self._evaluate_rule(rule)
                     evaluation_results.append(result)
                     self.stats["rules_evaluated"] += 1
                     
@@ -114,10 +113,6 @@ class LangChainEvaluatorAgent(BaseAgent):
             # Calculate statistics
             avg_quality = sum(r.get("quality_score", 0) for r in evaluation_results) / len(evaluation_results) if evaluation_results else 0
             passing_rules = sum(1 for r in evaluation_results if r.get("quality_score", 0) >= self.min_quality_score)
-            
-            # Calculate detection metrics
-            total_detection_rate = sum(r.get("metrics", {}).get("detection_rate", 0) for r in evaluation_results)
-            avg_detection_rate = total_detection_rate / len(evaluation_results) if evaluation_results else 0
             
             processing_time_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
             self.stats["processing_time_ms"] = processing_time_ms
@@ -134,9 +129,6 @@ class LangChainEvaluatorAgent(BaseAgent):
                     "errors": self.stats["errors"],
                     "processing_time_ms": processing_time_ms
                 },
-                "metrics": {
-                    "detection_rate": avg_detection_rate
-                },
                 "evaluation_results": evaluation_results,
                 "feedback": feedback
             }
@@ -148,7 +140,7 @@ class LangChainEvaluatorAgent(BaseAgent):
                 "error": str(e)
             }
     
-    async def _evaluate_rule(self, rule: Dict[str, Any], verification_results: List[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def _evaluate_rule(self, rule: Dict[str, Any]) -> Dict[str, Any]:
         """Evaluate a single rule"""
         rule_title = rule.get("title", "Unknown Rule")
         
@@ -164,21 +156,6 @@ class LangChainEvaluatorAgent(BaseAgent):
             try:
                 eval_result = await self.evaluation_chain.evaluate(rule, ttp)
                 
-                # Calculate metrics
-                detection_rate = 0.0
-                if verification_results:
-                    # Find verification result for this rule
-                    ver_result = next((v for v in verification_results if v.get('rule_id') == rule.get('id')), None)
-                    if ver_result:
-                        detection_data = ver_result.get('verification', {})
-                        # Handle both dataclass and dict
-                        if hasattr(detection_data, 'detected'):
-                            detected = detection_data.detected
-                        else:
-                            detected = detection_data.get('detected', False)
-                            
-                        detection_rate = 1.0 if detected else 0.0
-                
                 # Convert to evaluation result
                 result = {
                     "rule_title": rule_title,
@@ -192,8 +169,7 @@ class LangChainEvaluatorAgent(BaseAgent):
                         "accuracy": eval_result.get("detection_coverage", 5) / 10.0,
                         "completeness": eval_result.get("completeness", 5) / 10.0,
                         "efficiency": eval_result.get("performance", 5) / 10.0,
-                        "maintainability": eval_result.get("false_positive_rate", 5) / 10.0,
-                        "detection_rate": detection_rate  # Add real detection rate
+                        "maintainability": eval_result.get("false_positive_rate", 5) / 10.0
                     },
                     "evaluation_method": "langchain"
                 }

@@ -213,11 +213,12 @@ class LangChainRuleGenAgent(BaseAgent):
                 sigma_output = await self.sigma_chain.generate(ttp, feedback_text)
                 
                 # Convert to rule format
+                # Convert to rule format
                 rule = {
                     "title": sigma_output.title,
                     "description": sigma_output.description,
-                    "logsource": sigma_output.logsource,
-                    "detection": sigma_output.detection,
+                    "logsource": sigma_output.logsource.model_dump() if hasattr(sigma_output.logsource, 'model_dump') else sigma_output.logsource,
+                    "detection": json.loads(sigma_output.detection) if isinstance(sigma_output.detection, str) else sigma_output.detection,
                     "falsepositives": sigma_output.falsepositives,
                     "level": sigma_output.level,
                     "tags": sigma_output.tags,

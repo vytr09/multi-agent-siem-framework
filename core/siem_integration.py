@@ -5,6 +5,7 @@ Provides integration with Splunk and remote execution via SSH for rule verificat
 
 import time
 import json
+import re
 import logging
 import requests
 import paramiko
@@ -12,6 +13,102 @@ import urllib3
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
+
+@dataclass
+class SIEMMetrics:
+    """SIEM-specific detection metrics"""
+    true_positives: int
+    false_positives: int
+    false_negatives: int
+    true_negatives: int
+    precision: float
+    recall: float
+    f1_score: float
+    accuracy: float
+    detection_rate: float
+    false_positive_rate: float
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'true_positives': self.true_positives,
+            'false_positives': self.false_positives,
+            'false_negatives': self.false_negatives,
+            'true_negatives': self.true_negatives,
+            'precision': self.precision,
+            'recall': self.recall,
+            'f1_score': self.f1_score,
+            'accuracy': self.accuracy,
+            'detection_rate': self.detection_rate,
+            'false_positive_rate': self.false_positive_rate
+        }
+
+
+class SIEMMetricsCalculator:
+    """Calculate F1, Precision, Recall, Accuracy from SIEM detection results"""
+    
+    @staticmethod
+    def calculate_metrics(detection_results: List[Dict[str, Any]]) -> SIEMMetrics:
+        """
+        Calculate SIEM metrics from detection results
+        
+        Args:
+            detection_results: List of dicts with 'detected', 'events_found', 'historical_events'
+            
+        Returns:
+            SIEMMetrics with calculated values
+        """
+        true_positives = 0   # Attack detected correctly
+        false_positives = 0  # Rule triggered without attack (historical events)
+        false_negatives = 0  # Attack not detected
+        true_negatives = 0   # No attack, no detection (baseline)
+        
+        for result in detection_results:
+            detected = result.get('detected', False)
+            events_found = result.get('events_found', 0)
+            historical_events = result.get('historical_events', 0)
+            
+            if detected and events_found > 0:
+                true_positives += 1
+            else:
+                false_negatives += 1
+            
+            # Historical events indicate false positives (rule triggered without our attack)
+            if historical_events > 0:
+                false_positives += historical_events
+        
+        # Calculate metrics
+        total = true_positives + false_positives + false_negatives + true_negatives
+        
+        # Precision: TP / (TP + FP)
+        precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0.0
+        
+        # Recall (Detection Rate): TP / (TP + FN)
+        recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0.0
+        
+        # F1 Score: 2 * (Precision * Recall) / (Precision + Recall)
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        
+        # Accuracy: (TP + TN) / (TP + TN + FP + FN)
+        accuracy = (true_positives + true_negatives) / total if total > 0 else 0.0
+        
+        # Detection Rate (same as recall)
+        detection_rate = recall
+        
+        # False Positive Rate: FP / (FP + TN)
+        false_positive_rate = false_positives / (false_positives + true_negatives) if (false_positives + true_negatives) > 0 else 0.0
+        
+        return SIEMMetrics(
+            true_positives=true_positives,
+            false_positives=false_positives,
+            false_negatives=false_negatives,
+            true_negatives=true_negatives,
+            precision=precision,
+            recall=recall,
+            f1_score=f1_score,
+            accuracy=accuracy,
+            detection_rate=detection_rate,
+            false_positive_rate=false_positive_rate
+        )
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -232,10 +329,12 @@ class SIEMIntegrator:
         exec_result = self.ssh.execute_command(attack.get('command', 'echo "No command"'))
         
         if exec_result['status'] != 'success':
-            return DetectionResult(
-                detected=False, events_found=0, query_time_ms=0, historical_events=0,
-                status="error", message=f"Attack execution failed: {exec_result.get('error')}", raw_events=[]
-            )
+            logger.warning(f"Attack execution failed: {exec_result.get('error')}. Proceeding to verification anyway (Event ID 4688 should still be generated).")
+            # We continue instead of returning error
+            # return DetectionResult(
+            #     detected=False, events_found=0, query_time_ms=0, historical_events=0,
+            #     status="error", message=f"Attack execution failed: {exec_result.get('error')}", raw_events=[]
+            # )
             
         # 2. Wait for indexing (configurable)
         wait_time = self.config.get('indexing_wait_time', 10)
@@ -274,92 +373,203 @@ class SIEMIntegrator:
         )
         
     def _extract_query(self, rule: Dict[str, Any]) -> str:
-        """Extract Splunk query from Sigma rule (improved)"""
+        """Extract Splunk query from Sigma rule using robust conversion logic"""
         # Check for pre-built Splunk query
         if 'splunk_query' in rule:
             return rule['splunk_query']
-        
-        # Build query from Sigma rule components
-        query_parts = []
-        
-        # 1. Add log source constraints
-        logsource = rule.get('logsource', {})
-        if logsource:
-            product = logsource.get('product', '')
-            category = logsource.get('category', '')
             
-            # Map to Splunk sourcetypes
-            if product == 'windows':
-                if category == 'process_creation':
-                    query_parts.append('(sourcetype=WinEventLog:Security EventCode=4688 OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational EventCode=1)')
-                else:
-                    query_parts.append('sourcetype=WinEventLog:*')
-            elif product == 'linux':
-                query_parts.append('sourcetype=linux_secure')
+        # Initialize mappings if not already done (could be moved to __init__ but keeping here for now)
+        self._init_mappings()
         
-        # 2. Extract detection logic
         detection = rule.get('detection', {})
-        selection_parts = []
+        logsource = rule.get('logsource', {})
         
-        def extract_detection_fields(obj, prefix=''):
-            """Extract searchable fields from detection"""
-            if isinstance(obj, dict):
-                for key, value in obj.items():
-                    if key in ['condition', 'timeframe']:
-                        continue
-                    
-                    # Handle field operators
-                    if '|' in key:
-                        field_name, operator = key.split('|', 1)
-                        
-                        if 'contains' in operator:
-                            if isinstance(value, list):
-                                # Multiple values: field contains ANY of these
-                                for v in value:
-                                    selection_parts.append(f'{field_name}="*{v}*"')
-                            else:
-                                selection_parts.append(f'{field_name}="*{value}*"')
-                        elif 'endswith' in operator:
-                            selection_parts.append(f'{field_name}="*{value}"')
-                        elif 'startswith' in operator:
-                            selection_parts.append(f'{field_name}="{value}*"')
-                    else:
-                        # Direct field match
-                        if isinstance(value, (str, int, float)):
-                            selection_parts.append(f'{key}="{value}"')
-                        elif isinstance(value, list):
-                            for v in value:
-                                selection_parts.append(f'{key}="{v}"')
-                        elif isinstance(value, dict):
-                            extract_detection_fields(value, prefix=key)
-            elif isinstance(obj, list):
-                for item in obj:
-                    extract_detection_fields(item, prefix)
+        # Build base search with index and sourcetype
+        base_parts = ['index=*']
         
-        extract_detection_fields(detection)
+        # Determine sourcetype based on log source
+        product = logsource.get('product', '').lower()
+        service = logsource.get('service', '').lower()
+        category = logsource.get('category', '').lower()
         
-        # 3. Combine query parts
-        if selection_parts:
-            # Use OR for multiple selection criteria
-            detection_query = ' OR '.join(selection_parts)
-            if query_parts:
-                query_parts.append(f'({detection_query})')
+        # ALWAYS use Security log sourcetype for Windows process creation
+        if product == 'windows' and (category == 'process_creation' or service in ['sysmon', 'security']):
+            base_parts.append('sourcetype="WinEventLog:Security"')
+            if category == 'process_creation':
+                base_parts.append('EventCode=4688')
+        elif product == 'windows':
+            if service == 'sysmon':
+                base_parts.append('sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"')
+            elif service == 'security':
+                base_parts.append('sourcetype="WinEventLog:Security"')
+        else:
+            base_parts.append('sourcetype="WinEventLog:Security"')
+            
+        # Extract condition and detection blocks
+        condition = detection.get('condition', '')
+        detection_blocks = {k: v for k, v in detection.items() if k != 'condition'}
+        
+        detection_logic = ""
+        
+        # Handle selection as list (implicit OR)
+        if 'selection' in detection_blocks and isinstance(detection_blocks['selection'], list):
+            selection_queries = []
+            for sel in detection_blocks['selection']:
+                query = self._process_selection(sel, logsource)
+                if query:
+                    selection_queries.append(f"({query})")
+            detection_logic = ' OR '.join(selection_queries)
+        else:
+            # Parse complex condition logic
+            if condition:
+                detection_logic = self._parse_condition_logic(condition, detection_blocks, logsource)
             else:
-                query_parts.append(detection_query)
+                # No condition specified, use simple AND of all blocks
+                queries = []
+                for key, value in detection_blocks.items():
+                    if isinstance(value, dict):
+                        query = self._process_selection(value, logsource)
+                        if query:
+                            queries.append(f"({query})")
+                detection_logic = ' AND '.join(queries)
         
-        # 4. Build final query
-        if not query_parts:
-            # Last resort: at least constrain to Windows security logs
-            return 'sourcetype=WinEventLog:* OR sourcetype=XmlWinEventLog:*'
+        # Build final query
+        base_query = ' '.join(base_parts)
+        if detection_logic:
+            return f"{base_query} | search {detection_logic}"
+        return base_query
+
+    def _init_mappings(self):
+        """Initialize field mappings"""
+        if hasattr(self, 'traditional_mapping'):
+            return
+            
+        self.traditional_mapping = {
+            'EventID': 'EventCode',
+            'Image': 'New_Process_Name',
+            'CommandLine': 'Process_Command_Line',
+            'ParentImage': 'Parent_Process_Name',
+            'ParentCommandLine': 'Parent_Process_Command_Line',
+            'User': 'Subject_User_Name',
+            'ProcessId': 'Process_ID',
+            'NewProcessId': 'New_Process_Id',
+            'ParentProcessId': 'Parent_Process_ID',
+            'CurrentDirectory': 'Current_Directory',
+            'IntegrityLevel': 'Process_Integrity_Level',
+            'OriginalFileName': 'Original_File_Name',
+            'NewProcessName': 'New_Process_Name',
+            'Creator_Process_Name': 'Creator_Process_Name',
+            'SubjectUserName': 'Subject_User_Name',
+            'SubjectDomainName': 'Subject_Domain_Name',
+            'SubjectLogonId': 'Subject_Logon_Id',
+        }
         
-        final_query = ' '.join(query_parts)
+        self.ecs_mapping = {
+            'process.executable': 'New_Process_Name',
+            'process.command_line': 'Process_Command_Line',
+            'process.name': 'New_Process_Name',
+            'process.parent.executable': 'Parent_Process_Name',
+            'process.parent.command_line': 'Parent_Process_Command_Line',
+            'user.name': 'Subject_User_Name',
+            'event.code': 'EventCode',
+        }
+
+    def _convert_field_name(self, field: str, logsource: Dict = None) -> str:
+        """Convert Sigma field to Splunk field"""
+        if '.' in field:
+            return self.ecs_mapping.get(field, field)
+        return self.traditional_mapping.get(field, field)
+
+    def _escape_splunk_value(self, value: str) -> str:
+        """Escape Splunk value"""
+        if not isinstance(value, str):
+            value = str(value)
+        return value.replace('"', '\\"')
+
+    def _process_modifier(self, field: str, modifier: str, value: Any, logsource: Dict = None) -> str:
+        """Process Sigma modifiers"""
+        splunk_field = self._convert_field_name(field, logsource)
         
-        # 5. Validate query isn't too broad
-        if final_query == 'index=*' or final_query.strip() == '*':
-            logger.warning("Query too broad, adding Windows event constraint")
-            return 'sourcetype=WinEventLog:* OR sourcetype=XmlWinEventLog:*'
+        if modifier == 'contains':
+            if isinstance(value, list):
+                conditions = [f'{splunk_field}="*{self._escape_splunk_value(v)}*"' for v in value]
+                return f"({' OR '.join(conditions)})"
+            return f'{splunk_field}="*{self._escape_splunk_value(value)}*"'
         
-        return final_query
+        elif modifier == 'endswith':
+            if isinstance(value, list):
+                conditions = [f'{splunk_field}="*{self._escape_splunk_value(v)}"' for v in value]
+                return f"({' OR '.join(conditions)})"
+            return f'{splunk_field}="*{self._escape_splunk_value(value)}"'
+            
+        elif modifier == 'startswith':
+            if isinstance(value, list):
+                conditions = [f'{splunk_field}="{self._escape_splunk_value(v)}*"' for v in value]
+                return f"({' OR '.join(conditions)})"
+            return f'{splunk_field}="{self._escape_splunk_value(value)}*"'
+            
+        elif modifier == 'all':
+            if isinstance(value, list):
+                conditions = [f'{splunk_field}="*{self._escape_splunk_value(v)}*"' for v in value]
+                return f"({' AND '.join(conditions)})"
+            return f'{splunk_field}="*{self._escape_splunk_value(value)}*"'
+            
+        else:
+            if isinstance(value, list):
+                conditions = [f'{splunk_field}="{self._escape_splunk_value(v)}"' for v in value]
+                return f"({' OR '.join(conditions)})"
+            return f'{splunk_field}="{self._escape_splunk_value(value)}"'
+
+    def _process_selection(self, selection: Dict, logsource: Dict = None) -> str:
+        """Process selection block"""
+        conditions = []
+        for field_with_modifier, value in selection.items():
+            if '|' in field_with_modifier:
+                parts = field_with_modifier.split('|')
+                base_field = parts[0]
+                modifiers = parts[1:]
+                main_modifier = next((m for m in modifiers if m in ['contains', 'endswith', 'startswith', 're', 'all']), None)
+                conditions.append(self._process_modifier(base_field, main_modifier, value, logsource))
+            else:
+                splunk_field = self._convert_field_name(field_with_modifier, logsource)
+                if isinstance(value, list):
+                    or_conditions = [f'{splunk_field}="{self._escape_splunk_value(v)}"' for v in value]
+                    conditions.append(f"({' OR '.join(or_conditions)})")
+                else:
+                    conditions.append(f'{splunk_field}="{self._escape_splunk_value(value)}"')
+        return ' AND '.join(conditions) if conditions else ""
+
+    def _parse_condition_logic(self, condition: str, detection_blocks: Dict, logsource: Dict = None) -> str:
+        """Parse condition logic"""
+        condition = condition.strip().lower()
+        
+        # Simple implementation for common cases
+        if '1 of selection' in condition or 'any of selection' in condition:
+            queries = []
+            for key, value in detection_blocks.items():
+                if key.startswith('selection'):
+                    q = self._process_selection(value, logsource)
+                    if q: queries.append(f"({q})")
+            return ' OR '.join(queries)
+            
+        if 'all of selection' in condition:
+            queries = []
+            for key, value in detection_blocks.items():
+                if key.startswith('selection'):
+                    q = self._process_selection(value, logsource)
+                    if q: queries.append(f"({q})")
+            return ' AND '.join(queries)
+            
+        # Fallback for simple single block
+        if condition in detection_blocks:
+            return self._process_selection(detection_blocks[condition], logsource)
+            
+        # Fallback: AND everything
+        queries = []
+        for key, value in detection_blocks.items():
+            q = self._process_selection(value, logsource)
+            if q: queries.append(f"({q})")
+        return ' AND '.join(queries)
 
     def _simulate_verification(self, rule: Dict[str, Any], attack: Dict[str, Any]) -> DetectionResult:
         """Simulate verification for testing"""

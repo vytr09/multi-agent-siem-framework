@@ -1,8 +1,6 @@
 # config/agents.yaml
-# # Multi-Agent SIEM Framework - Agent Configuration
-
 # Multi-Agent SIEM Framework - Agent Configuration
-# Updated for Hybrid NLP + Gemini Extractor
+# Updated for Hybrid NLP + Gemini/OpenAI Support
 
 agents:
   collector:
@@ -53,7 +51,7 @@ agents:
       retry_delay: 5
     
   # ========================================
-  # UPDATED: Hybrid NLP + Gemini Extractor
+  # TTP Extractor Agent
   # ========================================
   extractor:
     name: "TTP Extractor Agent (Hybrid NLP + Gemini)"  
@@ -62,24 +60,22 @@ agents:
     memory_enabled: true 
 
     # ========== LLM Configuration ==========
-    # CHANGED: From OpenAI to Gemini
     llm:
-      provider: "gemini"              # ← CHANGED: was "openai"
-      model: "gemini-2.0-flash-lite"       # ← CHANGED: was "gpt-4"
-      api_key: "${GEMINI_API_KEY}"    # ← CHANGED: was "${OPENAI_API_KEY}"
-      use_mock: false                 # ← NEW: false=real API, true=mock
+      provider: "gemini"              # Options: "gemini", "openai"
+      model: "gemini-2.0-flash-lite"
+      api_key: "${GEMINI_API_KEY}"    # Or "${OPENAI_API_KEY}"
+      base_url: ""                    # Optional: Custom API endpoint
+      use_mock: false
       max_tokens: 1000
-      temperature: 0.3                # ← CHANGED: was 0.1 (more creative)
-      timeout: 30                     # ← CHANGED: was 120 (Gemini faster)
+      temperature: 0.3
+      timeout: 30
       
     # ========== NLP Processing ==========
-    # NEW: NLP configuration (was not present)
     nlp:
-      enabled: true                   # ← NEW: Enable NLP preprocessing
+      enabled: true
       language: "en"
-      enable_ioc_detection: true      # ← NEW: Extract IPs, domains, hashes
+      enable_ioc_detection: true
       
-      # Entity extraction
       entity_extraction:
         enabled: true
         extract_malware: true
@@ -87,7 +83,6 @@ agents:
         extract_threat_actors: true
         extract_attack_techniques: true
       
-      # IOC extraction
       ioc_extraction:
         enabled: true
         extract_ips: true
@@ -97,46 +92,41 @@ agents:
         extract_registry_keys: true
         extract_commands: true
       
-      # TTP indicators
       ttp_indicators:
-        enabled: true                 # ← NEW: Identify TTP patterns
+        enabled: true
         confidence_threshold: 0.6
         
     # ========== ATT&CK Mapping ==========
-    # UNCHANGED: Same as before
     attack_mapping:
-      framework_version: "v14.1"      # ← UPDATED: Latest version
+      framework_version: "v14.1"
       confidence_threshold: 0.6
       
     # ========== Confidence Scoring ==========
-    # NEW: Multi-factor confidence configuration
     confidence_scoring:
       enabled: true
       method:
-        nlp_weight: 0.35              # ← NEW: NLP contribution
-        llm_weight: 0.40              # ← NEW: LLM contribution
-        mapping_weight: 0.15          # ← NEW: ATT&CK mapping
-        entity_weight: 0.10           # ← NEW: Entity correlation
+        nlp_weight: 0.35
+        llm_weight: 0.40
+        mapping_weight: 0.15
+        entity_weight: 0.10
       min_threshold: 0.5
       high_confidence_threshold: 0.8
       
     # ========== Processing Settings ==========
-    # NEW: Processing optimization
     processing:
-      batch_size: 5                   # ← NEW: Reports per batch
-      enable_caching: true            # ← NEW: Cache results
-      cache_ttl: 3600                 # ← NEW: Cache TTL (1 hour)
-      max_concurrent: 3               # ← NEW: Parallel processing
+      batch_size: 5
+      enable_caching: true
+      cache_ttl: 3600
+      max_concurrent: 3
       
     # ========== Feature Flags ==========
-    # NEW: Control hybrid approach
     features:
-      use_nlp_preprocessing: true     # ← NEW: Enable NLP
-      nlp_entity_boost: true          # ← NEW: Boost with entities
-      extraction_method: "hybrid"     # ← NEW: hybrid/llm_only/nlp_only
-      
+      use_nlp_preprocessing: true
+      nlp_entity_boost: true
+      extraction_method: "hybrid"
+
   # ========================================
-  # UNCHANGED: Rule Generation Agent
+  # Rule Generation Agent
   # ========================================
   rulegen:
     name: "Rule Generation Agent"
@@ -148,6 +138,16 @@ agents:
       enabled: true
       lookback: 3
     
+    # ========== LLM Configuration ==========
+    llm:
+      provider: "openai"              # Cerebras is OpenAI-compatible
+      model: "llama-3.3-70b"
+      api_key: "${CEREBRAS_API_KEY}"
+      base_url: "https://api.cerebras.ai/v1"
+      use_mock: false
+      max_tokens: 2000
+      temperature: 0.3
+
     sigma:
       template_path: "data/templates/sigma_rules/"
       output_formats: ["sigma", "splunk", "elasticsearch"]
@@ -166,7 +166,7 @@ agents:
         api_key: "${ELASTICSEARCH_API_KEY}"
         
   # ========================================
-  # UNCHANGED: Evaluator Agent
+  # Evaluator Agent
   # ========================================
   evaluator:
     name: "Performance Evaluator Agent"
@@ -174,13 +174,15 @@ agents:
     
     memory_enabled: true
     feedback_enabled: true
-    auto_iterate: false  # Manual control
+    auto_iterate: false
     max_iterations: 3
     
     benchmark:
       use_llm_judge: true
       llm_judge:
+        provider: "gemini"
         model: "gemini-2.0-flash-lite"
+        api_key: "${GEMINI_API_KEY}"
         temperature: 0.3
       
       thresholds:
@@ -188,7 +190,7 @@ agents:
         high_quality_score: 0.85
 
     metrics:
-      collection_interval: 3600  # 1 hour
+      collection_interval: 3600
       retention_days: 30
       
     thresholds:
@@ -198,202 +200,28 @@ agents:
       
     evasion_detection:
       enabled: true
-      simulation_enabled: false  # Enable in test environments only
-agents:
-  collector:
-    name: "CTI Collector Agent"
-    description: "Collects and normalizes threat intelligence from multiple sources"
-    interval: 300  # Collection interval in seconds (5 minutes)
-    
-    sources:
-      misp:
-        enabled: true
-        use_mock: false
-        url: "${MISP_URL}"
-        api_key: "${MISP_API_KEY}"
-        verify_cert: false
-        days_back: 1          # How many days back to collect
-        published_only: true   # Only published events
-        include_attributes: true
-        include_objects: true
-        batch_size: 100
-        
-      taxii:
-        enabled: true
-        url: "${TAXII_URL}"
-        username: "${TAXII_USERNAME}"
-        password: "${TAXII_PASSWORD}"
-        collections: []       # Empty = all collections
-        poll_interval: 300
-        max_content_per_request: 100
-        
-      opencti:
-        enabled: false        # Optional - can enable later
-        url: "${OPENCTI_URL}"
-        api_key: "${OPENCTI_API_KEY}"
+      simulation_enabled: false
 
-      datasets:
-        enabled: true
-        offline_data_dir: "data/datasets"
-        
-    normalization:
-      enabled: true
-      deduplicate: true
-      confidence_threshold: 0.5
-      max_indicators_per_report: 1000
-      
-    storage:
-      batch_size: 50
-      max_retries: 3
-      retry_delay: 5
-    
   # ========================================
-  # UPDATED: Hybrid NLP + Gemini Extractor
+  # Attack Generation Agent
   # ========================================
-  extractor:
-    name: "TTP Extractor Agent (Hybrid NLP + Gemini)"  
-    description: "Extracts TTPs using NLP preprocessing and Gemini LLM"
+  attackgen:
+    name: "Attack Generation Agent"
+    description: "Generates attack commands for verification"
     
-    memory_enabled: true 
-
+    use_langchain: true
+    platforms: ["windows", "linux"]
+    safety_level: "medium"
+    
     # ========== LLM Configuration ==========
-    # CHANGED: From OpenAI to Gemini
     llm:
-      provider: "gemini"              # ← CHANGED: was "openai"
-      model: "gemini-2.0-flash-lite"       # ← CHANGED: was "gpt-4"
-      api_key: "${GEMINI_API_KEY}"    # ← CHANGED: was "${OPENAI_API_KEY}"
-      use_mock: false                 # ← NEW: false=real API, true=mock
+      provider: "openai"              # Cerebras is OpenAI-compatible
+      model: "llama-3.3-70b"
+      api_key: "${CEREBRAS_API_KEY}"
+      base_url: "https://api.cerebras.ai/v1"
+      use_mock: false
       max_tokens: 1000
-      temperature: 0.3                # ← CHANGED: was 0.1 (more creative)
-      timeout: 30                     # ← CHANGED: was 120 (Gemini faster)
-      
-    # ========== NLP Processing ==========
-    # NEW: NLP configuration (was not present)
-    nlp:
-      enabled: true                   # ← NEW: Enable NLP preprocessing
-      language: "en"
-      enable_ioc_detection: true      # ← NEW: Extract IPs, domains, hashes
-      
-      # Entity extraction
-      entity_extraction:
-        enabled: true
-        extract_malware: true
-        extract_tools: true
-        extract_threat_actors: true
-        extract_attack_techniques: true
-      
-      # IOC extraction
-      ioc_extraction:
-        enabled: true
-        extract_ips: true
-        extract_domains: true
-        extract_hashes: true
-        extract_file_paths: true
-        extract_registry_keys: true
-        extract_commands: true
-      
-      # TTP indicators
-      ttp_indicators:
-        enabled: true                 # ← NEW: Identify TTP patterns
-        confidence_threshold: 0.6
-        
-    # ========== ATT&CK Mapping ==========
-    # UNCHANGED: Same as before
-    attack_mapping:
-      framework_version: "v14.1"      # ← UPDATED: Latest version
-      confidence_threshold: 0.6
-      
-    # ========== Confidence Scoring ==========
-    # NEW: Multi-factor confidence configuration
-    confidence_scoring:
-      enabled: true
-      method:
-        nlp_weight: 0.35              # ← NEW: NLP contribution
-        llm_weight: 0.40              # ← NEW: LLM contribution
-        mapping_weight: 0.15          # ← NEW: ATT&CK mapping
-        entity_weight: 0.10           # ← NEW: Entity correlation
-      min_threshold: 0.5
-      high_confidence_threshold: 0.8
-      
-    # ========== Processing Settings ==========
-    # NEW: Processing optimization
-    processing:
-      batch_size: 5                   # ← NEW: Reports per batch
-      enable_caching: true            # ← NEW: Cache results
-      cache_ttl: 3600                 # ← NEW: Cache TTL (1 hour)
-      max_concurrent: 3               # ← NEW: Parallel processing
-      
-    # ========== Feature Flags ==========
-    # NEW: Control hybrid approach
-    features:
-      use_nlp_preprocessing: true     # ← NEW: Enable NLP
-      nlp_entity_boost: true          # ← NEW: Boost with entities
-      extraction_method: "hybrid"     # ← NEW: hybrid/llm_only/nlp_only
-      
-  # ========================================
-  # UNCHANGED: Rule Generation Agent
-  # ========================================
-  rulegen:
-    name: "Rule Generation Agent"
-    description: "Generates adaptive Sigma rules from extracted TTPs"
-
-    memory_enabled: true
-    use_feedback: true
-    feedback:
-      enabled: true
-      lookback: 3
-    
-    sigma:
-      template_path: "data/templates/sigma_rules/"
-      output_formats: ["sigma", "splunk", "elasticsearch"]
-      optimization: true
-      versioning: true
-      
-    platforms:
-      splunk:
-        enabled: true
-        host: "${SPLUNK_HOST}"
-        api_key: "${SPLUNK_API_KEY}"
-        
-      elasticsearch:
-        enabled: true
-        host: "${ELASTICSEARCH_HOST}"
-        api_key: "${ELASTICSEARCH_API_KEY}"
-        
-  # ========================================
-  # UNCHANGED: Evaluator Agent
-  # ========================================
-  evaluator:
-    name: "Performance Evaluator Agent"
-    description: "Evaluates rule performance and detects evasion"
-    
-    memory_enabled: true
-    feedback_enabled: true
-    auto_iterate: false  # Manual control
-    max_iterations: 3
-    
-    benchmark:
-      use_llm_judge: true
-      llm_judge:
-        model: "gemini-2.0-flash-lite"
-        temperature: 0.3
-      
-      thresholds:
-        minimum_score: 0.7
-        high_quality_score: 0.85
-
-    metrics:
-      collection_interval: 3600  # 1 hour
-      retention_days: 30
-      
-    thresholds:
-      false_positive_rate: 0.1
-      precision: 0.85
-      recall: 0.8
-      
-    evasion_detection:
-      enabled: true
-      simulation_enabled: false  # Enable in test environments only
+      temperature: 0.5
 
 feedback:
   enabled: true
