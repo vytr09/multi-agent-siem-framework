@@ -30,7 +30,7 @@ class TTPOutput(BaseModel):
     technique_id: str = Field(description="MITRE ATT&CK technique ID (e.g., T1566)")
     tactic: str = Field(description="MITRE ATT&CK tactic")
     description: str = Field(description="Detailed description of the technique")
-    confidence: float = Field(description="Confidence score between 0 and 1", ge=0.0, le=1.0)
+    confidence: float = Field(description="Confidence score between 0 and 1")
     indicators: List[str] = Field(default_factory=list, description="List of detection indicators")
     tools: List[str] = Field(default_factory=list, description="Tools/malware associated")
 
@@ -77,11 +77,11 @@ class AttackCommandListOutput(BaseModel):
 
 class RuleEvaluationOutput(BaseModel):
     """Structured output for rule evaluation"""
-    detection_coverage: float = Field(description="Detection coverage score (0-10)", ge=0.0, le=10.0)
-    false_positive_rate: float = Field(description="False positive rate score (0-10)", ge=0.0, le=10.0)
-    performance: float = Field(description="Performance score (0-10)", ge=0.0, le=10.0)
-    completeness: float = Field(description="Completeness score (0-10)", ge=0.0, le=10.0)
-    overall_score: float = Field(description="Overall average score (0-10)", ge=0.0, le=10.0)
+    detection_coverage: float = Field(description="Detection coverage score (0-10)")
+    false_positive_rate: float = Field(description="False positive rate score (0-10)")
+    performance: float = Field(description="Performance score (0-10)")
+    completeness: float = Field(description="Completeness score (0-10)")
+    overall_score: float = Field(description="Overall average score (0-10)")
     strengths: List[str] = Field(default_factory=list, description="List of strengths")
     weaknesses: List[str] = Field(default_factory=list, description="List of weaknesses")
     suggestions: List[str] = Field(default_factory=list, description="Improvement suggestions")
@@ -204,10 +204,28 @@ For each TTP, identify:
 - Technique name
 - Brief description
 - Confidence score (0.0 to 1.0)
+- List of indicators (file names, hashes, IPs, domains, commands)
+- List of tools/malware used
 
 Text: {text}
 
-Return a structured list of extracted TTPs.""",
+IMPORTANT: Even if the text is short, you MUST extract at least one TTP if any attack behavior is described.
+If a technique ID is mentioned (e.g., T1059.001), use it.
+If keywords like "PowerShell", "cmd", "malware" are present, infer the corresponding technique.
+
+EXAMPLES:
+Input: "The attacker used PowerShell to execute a base64 encoded command."
+Output: [{{
+    "technique_id": "T1059.001",
+    "technique_name": "PowerShell",
+    "tactic": "Execution",
+    "description": "Attacker used PowerShell with base64 encoding",
+    "confidence": 0.9,
+    "indicators": ["powershell.exe", "-enc"],
+    "tools": ["PowerShell"]
+}}]
+
+Return a structured list of extracted TTPs. Ensure the output matches the TTPListOutput schema.""",
             input_variables=["text"]
         )
         
@@ -385,6 +403,11 @@ Generate 2-3 realistic attack commands that demonstrate this technique on {platf
 - Avoid actual malicious payloads
 - Mark destructive commands as high safety risk
 - All commands are for TESTING ONLY in isolated environments
+
+**PowerShell Specifics:**
+- If the technique involves EncodedCommand (T1059.001), you MUST ensure the Base64 string is generated from **UTF-16LE** bytes.
+- Example: "Write-Host 'Test'" -> UTF-16LE bytes -> Base64
+- If you cannot guarantee UTF-16LE, provide the plain text command instead.
 
 Return a list of attack commands with metadata."""
         )

@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import json
 from typing import Dict, Any, List, Literal
+from datetime import datetime
 
 # Traditional agents
 from agents.extractor.agent import ExtractorAgent
@@ -140,15 +141,80 @@ class LangChainOrchestrator:
             self.evaluator = LangChainEvaluatorAgent("hybrid_evaluator", evaluator_config)
         
         # Start agents
-        await self.extractor.start()
-        await self.rulegen.start()
-        await self.evaluator.start()
-        if self.attackgen:
-            await self.attackgen.start()
-        if self.attackgen:
-            await self.attackgen.start()
-        
         self.logger.info(f"All agents initialized ({self.mode} mode)")
+    
+    def _restore_agent(self, agent_name: str):
+        """Re-create an agent instance if it was stopped/cleared"""
+        agent_config = self.config.get('agents', {}).get(agent_name, {})
+        
+        # Determine mode-specific settings
+        use_langchain = True
+        if self.mode == "traditional":
+            use_langchain = False
+        elif self.mode == "hybrid" and agent_name == "rulegen":
+            use_langchain = False
+            
+        agent_config["use_langchain"] = use_langchain
+        name_prefix = self.mode
+        
+        if agent_name == "extractor":
+            if use_langchain:
+                self.extractor = LangChainExtractorAgent(f"{name_prefix}_extractor", agent_config)
+            else:
+                self.extractor = ExtractorAgent(f"{name_prefix}_extractor", agent_config)
+        elif agent_name == "rulegen":
+            if use_langchain:
+                self.rulegen = LangChainRuleGenAgent(f"{name_prefix}_rulegen", agent_config)
+            else:
+                self.rulegen = RuleGenerationAgentWithLLM(f"{name_prefix}_rulegen", agent_config)
+        elif agent_name == "evaluator":
+            if use_langchain:
+                self.evaluator = LangChainEvaluatorAgent(f"{name_prefix}_evaluator", agent_config)
+            else:
+                self.evaluator = EvaluatorAgent(f"{name_prefix}_evaluator", agent_config)
+        elif agent_name == "attackgen":
+            if self.mode == "langchain": 
+                self.attackgen = LangChainAttackGenAgent(f"{name_prefix}_attackgen", agent_config)
+
+    async def start_all(self):
+        """Start all agents"""
+        # Restore any missing agents first
+        if not self.extractor: self._restore_agent("extractor")
+        if not self.rulegen: self._restore_agent("rulegen")
+        if not self.evaluator: self._restore_agent("evaluator")
+        if not self.attackgen and self.mode == "langchain": self._restore_agent("attackgen")
+
+        if self.extractor: await self.extractor.start()
+        if self.rulegen: await self.rulegen.start()
+        if self.evaluator: await self.evaluator.start()
+        if self.attackgen: await self.attackgen.start()
+            
+    async def start_agent(self, agent_name: str):
+        """Start a specific agent"""
+        self.logger.info(f"Starting agent: {agent_name}")
+        
+        if agent_name == "extractor":
+            if not self.extractor:
+                self._restore_agent("extractor")
+            if self.extractor:
+                await self.extractor.start()
+        elif agent_name == "rulegen":
+            if not self.rulegen:
+                self._restore_agent("rulegen")
+            if self.rulegen:
+                await self.rulegen.start()
+        elif agent_name == "evaluator":
+            if not self.evaluator:
+                self._restore_agent("evaluator")
+            if self.evaluator:
+                await self.evaluator.start()
+        elif agent_name == "attackgen":
+            if not self.attackgen:
+                self._restore_agent("attackgen")
+            if self.attackgen:
+                await self.attackgen.start()
+        else:
+            raise ValueError(f"Unknown agent: {agent_name}")
     
     async def run_pipeline(self, cti_reports: List[Dict]) -> Dict[str, Any]:
         """
@@ -278,7 +344,7 @@ class LangChainOrchestrator:
         
         self.logger.info(f"{self.mode.upper()} pipeline completed (final score: {score:.3f}, iterations: {iteration})")
         
-        return {
+        final_result = {
             'status': 'success',
             'mode': self.mode,
             'extraction': extraction_result,
@@ -287,8 +353,17 @@ class LangChainOrchestrator:
             'siem_verification': siem_results,
             'siem_metrics': siem_metrics.to_dict(),
             'iterations': iteration,
-            'final_score': score
+            'final_score': score,
+            'timestamp': datetime.now().isoformat()
         }
+        
+        # Write final result
+        final_file = self.output_dir / self.mode / 'pipeline_result.json'
+        final_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(final_file, 'w') as f:
+            json.dump(final_result, f, indent=2)
+            
+        return final_result
     
     async def run_agent(self, agent_name: str, input_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -316,6 +391,29 @@ class LangChainOrchestrator:
                 raise ValueError("AttackGen agent not initialized")
             return await self.attackgen.execute(input_data)
             
+        else:
+            raise ValueError(f"Unknown agent: {agent_name}")
+
+    async def stop_agent(self, agent_name: str):
+        """Stop a specific agent"""
+        self.logger.info(f"Stopping agent: {agent_name}")
+        
+        if agent_name == "extractor":
+            if self.extractor:
+                await self.extractor.stop()
+                self.extractor = None
+        elif agent_name == "rulegen":
+            if self.rulegen:
+                await self.rulegen.stop()
+                self.rulegen = None
+        elif agent_name == "evaluator":
+            if self.evaluator:
+                await self.evaluator.stop()
+                self.evaluator = None
+        elif agent_name == "attackgen":
+            if self.attackgen:
+                await self.attackgen.stop()
+                self.attackgen = None
         else:
             raise ValueError(f"Unknown agent: {agent_name}")
 

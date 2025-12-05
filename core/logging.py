@@ -17,12 +17,24 @@ class AgentLogger:
         
         # Set up basic logging if not already configured
         if not self.logger.handlers:
-            handler = logging.StreamHandler(sys.stdout)
+            # Stream Handler
+            stream_handler = logging.StreamHandler(sys.stdout)
             formatter = logging.Formatter(
                 '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             )
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
+            stream_handler.setFormatter(formatter)
+            self.logger.addHandler(stream_handler)
+            
+            # File Handler
+            try:
+                import os
+                os.makedirs("logs", exist_ok=True)
+                file_handler = logging.FileHandler("logs/system.log")
+                file_handler.setFormatter(formatter)
+                self.logger.addHandler(file_handler)
+            except Exception as e:
+                print(f"Failed to setup file logging: {e}")
+                
             self.logger.setLevel(logging.INFO)
     
     def info(self, message: str, **kwargs):

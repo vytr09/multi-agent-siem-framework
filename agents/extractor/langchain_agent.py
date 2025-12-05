@@ -190,10 +190,25 @@ class LangChainExtractorAgent(BaseAgent):
         """NLP preprocessing"""
         try:
             # Extract entities
-            entities = self.entity_extractor.extract_all(text)
+            entities_obj = self.entity_extractor.extract(text)
+            
+            # Convert dataclass to dict/list for JSON serialization
+            entities = []
+            if entities_obj.malware_families:
+                entities.extend([{"type": "malware", "value": m} for m in entities_obj.malware_families])
+            if entities_obj.tools:
+                entities.extend([{"type": "tool", "value": t} for t in entities_obj.tools])
+            if entities_obj.threat_actors:
+                entities.extend([{"type": "actor", "value": a} for a in entities_obj.threat_actors])
             
             # Extract IOCs
-            iocs = self.entity_extractor.extract_iocs(text)
+            iocs = []
+            if entities_obj.ip_addresses:
+                iocs.extend([{"type": "ip", "value": ip} for ip in entities_obj.ip_addresses])
+            if entities_obj.domains:
+                iocs.extend([{"type": "domain", "value": d} for d in entities_obj.domains])
+            for hash_type, hashes in entities_obj.file_hashes.items():
+                iocs.extend([{"type": hash_type, "value": h} for h in hashes])
             
             # Extract keywords (simplified)
             keywords = []

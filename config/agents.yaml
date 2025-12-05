@@ -45,10 +45,10 @@ config:
       description: Extracts TTPs using NLP preprocessing and Gemini LLM
       memory_enabled: true
       llm:
-        provider: gemini
-        model: gemini-2.0-flash-lite
-        api_key: ${GEMINI_API_KEY}
-        base_url: ''
+        provider: openai
+        model: llama-3.3-70b
+        api_key: ${CEREBRAS_API_KEY}
+        base_url: https://api.cerebras.ai/v1
         use_mock: false
         max_tokens: 1000
         temperature: 0.3
@@ -138,10 +138,11 @@ config:
       benchmark:
         use_llm_judge: true
         llm_judge:
-          provider: gemini
-          model: gemini-2.0-flash-lite
-          api_key: ${GEMINI_API_KEY}
+          provider: openai
+          model: llama-3.3-70b
+          api_key: ${CEREBRAS_API_KEY}
           temperature: 0.3
+          base_url: https://api.cerebras.ai/v1
         thresholds:
           minimum_score: 0.7
           high_quality_score: 0.85
