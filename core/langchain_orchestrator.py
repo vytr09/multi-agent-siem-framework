@@ -3,6 +3,7 @@ LangChain-Enabled Orchestrator
 Supports both traditional and LangChain-powered agent pipelines
 """
 import asyncio
+import os
 from pathlib import Path
 import json
 from typing import Dict, Any, List, Literal
@@ -59,10 +60,24 @@ class LangChainOrchestrator:
         self.logger.info(f"Orchestrator created with mode: {mode}")
     
     def _load_config(self, path: str) -> Dict[str, Any]:
-        """Load config from file"""
+        """Load config from file with env var substitution"""
+        from dotenv import load_dotenv
+        load_dotenv()
+        
         with open(path, 'r', encoding='utf-8') as f:
-            import yaml
-            return yaml.safe_load(f)
+            content = f.read()
+            
+        # Substitute env vars
+        content = os.path.expandvars(content)
+        
+        import yaml
+        data = yaml.safe_load(content)
+        
+        # Handle root 'config' key if present
+        if data and 'config' in data and 'agents' in data['config']:
+            return data['config']
+            
+        return data
     
     async def initialize(self):
         """Initialize agents based on mode"""
@@ -275,6 +290,35 @@ class LangChainOrchestrator:
             'final_score': score
         }
     
+    async def run_agent(self, agent_name: str, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Run a specific agent in isolation
+        """
+        self.logger.info(f"Running agent: {agent_name}")
+        
+        if agent_name == "extractor":
+            if not self.extractor:
+                raise ValueError("Extractor agent not initialized")
+            return await self.extractor.execute(input_data)
+            
+        elif agent_name == "rulegen":
+            if not self.rulegen:
+                raise ValueError("RuleGen agent not initialized")
+            return await self.rulegen.execute(input_data)
+            
+        elif agent_name == "evaluator":
+            if not self.evaluator:
+                raise ValueError("Evaluator agent not initialized")
+            return await self.evaluator.execute(input_data)
+            
+        elif agent_name == "attackgen":
+            if not self.attackgen:
+                raise ValueError("AttackGen agent not initialized")
+            return await self.attackgen.execute(input_data)
+            
+        else:
+            raise ValueError(f"Unknown agent: {agent_name}")
+
     async def run_test_pipeline(self, extraction_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Run test pipeline with pre-extracted data (simplified version without SIEM)
@@ -294,16 +338,17 @@ class LangChainOrchestrator:
             return rulegen_result
         
         # Write rulegen output
+        # ... (rest of the function)
+        return rulegen_result
+
+    async def cleanup(self):
+        """Cleanup resources"""
         if self.extractor:
             await self.extractor.stop()
         if self.rulegen:
             await self.rulegen.stop()
         if self.evaluator:
             await self.evaluator.stop()
-        if self.attackgen:
-            await self.attackgen.stop()
-        if self.siem_integrator and self.siem_integrator.ssh:
-            self.siem_integrator.ssh.close()
         if self.attackgen:
             await self.attackgen.stop()
         if self.siem_integrator and self.siem_integrator.ssh:

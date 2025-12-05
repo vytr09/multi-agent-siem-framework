@@ -1,3 +1,29 @@
+"""
+Test script for Hybrid NLP + Gemini Extractor Agent with Validators
+Uses configuration from config/agents.yaml
+"""
+
+import asyncio
+import json
+from pathlib import Path
+from datetime import datetime
+import os
+from dotenv import load_dotenv
+import sys
+
+load_dotenv()
+
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from agents.extractor.agent import ExtractorAgent
+from agents.extractor.validators import (
+    AttackIdValidator,
+    IndicatorExtractor,
+    AdvancedTechniqueDiscovery
+)
+from tests.conftest import get_full_agent_config
+
 #     print("=" * 80)
     
 #     config = {
@@ -185,7 +211,8 @@ async def test_hybrid_extraction():
     print("  2. N reports (specify number)")
     print("  3. All reports")
     
-    option = input("\nChoice (1-3): ").strip()
+    # option = input("\nChoice (1-3): ").strip()
+    option = "1"
     
     if option == "1":
         reports_to_process = [test_reports[0]]
@@ -201,6 +228,31 @@ async def test_hybrid_extraction():
             print(f"→ Processing 1 report (default)")
     elif option == "3":
         reports_to_process = test_reports
+    # Configuration - IMPORTANT: Validators are applied in _format_ttp_for_handoff()
+    # Load LLM config from agents.yaml
+    yaml_config = get_full_agent_config("extractor")
+    llm_config = yaml_config.get("llm", {})
+    
+    config = {
+        "llm": {
+            "api_key": llm_config.get("api_key", ""),
+            "provider": llm_config.get("provider", "gemini"),
+            "use_mock": False,
+            "model": llm_config.get("model", "gemini-2.0-flash-lite"),
+            "base_url": llm_config.get("base_url"),
+            "temperature": llm_config.get("temperature", 0.3),
+            "max_tokens": llm_config.get("max_tokens", 1000)
+        },
+        "use_nlp_preprocessing": True,
+        "nlp_entity_boost": True,
+        "min_confidence": 0.5,
+        "enable_caching": True,
+        "batch_size": 5
+    }
+    
+    agent = ExtractorAgent(name="hybrid-extraction", config=config)
+
+    try:
         print("INITIALIZING EXTRACTOR AGENT")
         print("=" * 80)
         await agent.start()
