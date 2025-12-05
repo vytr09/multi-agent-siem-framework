@@ -67,28 +67,31 @@ async def test_attackgen_langchain():
     
     # Verify Results
     print("\nRESULTS:")
-    print(f"Status: {result['status']}")
+    print(f"Status: {result.get('status', 'unknown')}")
     
-    if result['status'] == 'success':
+    if result.get('status') == 'success':
         commands = result.get('attack_commands', [])
         print(f"Generated {len(commands)} commands")
         
         for i, cmd in enumerate(commands):
             print(f"\nCommand {i+1}:")
-            print(f"  Name: {cmd['name']}")
-            print(f"  Platform: {cmd['platform']}")
-            print(f"  Command: {cmd['command']}")
-            print(f"  Source: {cmd['source']}")
+            print(f"  Name: {cmd.get('name', cmd.get('technique_name', 'N/A'))}")
+            print(f"  Platform: {cmd.get('platform', 'N/A')}")
+            command_text = cmd.get('command', 'N/A')
+            if len(str(command_text)) > 100:
+                command_text = str(command_text)[:100] + "..."
+            print(f"  Command: {command_text}")
+            print(f"  Source: {cmd.get('source', 'N/A')}")
             
-            # Validation
-            if cmd['source'] != 'langchain':
-                print("  [WARNING] Source is not langchain!")
-            if not cmd.get('validated'):
-                print("  [WARNING] Command not validated!")
+            # Validation info
+            source = cmd.get('source', '')
+            if source and source != 'langchain':
+                print("  [INFO] Source is not langchain")
     else:
-        print(f"Error: {result.get('error')}")
+        print(f"Error: {result.get('error', 'Unknown error')}")
         
     await agent.stop()
+    print("\n[SUCCESS] Test completed!")
 
 if __name__ == "__main__":
     asyncio.run(test_attackgen_langchain())

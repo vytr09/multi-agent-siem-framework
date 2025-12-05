@@ -1,73 +1,3 @@
-"""
-Test script for Hybrid NLP + Gemini Extractor Agent with Validators
-
-Run with: python tests/unit/test_extractor_hybrid.py
-
-This comprehensive test:
-1. OPTION 1: HYBRID EXTRACTION - Extracts TTPs using NLP + Gemini from normalized reports
-   - Processes multiple reports
-   - Applies validators during extraction (_format_ttp_for_handoff)
-   - Generates complete JSON: data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json
-
-2. OPTION 2: ENHANCEMENT (MANUAL) - Loads existing extraction and applies validators
-   - Loads: data/processed/test_hybrid_multi_extraction_gemini-2.0-flash-lite.json
-   - Applies: AttackIdValidator, IndicatorExtractor, AdvancedTechniqueDiscovery
-   - Enhances TTPs with: validation, indicators, discovered techniques
-   - Overwrites same file with enhanced fields
-
-3. OPTION 3: NLP ANALYSIS - Analyzes NLP components separately
-
-4. OPTION 4: BATCH PROCESSING - Tests batch mode with multiple reports
-
-Output JSON Structure:
-{
-  "test_timestamp": "ISO datetime",
-  "total_reports": N,
-  "total_ttps": M,
-  "total_processing_time_seconds": X,
-  "agent_statistics": {...},
-  "per_report_results": [
-    {
-      "report_id": "...",
-      "title": "...",
-      "ttps_count": N,
-      "high_confidence_count": K,
-      "processing_time_ms": T,
-      "extraction": {
-        "report_id": "...",
-        "source_report": {...},
-        "extracted_ttps": [...each TTP with validators applied...],
-        "nlp_analysis": {...},
-        "metadata": {...}
-      }
-    }
-  ],
-  "enhancement_applied": {...}  // Added by OPTION 2 if applied
-}
-"""
-
-import asyncio
-import json
-from pathlib import Path
-from datetime import datetime
-import os
-from dotenv import load_dotenv
-import sys
-
-load_dotenv()
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from agents.extractor.agent import ExtractorAgent
-from agents.extractor.validators import (
-    AttackIdValidator,
-    IndicatorExtractor,
-    AdvancedTechniqueDiscovery
-)
-
-# async def test_hybrid_with_mock():
-#     """Test hybrid approach with mock Gemini"""
-#     print("=" * 80)
-#     print("HYBRID NLP + GEMINI EXTRACTOR TEST (MOCK MODE)")
 #     print("=" * 80)
     
 #     config = {
@@ -271,31 +201,6 @@ async def test_hybrid_extraction():
             print(f"→ Processing 1 report (default)")
     elif option == "3":
         reports_to_process = test_reports
-        print(f"→ Processing all {total_reports} reports")
-    else:
-        reports_to_process = [test_reports[0]]
-        print(f"→ Processing 1 report (default)")
-    
-    # Configuration - IMPORTANT: Validators are applied in _format_ttp_for_handoff()
-    config = {
-        "llm": {
-            "api_key": os.getenv("GEMINI_API_KEY"),
-            "use_mock": False,
-            "model": "gemini-2.0-flash-lite",
-            "temperature": 0.3,
-            "max_tokens": 1000
-        },
-        "use_nlp_preprocessing": True,
-        "nlp_entity_boost": True,
-        "min_confidence": 0.5,
-        "enable_caching": True,
-        "batch_size": 5
-    }
-    
-    agent = ExtractorAgent(name="hybrid-extraction", config=config)
-    
-    try:
-        print("\n" + "=" * 80)
         print("INITIALIZING EXTRACTOR AGENT")
         print("=" * 80)
         await agent.start()
