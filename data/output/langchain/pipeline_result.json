@@ -1,0 +1,268 @@
+{
+  "status": "success",
+  "mode": "langchain",
+  "extraction": {
+    "status": "success",
+    "extraction_summary": {
+      "reports_processed": 1,
+      "total_ttps_extracted": 1,
+      "langchain_extractions": 1,
+      "processing_time_ms": 688.437
+    },
+    "results": [
+      {
+        "report_id": "unknown",
+        "ttps": [
+          {
+            "ttp_id": "ttp_0",
+            "technique_name": "Command and Scripting Interpreter",
+            "technique_id": "T1059.001",
+            "tactic": "Execution",
+            "description": "Attacker used PowerShell with base64 encoding",
+            "confidence_score": 0.9,
+            "indicators": [
+              "powershell.exe",
+              "-enc",
+              "JABzACAAPQAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABJAE8ALgBNAGUAbQBvAHIAeQBTAHQAcgBlAGEAbQAoAFsAQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAIgBIADQAcwBJAEE"
+            ],
+            "tools": [
+              "PowerShell"
+            ],
+            "source": "langchain"
+          }
+        ],
+        "extraction_method": "langchain",
+        "nlp_context": {
+          "entities": [
+            {
+              "type": "malware",
+              "value": "malware"
+            },
+            {
+              "type": "tool",
+              "value": "PowerShell"
+            },
+            {
+              "type": "tool",
+              "value": "at"
+            }
+          ],
+          "iocs": [
+            {
+              "type": "domain",
+              "value": "powershell.exe"
+            }
+          ],
+          "keywords": [
+            "attack",
+            "fileless",
+            "encoded",
+            "malware",
+            "attacker",
+            "potential",
+            "powershell",
+            "indicates",
+            "execute",
+            "command"
+          ]
+        }
+      }
+    ],
+    "ttps": [
+      {
+        "ttp_id": "ttp_0",
+        "technique_name": "Command and Scripting Interpreter",
+        "technique_id": "T1059.001",
+        "tactic": "Execution",
+        "description": "Attacker used PowerShell with base64 encoding",
+        "confidence_score": 0.9,
+        "indicators": [
+          "powershell.exe",
+          "-enc",
+          "JABzACAAPQAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABJAE8ALgBNAGUAbQBvAHIAeQBTAHQAcgBlAGEAbQAoAFsAQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAIgBIADQAcwBJAEE"
+        ],
+        "tools": [
+          "PowerShell"
+        ],
+        "source": "langchain"
+      }
+    ]
+  },
+  "rules": {
+    "status": "success",
+    "summary": {
+      "ttps_processed": 1,
+      "rules_generated": 1,
+      "langchain_generations": 3,
+      "fallback_generations": 0,
+      "errors": 0,
+      "processing_time_ms": 623.198
+    },
+    "rule_generation_results": [
+      {
+        "ttp_id": "T1059.001",
+        "technique_name": "Command and Scripting Interpreter",
+        "status": "success",
+        "rule": {
+          "title": "PowerShell Base64 Encoded Command Execution",
+          "description": "Detects PowerShell execution with base64 encoded commands, which can be used to evade detection and execute malicious code",
+          "logsource": {
+            "category": "process_creation",
+            "product": "windows",
+            "service": "sysmon"
+          },
+          "detection": {
+            "selection": {
+              "Image|endswith": "\\powershell.exe",
+              "CommandLine|contains|all": [
+                "-enc",
+                "-EncodedCommand"
+              ]
+            },
+            "condition": "selection"
+          },
+          "falsepositives": [
+            "Legitimate PowerShell scripts using base64 encoding for automation",
+            "PowerShell modules that use base64 encoding for data transfer"
+          ],
+          "level": "medium",
+          "tags": [
+            "attack.execution",
+            "attack.t1059.001",
+            "attack.t1059",
+            "sigma"
+          ],
+          "ttp_id": "T1059.001",
+          "technique_name": "Command and Scripting Interpreter",
+          "generation_method": "langchain"
+        },
+        "generation_method": "langchain"
+      }
+    ],
+    "rules": [
+      {
+        "title": "PowerShell Base64 Encoded Command Execution",
+        "description": "Detects PowerShell execution with base64 encoded commands, which can be used to evade detection and execute malicious code",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": "\\powershell.exe",
+            "CommandLine|contains|all": [
+              "-enc",
+              "-EncodedCommand"
+            ]
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate PowerShell scripts using base64 encoding for automation",
+          "PowerShell modules that use base64 encoding for data transfer"
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.execution",
+          "attack.t1059.001",
+          "attack.t1059",
+          "sigma"
+        ],
+        "ttp_id": "T1059.001",
+        "technique_name": "Command and Scripting Interpreter",
+        "generation_method": "langchain"
+      }
+    ]
+  },
+  "evaluation": {
+    "status": "success",
+    "summary": {
+      "rules_evaluated": 1,
+      "average_quality_score": 0.75,
+      "passing_rules": 1,
+      "failing_rules": 0,
+      "langchain_evaluations": 3,
+      "fallback_evaluations": 0,
+      "errors": 0,
+      "processing_time_ms": 1698.818
+    },
+    "evaluation_results": [
+      {
+        "rule_title": "PowerShell Base64 Encoded Command Execution",
+        "rule_id": "T1059.001",
+        "quality_score": 0.75,
+        "status": "pass",
+        "strengths": [
+          "Simple and effective logic",
+          "Targets a common TTP"
+        ],
+        "weaknesses": [
+          "May miss variations of base64 encoding",
+          "High false positive potential due to legitimate use of base64"
+        ],
+        "suggestions": [
+          "Consider adding more specific filters to reduce false positives, such as filtering on specific command-line arguments or process parent.",
+          "Investigate adding a deobfuscation step to the rule to decode the base64 and analyze the command."
+        ],
+        "metrics": {
+          "accuracy": 0.8,
+          "completeness": 0.7,
+          "efficiency": 0.9,
+          "maintainability": 0.6
+        },
+        "evaluation_method": "langchain"
+      }
+    ],
+    "feedback": {
+      "timestamp": "2025-12-05T09:26:34.967382",
+      "source_agent": "b7a9c180-cd61-4723-a6ec-b99ac7205b30",
+      "target_agent": "rulegen",
+      "average_quality_score": 0.75,
+      "total_rules_evaluated": 1,
+      "improvements_needed": [
+        {
+          "metric": "quality",
+          "current_value": 0.75,
+          "target_value": 0.85,
+          "suggestion": "Improve overall rule quality"
+        }
+      ],
+      "common_issues": [
+        "May miss variations of base64 encoding",
+        "High false positive potential due to legitimate use of base64"
+      ],
+      "actionable_suggestions": [
+        "Consider adding more specific filters to reduce false positives, such as filtering on specific command-line arguments or process parent.",
+        "Investigate adding a deobfuscation step to the rule to decode the base64 and analyze the command."
+      ]
+    }
+  },
+  "siem_verification": [
+    {
+      "rule_id": "rule_0",
+      "attack_id": "1662b1b0-c197-4b28-ba92-0a581f2b21cb",
+      "detected": false,
+      "events_found": 0,
+      "historical_events": 0,
+      "query_time_ms": 269.0,
+      "status": "success",
+      "message": "Verification complete"
+    }
+  ],
+  "siem_metrics": {
+    "true_positives": 0,
+    "false_positives": 0,
+    "false_negatives": 1,
+    "true_negatives": 0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0,
+    "accuracy": 0.0,
+    "detection_rate": 0.0,
+    "false_positive_rate": 0.0
+  },
+  "iterations": 3,
+  "final_score": 0.75,
+  "timestamp": "2025-12-05T16:26:34.971190"
+}

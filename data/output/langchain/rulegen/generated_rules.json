@@ -1,0 +1,83 @@
+{
+  "status": "success",
+  "summary": {
+    "ttps_processed": 1,
+    "rules_generated": 1,
+    "langchain_generations": 1,
+    "fallback_generations": 0,
+    "errors": 0,
+    "processing_time_ms": 394.164
+  },
+  "rule_generation_results": [
+    {
+      "ttp_id": "T1059.001",
+      "technique_name": "Command and Scripting Interpreter",
+      "status": "success",
+      "rule": {
+        "title": "PowerShell Base64 Encoding Detection",
+        "description": "Detects PowerShell base64 encoded commands",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": "\\powershell.exe",
+            "CommandLine|contains": "JAB"
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate PowerShell scripts using base64 encoding for automation",
+          "PowerShell modules using base64 encoding for data transfer"
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.T1059.001",
+          "attack.execution",
+          "powershell",
+          "base64",
+          "encoding"
+        ],
+        "ttp_id": "T1059.001",
+        "technique_name": "Command and Scripting Interpreter",
+        "generation_method": "langchain"
+      },
+      "generation_method": "langchain"
+    }
+  ],
+  "rules": [
+    {
+      "title": "PowerShell Base64 Encoding Detection",
+      "description": "Detects PowerShell base64 encoded commands",
+      "logsource": {
+        "category": "process_creation",
+        "product": "windows",
+        "service": "sysmon"
+      },
+      "detection": {
+        "selection": {
+          "Image|endswith": "\\powershell.exe",
+          "CommandLine|contains": "JAB"
+        },
+        "condition": "selection"
+      },
+      "falsepositives": [
+        "Legitimate PowerShell scripts using base64 encoding for automation",
+        "PowerShell modules using base64 encoding for data transfer"
+      ],
+      "level": "medium",
+      "tags": [
+        "attack.T1059.001",
+        "attack.execution",
+        "powershell",
+        "base64",
+        "encoding"
+      ],
+      "ttp_id": "T1059.001",
+      "technique_name": "Command and Scripting Interpreter",
+      "generation_method": "langchain"
+    }
+  ]
+}
