@@ -42,6 +42,7 @@ class CollectorAgent(BaseAgent):
         # Initialize components
         self.misp_client = None
         self.misp_normalizer = MISPNormalizer()
+        self.processed_ids = set() # Track processed report IDs for deduplication
         
         # Configuration
         self.sources_config = config.get("sources", {})
@@ -82,12 +83,13 @@ class CollectorAgent(BaseAgent):
             self.set_status(AgentStatus.ERROR, f"Failed to start: {str(e)}")
             raise CollectorException(f"Failed to start Collector Agent: {str(e)}")
     
-    async def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _execute_with_context(self, input_data: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Execute collection cycle.
+        Execute collection cycle (Internal).
         
         Args:
-            input_data: Input parameters (can specify sources, filters, etc.)
+            input_data: Input parameters
+            context: Execution context (memory, etc.)
             
         Returns:
             Collection results with statistics
@@ -142,21 +144,7 @@ class CollectorAgent(BaseAgent):
                     self.stats["collection_errors"] += 1
 
             # 3. Normalize all reports
-            normalized_reports = []
-            for raw in all_raw_reports:
-                try:
-                    # PDF-based events have 'content' key
-                    if raw.get("content") is not None:
-                        normalized = PDFDatasetNormalizer().normalize_event(raw)
-                    else:
-                        normalized = self.misp_normalizer.normalize_event(raw)
-                    normalized_reports.append(normalized)
-
-                except Exception as e:
-                    msg = f"Normalization failed: {e}"
-                    self.logger.error(msg)
-                    errors.append(msg)
-                    self.stats["normalization_errors"] += 1
+            normalized_reports = await self._normalize_reports(all_raw_reports)
 
             # 4. Update statistics
             self.stats["total_reports_collected"]   += len(all_raw_reports)
@@ -314,6 +302,13 @@ class CollectorAgent(BaseAgent):
                     normalized = self.misp_normalizer.normalize_event(report)
                 
                 if normalized:
+                    # Deduplication check
+                    report_id = normalized.get("report_id")
+                    if report_id and report_id in self.processed_ids:
+                        self.logger.debug(f"Skipping duplicate report: {report_id}")
+                        continue
+                        
+                    self.processed_ids.add(report_id)
                     normalized_reports.append(normalized)
                     
             except Exception as e:

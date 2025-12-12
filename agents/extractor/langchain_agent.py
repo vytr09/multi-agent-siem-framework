@@ -405,11 +405,12 @@ class LangChainExtractorAgent(BaseAgent):
         mapped = []
         for ttp in ttps:
             try:
-                mapping = self.attack_mapper.map_technique(
-                    technique_name=ttp.get("technique_name", ""),
-                    tactic=ttp.get("tactic", ""),
-                    description=ttp.get("description", "")
+                # Use new validation logic that trusts LLM output if valid
+                mapping = self.attack_mapper.validate_or_fallback(
+                    llm_id=ttp.get("technique_id", ""),
+                    llm_name=ttp.get("technique_name", "")
                 )
+                
                 if mapping:
                     ttp["attack_id"] = mapping["technique_id"]
                     ttp["subtechnique"] = mapping.get("subtechnique", False)
