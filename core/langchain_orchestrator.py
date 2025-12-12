@@ -307,12 +307,29 @@ class LangChainOrchestrator:
         score = evaluation_result.get('summary', {}).get('average_quality_score', 0)
         detection_rate = siem_metrics.detection_rate
         
+        # Track best result
+        best_result = {
+            'rules': rulegen_result,
+            'evaluation': evaluation_result,
+            'siem_verification': siem_results,
+            'siem_metrics': siem_metrics,
+            'score': score,
+            'detection_rate': detection_rate
+        }
+        
         iteration = 1
         max_iterations = self.config.get('feedback', {}).get('max_iterations', 3)
         min_score = self.config.get('feedback', {}).get('minimum_score', 0.75)
+        # 0.9 allows for small rounding errors or partial detection if multiple attacks
         min_detection_rate = self.config.get('feedback', {}).get('minimum_detection_rate', 0.9)
         
+        # Stop if we have 100% detection, even if score is slightly low
+        # Functional success (detection) > Stylistic perfection (score)
         while (score < min_score or detection_rate < min_detection_rate) and iteration < max_iterations:
+            if detection_rate >= 0.99:
+                self.logger.info(f"Detection rate {detection_rate:.3f} is excellent. Stopping iterations despite score {score:.3f}.")
+                break
+                
             self.logger.info(f"Score {score:.3f} or DR {detection_rate:.3f} below threshold, re-running (iteration {iteration+1})...")
             
             # Generate combined feedback (simplified here, full logic in evaluator/orchestrator)
@@ -328,11 +345,29 @@ class LangChainOrchestrator:
                 'feedback': feedback
             })
             
-            # Re-verify (simplified: assume we need new attacks or re-run existing)
-            # For now, we'll just re-evaluate the new rules
-            # Ideally, we should re-generate attacks and re-verify in SIEM
-            
+            # Use the new rules
             rules = rulegen_result.get('rules', [])
+            
+            # We MUST re-verify because the rules changed (or at least re-evaluated)
+            # Ideally we re-run attacks too, but let's assume TTP didn't change enough to invalidate attacks
+            # Re-verify rules in SIEM
+            if self.siem_integrator:
+                self.logger.info(f"Stage 4 (Iter {iteration+1}): Verifying rules in SIEM...")
+                # We reuse the previous attacks for now to save time/risk
+                siem_results = []
+                for i, (rule, attack) in enumerate(zip(rules, attack_results[:len(rules)])):
+                    detection_result = self.siem_integrator.verify_rule(rule, attack)
+                    siem_results.append({
+                        'rule_id': rule.get('id', f'rule_{i}'),
+                        'attack_id': attack.get('id', f'attack_{i}'),
+                        'detected': detection_result.detected,
+                        'events_found': detection_result.events_found,
+                        'historical_events': detection_result.historical_events,
+                        'query_time_ms': detection_result.query_time_ms,
+                        'status': detection_result.status,
+                        'message': detection_result.message
+                    })
+                siem_metrics = SIEMMetricsCalculator.calculate_metrics(siem_results)
             
             # Re-evaluate
             evaluation_result = await self.evaluator.execute({
@@ -340,9 +375,33 @@ class LangChainOrchestrator:
             })
             
             score = evaluation_result.get('summary', {}).get('average_quality_score', 0)
+            detection_rate = siem_metrics.detection_rate
+            
+            # Update best object if this iteration is better
+            # Priority: Detection Rate > Score
+            current_dr = detection_rate
+            best_dr = best_result['detection_rate']
+            
+            if current_dr > best_dr or (current_dr == best_dr and score > best_result['score']):
+                best_result = {
+                    'rules': rulegen_result,
+                    'evaluation': evaluation_result,
+                    'siem_verification': siem_results,
+                    'siem_metrics': siem_metrics,
+                    'score': score,
+                    'detection_rate': detection_rate
+                }
+                
             iteration += 1
+            
+        # Use the best result found
+        rulegen_result = best_result['rules']
+        evaluation_result = best_result['evaluation']
+        siem_results = best_result['siem_verification']
+        siem_metrics = best_result['siem_metrics']
+        score = best_result['score']
         
-        self.logger.info(f"{self.mode.upper()} pipeline completed (final score: {score:.3f}, iterations: {iteration})")
+        self.logger.info(f"{self.mode.upper()} pipeline completed (final score: {score:.3f}, best DR: {best_result['detection_rate']:.3f}, iterations: {iteration})")
         
         final_result = {
             'status': 'success',
