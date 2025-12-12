@@ -230,24 +230,58 @@ class LangChainExtractorAgent(BaseAgent):
                 # Build context string
                 context_str = self._build_context_string(report, nlp_results)
                 
-                # Execute chain
-                ttp_output = await self.ttp_chain.extract(report_text, context_str)
+                # Check for IntelEx chunks
+                chunks = report.get("chunks", [])
                 
-                # Convert
-                llm_ttps = [
-                    {
-                        "technique_name": ttp.technique_name,
-                        "technique_id": ttp.technique_id,
-                        "tactic": ttp.tactic,
-                        "description": ttp.description,
-                        "confidence": ttp.confidence,
-                        "indicators": ttp.indicators,
-                        "tools": ttp.tools,
-                        "extraction_method": "langchain_llm",
-                        "source": "langchain"
-                    }
-                    for ttp in ttp_output.ttps
-                ]
+                if chunks:
+                    self.logger.info(f"Processing {len(chunks)} IntelEx chunks for report {report_id}")
+                    # Process each chunk
+                    for i, chunk in enumerate(chunks):
+                        try:
+                            # Add chunk context
+                            chunk_context = f"{context_str}\n\n[Chunk {i+1}/{len(chunks)}]"
+                            
+                            # Execute chain on chunk
+                            ttp_output = await self.ttp_chain.extract(chunk, chunk_context)
+                            
+                            # Convert and append
+                            chunk_ttps = [
+                                {
+                                    "technique_name": ttp.technique_name,
+                                    "technique_id": ttp.technique_id,
+                                    "tactic": ttp.tactic,
+                                    "description": ttp.description,
+                                    "confidence": ttp.confidence,
+                                    "indicators": ttp.indicators,
+                                    "tools": ttp.tools,
+                                    "extraction_method": "langchain_llm",
+                                    "source": "langchain",
+                                    "chunk_index": i # Track origin
+                                }
+                                for ttp in ttp_output.ttps
+                            ]
+                            llm_ttps.extend(chunk_ttps)
+                        except Exception as ce:
+                            self.logger.warning(f"Failed to process chunk {i} for {report_id}: {ce}")
+                            continue
+                else:
+                    # Fallback to full text if no chunks
+                    self.logger.info(f"No chunks found for {report_id}, using full text")
+                    ttp_output = await self.ttp_chain.extract(report_text, context_str)
+                    llm_ttps = [
+                        {
+                            "technique_name": ttp.technique_name,
+                            "technique_id": ttp.technique_id,
+                            "tactic": ttp.tactic,
+                            "description": ttp.description,
+                            "confidence": ttp.confidence,
+                            "indicators": ttp.indicators,
+                            "tools": ttp.tools,
+                            "extraction_method": "langchain_llm",
+                            "source": "langchain"
+                        }
+                        for ttp in ttp_output.ttps
+                    ]
                 self.stats["langchain_extractions"] += 1
                 
             except Exception as e:

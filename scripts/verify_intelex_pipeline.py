@@ -71,7 +71,14 @@ async def run_verification():
     try:
         extract_result = await extractor.execute({"normalized_reports": [pdf_report]})
         print("\n--- Extractor Result ---")
-        print(json.dumps(extract_result, indent=2, default=str))
+        
+        # Save to file as requested
+        output_path = "data/processed/spectral_blur_extraction.json"
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, "w") as f:
+            json.dump(extract_result, f, indent=2, default=str)
+        print(f"Extraction saved to {output_path}")
+        
     except Exception as e:
         print(f"\n[WARN] Extractor execution failed (likely due to invalid API Key): {e}")
         print("However, Collector -> Extractor data hand-off is verified via schema matching.")
