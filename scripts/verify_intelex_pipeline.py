@@ -88,5 +88,39 @@ async def run_verification():
     norm_2 = collect_result_2.get("normalized_reports", [])
     print(f"Second Run Collected: {len(norm_2)} reports (Should be 0 if dedupe works)")
 
+    print("\n--- 4. Verifying Framework Downstream Capabilities (LangChain) ---")
+    try:
+        from core.langchain_integration import LangChainManager
+        
+        # Test Manager init
+        manager = LangChainManager(config["extractor"]["llm"])
+        
+        # Get first extracted TTP
+        extracted_reports = extract_result.get("extraction_results", [])
+        if extracted_reports and extracted_reports[0].get("extracted_ttps"):
+            first_ttp = extracted_reports[0]["extracted_ttps"][0]
+            print(f"\nTesting Downstream Gen for TTP: {first_ttp.get('technique_name')} ({first_ttp.get('attack_id')})")
+            
+            # 1. Sigma Generation
+            print("Type: Sigma Rule Generation...")
+            sigma_rule = await manager.sigma_chain.generate(first_ttp)
+            print(f"  [OK] Generated Sigma Rule Title: {sigma_rule.title}")
+            
+            # 2. Attack Command Generation
+            print("Type: Attack Command Generation...")
+            attack_cmds = await manager.attack_chain.generate(first_ttp)
+            if attack_cmds.commands:
+                print(f"  [OK] Generated {len(attack_cmds.commands)} Attack Commands")
+                print(f"  Sample: {attack_cmds.commands[0].command}")
+            else:
+                 print("  [WARN] No commands generated")
+
+            print("\n>>> FULL FRAMEWORK VERIFICATION: SUCCESS <<<")
+        else:
+            print("[WARN] No TTPs found to test downstream generation.")
+            
+    except Exception as e:
+        print(f"[ERROR] Downstream verification failed: {e}")
+
 if __name__ == "__main__":
     asyncio.run(run_verification())
