@@ -154,7 +154,7 @@ class LangChainLLMWrapper:
             llm_kwargs = {
                 'model': config.get('model', 'gpt-4'),
                 'temperature': config.get('temperature', 0.3),
-                'max_tokens': config.get('max_tokens', 2000), # Note: config key might be max_output_tokens or max_tokens
+                'max_tokens': config.get('max_tokens', 2000),
                 'api_key': api_key
             }
             
@@ -176,7 +176,7 @@ class LangChainLLMWrapper:
         # Metrics
         self.callback = MetricsCallback()
         
-        print(f"[OK] LangChain LLM initialized: {config.get('model', 'gemini-2.0-flash-lite')}")
+        print(f"[OK] LangChain LLM initialized: {config.get('model', 'unknown')} (Provider: {provider})")
     
     def get_metrics(self) -> Dict[str, Any]:
         """Get metrics"""
@@ -199,6 +199,9 @@ class TTPExtractionChain:
             template="""You are a cybersecurity expert analyzing threat intelligence reports.
 
 Extract all TTPs (Tactics, Techniques, and Procedures) from the following text.
+
+{context}
+
 For each TTP, identify:
 - MITRE ATT&CK technique ID (e.g., T1059.001)
 - Technique name
@@ -226,7 +229,7 @@ Output: [{{
 }}]
 
 Return a structured list of extracted TTPs. Ensure the output matches the TTPListOutput schema.""",
-            input_variables=["text"]
+            input_variables=["text", "context"]
         )
         
         # Create chain (LCEL style)
@@ -237,7 +240,9 @@ Return a structured list of extracted TTPs. Ensure the output matches the TTPLis
     async def extract(self, text: str, context: Optional[str] = None) -> TTPListOutput:
         """Extract TTPs from text"""
         try:
-            result = await self.chain.ainvoke({"text": text})
+            # Provide default empty context if None
+            ctx = context if context else "No additional context."
+            result = await self.chain.ainvoke({"text": text, "context": ctx})
             return result
         except Exception as e:
             print(f"Extraction error: {e}")
