@@ -51,7 +51,9 @@ class CollectorAgent(BaseAgent):
         self.max_retries = config.get("max_retries", 3)
 
         # Offline dataset loader (for PDF, JSON, CSV files)
-        data_dir = config.get("offline_data_dir", "data/datasets")
+        # Fix: Read from sources config, not root config
+        datasets_config = self.sources_config.get("datasets", {})
+        data_dir = datasets_config.get("offline_data_dir", "data/datasets")
         self.dataset_loader = FileDatasetLoader(data_dir)
         
         # Statistics

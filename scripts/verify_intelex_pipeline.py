@@ -25,7 +25,10 @@ async def run_verification():
         config = yaml.safe_load(f)["config"]["agents"]
     
     # Enable datasets for collector, disable others to avoid init errors
-    config["collector"]["sources"]["datasets"] = {"enabled": True, "offline_data_dir": "data/datasets"}
+    config["collector"]["sources"]["datasets"] = {
+        "enabled": True, 
+        "offline_data_dir": "data/APT_CyberCriminal_Campagin_Collections/2024/2024.01.03.SpectralBlur_North_Korean"
+    }
     if "misp" in config["collector"]["sources"]:
         config["collector"]["sources"]["misp"]["enabled"] = False
         del config["collector"]["sources"]["misp"] # Remove completely to be safe
@@ -45,11 +48,14 @@ async def run_verification():
     
     normalized_reports = collect_result.get("normalized_reports", [])
     print(f"Collected {len(normalized_reports)} reports.")
+    for i, r in enumerate(normalized_reports):
+        print(f"[{i}] Title: {r.get('title', 'NO TITLE')}")
     
-    pdf_report = next((r for r in normalized_reports if "CYBERWAR" in r.get("title", "")), None)
+    # Updated filter for new report
+    pdf_report = next((r for r in normalized_reports if "SpectralBlur" in r.get("title", "")), None)
     
     if not pdf_report:
-        print("ERROR: CYBERWAR PDF not found in collection!")
+        print("ERROR: SpectralBlur PDF not found in collection!")
         return
 
     print(f"Found PDF Report: {pdf_report['title']}")
