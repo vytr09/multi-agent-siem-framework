@@ -13,7 +13,7 @@ import json
 import os
 from dotenv import load_dotenv
 from agents.attackgen.langchain_agent import LangChainAttackGenAgent
-from tests.conftest import get_full_agent_config
+from tests.utils import get_full_agent_config
 
 async def test_attackgen_langchain():
     print("="*80)

@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 
 from agents.rulegen.agent import RuleGenerationAgentWithLLM
 from agents.rulegen.langchain_agent import LangChainRuleGenAgent
+from tests.utils import get_full_agent_config
 
 # Load environment variables
 load_dotenv()
@@ -42,18 +43,11 @@ async def test_refactoring():
         }]
     }
     
-    config = {
-        'platforms': ['splunk', 'elasticsearch'],
-        'optimize_rules': True,
-        'validate_rules': True,
-        'min_confidence_threshold': 0.7,
-        'llm': {
-            'enabled': True,
-            'api_key': os.getenv('GEMINI_API_KEY'),
-            'model': 'gemini-2.0-flash-lite',
-            'temperature': 0.3
-        }
-    }
+    config = get_full_agent_config("rulegen")
+    config['optimize_rules'] = True
+    config['validate_rules'] = True
+    # config['min_confidence_threshold'] = 0.7 # Already in yaml?
+    config.setdefault('llm', {})['enabled'] = True
     
     # 1. Test RuleGenerationAgentWithLLM (Traditional)
     print("\n1. Testing RuleGenerationAgentWithLLM (Traditional)...")

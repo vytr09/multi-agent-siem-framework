@@ -24,6 +24,7 @@ from agents.rulegen.langchain_agent import LangChainRuleGenAgent
 from agents.evaluator.langchain_agent import LangChainEvaluatorAgent
 
 from core.logging import get_agent_logger
+from tests.utils import get_full_agent_config
 
 
 logger = get_agent_logger("langchain_integration_test")
@@ -52,11 +53,9 @@ async def test_traditional_pipeline():
     
     try:
         # 1. Extractor
-        extractor_config = {
-            "nlp": {"enabled": True},
-            "llm": {"enabled": False},  # Disable LLM for speed
-            "use_langchain": False
-        }
+        extractor_config = get_full_agent_config("extractor")
+        extractor_config.setdefault("llm", {})["enabled"] = False
+        extractor_config["use_langchain"] = False
         
         extractor = ExtractorAgent("traditional_extractor", extractor_config)
         await extractor.start()
@@ -72,10 +71,9 @@ async def test_traditional_pipeline():
         await extractor.stop()
         
         # 2. RuleGen
-        rulegen_config = {
-            "llm": {"enabled": False},  # Disable LLM for speed
-            "use_langchain": False
-        }
+        rulegen_config = get_full_agent_config("rulegen")
+        rulegen_config.setdefault("llm", {})["enabled"] = False
+        rulegen_config["use_langchain"] = False
         
         rulegen = RuleGenerationAgentWithLLM("traditional_rulegen", rulegen_config)
         await rulegen.start()
@@ -91,10 +89,9 @@ async def test_traditional_pipeline():
         await rulegen.stop()
         
         # 3. Evaluator
-        evaluator_config = {
-            "llm": {"enabled": False},  # Disable LLM for speed
-            "use_langchain": False
-        }
+        evaluator_config = get_full_agent_config("evaluator")
+        evaluator_config.setdefault("llm", {})["enabled"] = False
+        evaluator_config["use_langchain"] = False
         
         evaluator = EvaluatorAgent("traditional_evaluator", evaluator_config)
         await evaluator.start()
@@ -150,16 +147,12 @@ async def test_langchain_pipeline():
     
     try:
         # 1. LangChain Extractor
-        extractor_config = {
-            "nlp": {"enabled": True},
-            "llm": {
-                "enabled": True,
-                "model": "gemini-2.0-flash-exp",
-                "temperature": 0.1,
-                "max_output_tokens": 2048
-            },
-            "use_langchain": True
-        }
+        extractor_config = get_full_agent_config("extractor")
+        extractor_config["use_langchain"] = True
+        extractor_config.setdefault("llm", {})["enabled"] = True
+        # Ensure max_output_tokens is set if missing (optional)
+        if "max_output_tokens" not in extractor_config["llm"]:
+             extractor_config["llm"]["max_output_tokens"] = 2048
         
         extractor = LangChainExtractorAgent("langchain_extractor", extractor_config)
         await extractor.start()
@@ -176,16 +169,10 @@ async def test_langchain_pipeline():
         await extractor.stop()
         
         # 2. LangChain RuleGen
-        rulegen_config = {
-            "llm": {
-                "enabled": True,
-                "model": "gemini-2.0-flash-exp",
-                "temperature": 0.3,
-                "max_output_tokens": 4096
-            },
-            "use_langchain": True,
-            "use_feedback": True
-        }
+        rulegen_config = get_full_agent_config("rulegen")
+        rulegen_config["use_langchain"] = True
+        rulegen_config["use_feedback"] = True
+        rulegen_config.setdefault("llm", {})["enabled"] = True
         
         rulegen = LangChainRuleGenAgent("langchain_rulegen", rulegen_config)
         await rulegen.start()
@@ -202,15 +189,9 @@ async def test_langchain_pipeline():
         await rulegen.stop()
         
         # 3. LangChain Evaluator
-        evaluator_config = {
-            "llm": {
-                "enabled": True,
-                "model": "gemini-2.0-flash-exp",
-                "temperature": 0.1,
-                "max_output_tokens": 2048
-            },
-            "use_langchain": True
-        }
+        evaluator_config = get_full_agent_config("evaluator")
+        evaluator_config["use_langchain"] = True
+        evaluator_config.setdefault("llm", {})["enabled"] = True
         
         evaluator = LangChainEvaluatorAgent("langchain_evaluator", evaluator_config)
         await evaluator.start()

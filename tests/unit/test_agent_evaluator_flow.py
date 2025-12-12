@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from agents.evaluator.agent import EvaluatorAgent
 from agents.evaluator.feedback_manager import FeedbackManager
 from core.memory import get_memory_manager
-from core.orchestrator import HybridOrchestrator
+from core.langchain_orchestrator import LangChainOrchestrator
 from tests.conftest import get_full_agent_config
 
 
@@ -42,23 +42,17 @@ async def test_evaluator_flow():
         print("[SUCCESS] Feedback manager created")
 
         # Test orchestrator
-        orchestrator = HybridOrchestrator()
+        orchestrator = LangChainOrchestrator()
         print("[SUCCESS] Orchestrator created")
 
         # Load evaluator configuration from agents.yaml
-        yaml_config = get_full_agent_config("evaluator")
+        evaluator_config = get_full_agent_config("evaluator")
         
-        evaluator_config = {
-            "llm": yaml_config.get("llm", {
-                "use_mock": True,
-                "model": "gemini-2.0-flash-lite"
-            }),
-            "evaluation": {
-                "metrics": ["accuracy", "coverage", "false_positives"],
-                "benchmark_enabled": False
-            },
-            "benchmark": yaml_config.get("benchmark", {})
-        }
+        # Ensure evaluation settings exist
+        evaluator_config.setdefault("evaluation", {}).update({
+            "metrics": ["accuracy", "coverage", "false_positives"],
+            "benchmark_enabled": False
+        })
         
         print(f"[CONFIG] LLM Provider: {evaluator_config['llm'].get('provider', 'unknown')}")
         print(f"[CONFIG] LLM Model: {evaluator_config['llm'].get('model', 'unknown')}")

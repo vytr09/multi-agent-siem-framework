@@ -22,7 +22,7 @@ from agents.extractor.validators import (
     IndicatorExtractor,
     AdvancedTechniqueDiscovery
 )
-from tests.conftest import get_full_agent_config
+from tests.utils import get_full_agent_config
 
 #     print("=" * 80)
     
@@ -230,25 +230,15 @@ async def test_hybrid_extraction():
         reports_to_process = test_reports
     # Configuration - IMPORTANT: Validators are applied in _format_ttp_for_handoff()
     # Load LLM config from agents.yaml
-    yaml_config = get_full_agent_config("extractor")
-    llm_config = yaml_config.get("llm", {})
+    config = get_full_agent_config("extractor")
     
-    config = {
-        "llm": {
-            "api_key": llm_config.get("api_key", ""),
-            "provider": llm_config.get("provider", "gemini"),
-            "use_mock": False,
-            "model": llm_config.get("model", "gemini-2.0-flash-lite"),
-            "base_url": llm_config.get("base_url"),
-            "temperature": llm_config.get("temperature", 0.3),
-            "max_tokens": llm_config.get("max_tokens", 1000)
-        },
-        "use_nlp_preprocessing": True,
-        "nlp_entity_boost": True,
-        "min_confidence": 0.5,
-        "enable_caching": True,
-        "batch_size": 5
-    }
+    # Ensure test-specific overrides
+    config["use_nlp_preprocessing"] = True
+    config["nlp_entity_boost"] = True
+    config.setdefault("llm", {})["use_mock"] = False
+    config.setdefault("min_confidence", 0.5)
+    config.setdefault("enable_caching", True)
+    config.setdefault("batch_size", 5)
     
     agent = ExtractorAgent(name="hybrid-extraction", config=config)
 
@@ -551,18 +541,12 @@ async def test_batch_hybrid():
     print("BATCH HYBRID PROCESSING TEST")
     print("=" * 80)
     
-    config = {
-        "llm": {
-            "use_mock": False,
-            "model": "gemini-2.0-flash-lite",
-            "temperature": 0.3,
-            "max_tokens": 1000
-        },
-        "use_nlp_preprocessing": True,
-        "min_confidence": 0.5,
-        "enable_caching": True,
-        "batch_size": 2
-    }
+    config = get_full_agent_config("extractor")
+    config["use_nlp_preprocessing"] = True
+    config.setdefault("llm", {})["use_mock"] = False
+    config.setdefault("min_confidence", 0.5)
+    config.setdefault("enable_caching", True)
+    config["batch_size"] = 2
     
     agent = ExtractorAgent(name="hybrid-batch", config=config)
     
