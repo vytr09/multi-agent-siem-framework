@@ -11,8 +11,16 @@ import json
 import os
 import re
 from typing import Dict, Any, List, Optional
-from google import genai
-from google.genai import types
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    genai = None
+    # Mock types for environments without the SDK
+    class MockTypes:
+        GenerateContentConfig = Any
+        SafetySetting = Any
+    types = MockTypes()
 
 
 class LLMJudge:

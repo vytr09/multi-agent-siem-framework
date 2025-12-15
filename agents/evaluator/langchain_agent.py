@@ -66,8 +66,8 @@ class LangChainEvaluatorAgent(BaseAgent):
         try:
             if self.langchain_enabled:
                 # Initialize LangChain components
-                llm_wrapper = create_langchain_llm(self.llm_config)
-                self.evaluation_chain = create_evaluation_chain(llm_wrapper)
+                self.llm_wrapper = create_langchain_llm(self.llm_config)
+                self.evaluation_chain = create_evaluation_chain(self.llm_wrapper)
                 
                 self.logger.info("LangChain Evaluator Agent started with LangChain integration")
             else:
@@ -153,34 +153,50 @@ class LangChainEvaluatorAgent(BaseAgent):
         
         # Evaluate with LangChain
         if self.langchain_enabled and self.evaluation_chain:
-            try:
-                eval_result = await self.evaluation_chain.evaluate(rule, ttp)
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    eval_result = await self.evaluation_chain.evaluate(rule, ttp)
+                    
+                    # Convert to evaluation result
+                    result = {
+                        "rule_title": rule_title,
+                        "rule_id": rule.get("id", rule.get("ttp_id")),
+                        "quality_score": eval_result.get("overall_score", 0) / 10.0,  # Scale to 0-1
+                        "status": "pass" if eval_result.get("overall_score", 0) >= self.min_quality_score * 10 else "fail",
+                        "strengths": eval_result.get("strengths", []),
+                        "weaknesses": eval_result.get("weaknesses", []),
+                        "suggestions": eval_result.get("suggestions", []),
+                        "metrics": {
+                            "accuracy": eval_result.get("detection_coverage", 5) / 10.0,
+                            "completeness": eval_result.get("completeness", 5) / 10.0,
+                            "efficiency": eval_result.get("performance", 5) / 10.0,
+                            "maintainability": eval_result.get("false_positive_rate", 5) / 10.0
+                        },
+                        "evaluation_method": "langchain"
+                    }
+                    
+                    self.stats["langchain_evaluations"] += 1
+                    return result
                 
-                # Convert to evaluation result
-                result = {
-                    "rule_title": rule_title,
-                    "rule_id": rule.get("id", rule.get("ttp_id")),
-                    "quality_score": eval_result.get("overall_score", 0) / 10.0,  # Scale to 0-1
-                    "status": "pass" if eval_result.get("overall_score", 0) >= self.min_quality_score * 10 else "fail",
-                    "strengths": eval_result.get("strengths", []),
-                    "weaknesses": eval_result.get("weaknesses", []),
-                    "suggestions": eval_result.get("suggestions", []),
-                    "metrics": {
-                        "accuracy": eval_result.get("detection_coverage", 5) / 10.0,
-                        "completeness": eval_result.get("completeness", 5) / 10.0,
-                        "efficiency": eval_result.get("performance", 5) / 10.0,
-                        "maintainability": eval_result.get("false_positive_rate", 5) / 10.0
-                    },
-                    "evaluation_method": "langchain"
-                }
-                
-                self.stats["langchain_evaluations"] += 1
-                
-                return result
-                
-            except Exception as e:
-                self.logger.warning(f"LangChain evaluation failed for {rule_title}: {e}, using fallback")
-                return await self._fallback_evaluation(rule)
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    is_rate_limit = "429" in error_msg or "quota" in error_msg or "rate limit" in error_msg or "too many requests" in error_msg
+                    
+                    if is_rate_limit and attempt < max_retries - 1:
+                        self.logger.warning(f"Rate limit hit ({e}). Rotating provider and retrying [{attempt+1}/{max_retries}]...")
+                        try:
+                            if hasattr(self, 'llm_wrapper'):
+                                self.llm_wrapper.rotate_provider()
+                                self.evaluation_chain = create_evaluation_chain(self.llm_wrapper)
+                                await asyncio.sleep(1)
+                                continue
+                        except Exception as rot_e:
+                            self.logger.error(f"Rotation failed: {rot_e}")
+                    
+                    if attempt == max_retries - 1:
+                        self.logger.warning(f"LangChain evaluation failed for {rule_title}: {e}, using fallback")
+                        return await self._fallback_evaluation(rule)
         else:
             return await self._fallback_evaluation(rule)
     

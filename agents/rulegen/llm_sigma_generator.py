@@ -7,8 +7,11 @@ import os
 import json
 import re
 from typing import Dict, List, Any, Optional
-from google import genai
-from google.genai import types
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    genai = None
 from datetime import datetime
 import uuid
 import asyncio

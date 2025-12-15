@@ -5,19 +5,29 @@ Provides LangChain wrappers for the Multi-Agent SIEM Framework
 """
 
 from typing import Dict, Any, List, Optional
-from langchain_google_genai import ChatGoogleGenerativeAI
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+except ImportError:
+    ChatGoogleGenerativeAI = None
+
 try:
     from langchain_openai import ChatOpenAI
 except ImportError:
-    ChatOpenAI = None  # Handle missing dependency gracefully
+    ChatOpenAI = None
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.language_models import BaseChatModel
 from pydantic import BaseModel, Field
 import os
 import json
 import ast
+import random
 from datetime import datetime
+import logging
+from dataclasses import dataclass
+import yaml
+from pathlib import Path
 
 
 # ============================================================================
@@ -120,63 +130,213 @@ class MetricsCallback(BaseCallbackHandler):
 # LangChain LLM Wrapper
 # ============================================================================
 
+# ============================================================================
+# Provider Rotation Logic
+# ============================================================================
+
+@dataclass
+class LLMProvider:
+    name: str
+    type: str  # 'openai', 'gemini'
+    model: str
+    api_key_env: str
+    priority: int = 1
+    base_url: Optional[str] = None
+    
+    def get_api_key(self) -> Optional[str]:
+        return os.getenv(self.api_key_env)
+
+class ProviderRotationManager:
+    """Manages rotation between different LLM providers"""
+    
+    def __init__(self, config_path: str = "config/providers.yaml"):
+        self.logger = logging.getLogger("provider_manager")
+        self.providers: List[LLMProvider] = self._load_providers(config_path)
+        self.current_index = 0
+
+    def _load_providers(self, config_path: str) -> List[LLMProvider]:
+        """Load providers from YAML file"""
+        try:
+            # Resolve path relative to project root
+            root_dir = Path(__file__).resolve().parents[1]
+            full_path = root_dir / config_path
+            
+            if not full_path.exists():
+                self.logger.warning(f"Provider config not found at {full_path}. Using internal defaults.")
+                return self._get_default_providers()
+                
+            with open(full_path, 'r') as f:
+                data = yaml.safe_load(f)
+                
+            providers = []
+            for p in data.get('providers', []):
+                providers.append(LLMProvider(
+                    name=p['name'],
+                    type=p['type'],
+                    model=p['model'],
+                    api_key_env=p['api_key_env'],
+                    priority=p.get('priority', 99),
+                    base_url=p.get('base_url')
+                ))
+            
+            # Sort by priority
+            return sorted(providers, key=lambda x: x.priority)
+            
+        except Exception as e:
+            self.logger.error(f"Failed to load provider config: {e}")
+            return self._get_default_providers()
+
+    def _get_default_providers(self) -> List[LLMProvider]:
+        """Hardcoded defaults if config fails"""
+        return [
+            # Cerebras (Primary - Fast & High Quality)
+            LLMProvider(
+                name="cerebras",
+                type="openai",
+                model="llama-3.3-70b",
+                api_key_env="CEREBRAS_API_KEY",
+                priority=1,
+                base_url="https://api.cerebras.ai/v1"
+            ),
+            # Gemini (Secondary - Default Free Tier)
+            LLMProvider(
+                name="gemini",
+                type="gemini",
+                model="gemini-2.0-flash-lite",
+                api_key_env="GEMINI_API_KEY",
+                priority=2
+            ),
+             # OpenAI (Fallback)
+            LLMProvider(
+                name="openai",
+                type="openai",
+                model="gpt-4o",
+                api_key_env="OPENAI_API_KEY",
+                priority=3
+            )
+        ]
+
+    def get_current_provider(self) -> LLMProvider:
+        """Get currently active provider"""
+        # Ensure we have a valid provider with an API key
+        for _ in range(len(self.providers)):
+            provider = self.providers[self.current_index]
+            if provider.get_api_key():
+                return provider
+            # Skip if no key
+            self.current_index = (self.current_index + 1) % len(self.providers)
+            
+        raise ValueError("No valid LLM providers found (check your API keys in .env)")
+
+    def rotate_provider(self) -> LLMProvider:
+        """Switch to next available provider"""
+        self.current_index = (self.current_index + 1) % len(self.providers)
+        new_provider = self.get_current_provider()
+        self.logger.warning(f"Switched LLM provider to: {new_provider.name} ({new_provider.model})")
+        return new_provider
+
+
+# ============================================================================
+# LangChain LLM Wrapper
+# ============================================================================
+
 class LangChainLLMWrapper:
-    """Wrapper for LangChain LLM integration"""
+    """Wrapper for LangChain LLM integration with auto-rotation"""
     
     def __init__(self, config: Dict[str, Any]):
         """Initialize LangChain LLM"""
         self.config = config
+        self.callback = MetricsCallback()
+        self.provider_manager = ProviderRotationManager()
+        self.logger = logging.getLogger("llm_wrapper")
         
-        # Get API key and resolve env vars
+        # Initialize initial LLM
+        self._init_llm_from_config_or_manager()
+        
+    def _init_llm_from_config_or_manager(self):
+        """Initialize LLM based on config or fallback to manager"""
+        # Try to use specific config first
+        try:
+            self._create_llm_instance(self.config)
+        except Exception as e:
+            self.logger.warning(f"Initial config failed: {e}. Falling back to provider manager.")
+            self._init_from_provider(self.provider_manager.get_current_provider())
+
+    def _init_from_provider(self, provider: LLMProvider):
+        """Initialize from a provider object"""
+        config = {
+            'provider': provider.type,
+            'model': provider.model,
+            'api_key': provider.get_api_key(),
+            'base_url': provider.base_url,
+            'temperature': self.config.get('temperature', 0.3),
+            'max_tokens': self.config.get('max_tokens', 2000)
+        }
+        self._create_llm_instance(config)
+        self.current_provider_name = provider.name
+
+    def _create_llm_instance(self, config: Dict[str, Any]):
+        """Internal method to create the LangChain object"""
         api_key = config.get('api_key')
-        if api_key and isinstance(api_key, str) and api_key.startswith('${') and api_key.endswith('}'):
-            env_var = api_key[2:-1]
-            api_key = os.getenv(env_var)
-            
+        
+        # Resolve config variables if needed (simplified here as usually done by caller)
         if not api_key:
-            # Fallback to env vars based on provider
-            provider = config.get('provider', 'gemini').lower()
-            if provider == 'openai':
+            # Check for legacy fallback logic or assume resolved
+            provider_type = config.get('provider', 'gemini').lower()
+            if provider_type == 'openai':
                 api_key = os.getenv('OPENAI_API_KEY')
             else:
                 api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
-                
+
         if not api_key:
-            raise ValueError(f"API key required for provider {config.get('provider', 'gemini')}")
-        
-        # Create LLM based on provider
+            raise ValueError(f"No API key for {config.get('provider')}")
+
         provider = config.get('provider', 'gemini').lower()
         
         if provider == 'openai':
             if ChatOpenAI is None:
-                raise ImportError("langchain-openai is not installed. Please run: pip install langchain-openai")
+                raise ImportError("langchain-openai not installed")
                 
             llm_kwargs = {
                 'model': config.get('model', 'gpt-4'),
                 'temperature': config.get('temperature', 0.3),
-                'max_tokens': config.get('max_tokens', 2000),
-                'api_key': api_key
+                'api_key': api_key,
+                'max_retries': 0,
+                'timeout': 60.0, # Increased timeout for slower providers
             }
             
-            # Support custom base_url
-            base_url = config.get('base_url')
+            # Handle max_tokens vs max_completion_tokens for Mistral/Others
+            base_url = config.get('base_url', '')
+            max_tokens = config.get('max_tokens', 2000)
+            
             if base_url:
                 llm_kwargs['base_url'] = base_url
                 
+            # Mistral (via codestral endpoint) rejects max_completion_tokens, requires max_tokens
+            if 'mistral' in base_url or 'codestral' in base_url:
+                # Pass via model_kwargs to bypass ChatOpenAI's auto-conversion to max_completion_tokens
+                llm_kwargs['model_kwargs'] = {'max_tokens': max_tokens}
+            else:
+                # Standard behavior (OpenAI, Cerebras seems fine with it)
+                llm_kwargs['max_tokens'] = max_tokens
+                
             self.llm = ChatOpenAI(**llm_kwargs)
             
-        else: # Default to Gemini
+        else: # Gemini
             self.llm = ChatGoogleGenerativeAI(
-                model=config.get('model', 'gemini-2.0-flash-lite'),
+                model=config.get('model', 'gemini-2.5-flash-lite'),
                 temperature=config.get('temperature', 0.3),
                 max_tokens=config.get('max_output_tokens', 2000),
                 google_api_key=api_key
             )
-        
-        # Metrics
-        self.callback = MetricsCallback()
-        
-        print(f"[OK] LangChain LLM initialized: {config.get('model', 'unknown')} (Provider: {provider})")
+            
+        print(f"[LLM] Initialized {config.get('model')} via {provider}")
+
+    def rotate_provider(self):
+        """Manually trigger rotation (to be called by agents on error)"""
+        new_provider = self.provider_manager.rotate_provider()
+        self._init_from_provider(new_provider)
+        return self.llm
     
     def get_metrics(self) -> Dict[str, Any]:
         """Get metrics"""
@@ -308,66 +468,52 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
     
     async def generate(self, ttp_data: Dict[str, Any], feedback: Optional[str] = None) -> SigmaRuleOutput:
         """Generate Sigma rule"""
-        try:
-            indicators_text = "\n".join(f"- {ind}" for ind in ttp_data.get('indicators', []))
-            feedback_text = feedback if feedback else "No previous feedback"
-            
-            result = await self.chain.ainvoke({
-                "ttp_name": ttp_data.get('technique_name', ''),
-                "ttp_id": ttp_data.get('technique_id', ''),
-                "tactic": ttp_data.get('tactic', ''),
-                "description": ttp_data.get('description', '')[:500],
-                "indicators": indicators_text,
-                "feedback": feedback_text
-            })
-            
-            # Post-process: Parse detection JSON string to dict
-            # This is necessary because we changed the model to use str for detection
-            if isinstance(result, SigmaRuleOutput):
-                # Create a new object or modify the existing one (Pydantic models are immutable by default but we can dump to dict)
-                result_dict = result.model_dump()
-                try:
-                    if isinstance(result.detection, str):
-                        # Clean markdown code blocks if present
-                        detection_str = result.detection.strip()
-                        if detection_str.startswith("```"):
-                            detection_str = detection_str.split("```")[1]
-                            if detection_str.startswith("json"):
-                                detection_str = detection_str[4:]
-                        detection_str = detection_str.strip()
-                        
-                        print(f"[DEBUG] Raw detection string: {detection_str}")
+        indicators_text = "\n".join(f"- {ind}" for ind in ttp_data.get('indicators', []))
+        feedback_text = feedback if feedback else "No previous feedback"
+        
+        result = await self.chain.ainvoke({
+            "ttp_name": ttp_data.get('technique_name', ''),
+            "ttp_id": ttp_data.get('technique_id', ''),
+            "tactic": ttp_data.get('tactic', ''),
+            "description": ttp_data.get('description', '')[:500],
+            "indicators": indicators_text,
+            "feedback": feedback_text
+        })
+        
+        # Post-process: Parse detection JSON string to dict
+        # This is necessary because we changed the model to use str for detection
+        if isinstance(result, SigmaRuleOutput):
+            # Create a new object or modify the existing one (Pydantic models are immutable by default but we can dump to dict)
+            result_dict = result.model_dump()
+            try:
+                if isinstance(result.detection, str):
+                    # Clean markdown code blocks if present
+                    detection_str = result.detection.strip()
+                    if detection_str.startswith("```"):
+                        detection_str = detection_str.split("```")[1]
+                        if detection_str.startswith("json"):
+                            detection_str = detection_str[4:]
+                    detection_str = detection_str.strip()
+                    
+                    print(f"[DEBUG] Raw detection string: {detection_str}")
+                    try:
+                        parsed_detection = json.loads(detection_str)
+                    except json.JSONDecodeError:
+                        # Try ast.literal_eval for Python dict syntax (single quotes)
                         try:
-                            parsed_detection = json.loads(detection_str)
-                        except json.JSONDecodeError:
-                            # Try ast.literal_eval for Python dict syntax (single quotes)
-                            try:
-                                parsed_detection = ast.literal_eval(detection_str)
-                            except (ValueError, SyntaxError):
-                                raise  # Re-raise to trigger the outer exception handler
-                        
-                        # Ensure it's a valid JSON string for the Pydantic model
-                        result.detection = json.dumps(parsed_detection)
-                        
-                except (json.JSONDecodeError, ValueError, SyntaxError) as e:
-                    print(f"[ERROR] JSON/AST Decode Error: {e}")
-                    # Fallback if JSON is invalid
-                    result.detection = json.dumps({"selection": {"CommandLine|contains": "suspicious"}, "condition": "selection"})
-            
-            return result
-            
-        except Exception as e:
-            print(f"Sigma generation error: {e}")
-            # Return basic rule on error
-            return SigmaRuleOutput(
-                title=f"Detection: {ttp_data.get('technique_name', 'Unknown')}",
-                description="Auto-generated rule",
-                logsource=LogSourceOutput(category="process_creation", product="windows"),
-                detection=json.dumps({"selection": {"CommandLine|contains": "suspicious"}, "condition": "selection"}),
-                falsepositives=["Unknown"],
-                level="medium",
-                tags=[f"attack.{ttp_data.get('technique_id', 'unknown').lower()}"]
-            )
+                            parsed_detection = ast.literal_eval(detection_str)
+                        except (ValueError, SyntaxError):
+                            raise  # Re-raise to trigger the outer exception handler
+                    
+                    # Ensure it's a valid JSON string for the Pydantic model
+                    result.detection = json.dumps(parsed_detection)
+                    
+            except (json.JSONDecodeError, ValueError, SyntaxError) as e:
+                print(f"[ERROR] JSON/AST Decode Error: {e}")
+                # Fallback if JSON is invalid
+                result.detection = json.dumps({"selection": {"CommandLine|contains": "suspicious"}, "condition": "selection"})
+        
+        return result
 
 
 # ============================================================================
@@ -424,35 +570,17 @@ Return a list of attack commands with metadata."""
     
     async def generate(self, ttp_data: Dict[str, Any]) -> AttackCommandListOutput:
         """Generate attack commands for a TTP"""
-        try:
-            platform = ttp_data.get('platform', 'windows')
-            
-            result = await self.chain.ainvoke({
-                "technique_name": ttp_data.get('technique_name', ttp_data.get('name', 'Unknown')),
-                "technique_id": ttp_data.get('technique_id', 'T1059'),
-                "tactic": ttp_data.get('tactic', 'execution'),
-                "platform": platform,
-                "description": ttp_data.get('description', '')[:500]
-            })
-            
-            return result
-            
-        except Exception as e:
-            print(f"Attack generation error: {e}")
-            # Return safe default command on error
-            return AttackCommandListOutput(
-                commands=[
-                    AttackCommandOutput(
-                        command="echo 'test_command'",
-                        platform=ttp_data.get('platform', 'windows'),
-                        description="Default test command (generation failed)",
-                        technique_id=ttp_data.get('technique_id', 'T1059'),
-                        requires_admin=False,
-                        safety_level="low",
-                        expected_behavior="Prints test string to console"
-                    )
-                ]
-            )
+        platform = ttp_data.get('platform', 'windows')
+        
+        result = await self.chain.ainvoke({
+            "technique_name": ttp_data.get('technique_name', ttp_data.get('name', 'Unknown')),
+            "technique_id": ttp_data.get('technique_id', 'T1059'),
+            "tactic": ttp_data.get('tactic', 'execution'),
+            "platform": platform,
+            "description": ttp_data.get('description', '')[:500]
+        })
+        
+        return result
 
 
 # ============================================================================
@@ -469,10 +597,10 @@ class RuleEvaluationChain:
         
         # Create prompt (no JSON format instructions needed)
         self.prompt = PromptTemplate(
-            input_variables=["rule_content", "ttp_info"],
+            input_variables=["rule_content", "ttp_info", "verification_result"],
             template="""You are a detection engineering expert evaluating SIEM rules.
 
-Evaluate this Sigma rule for quality and effectiveness:
+Evaluate this Sigma rule for quality and effectiveness.
 
 **Rule:**
 {rule_content}
@@ -480,11 +608,16 @@ Evaluate this Sigma rule for quality and effectiveness:
 **Target TTP:**
 {ttp_info}
 
+**Real-World Verification Result:**
+{verification_result}
+
 Evaluate on these criteria (score each 0-10):
-1. Detection Coverage: Does it catch the technique?
+1. Detection Coverage: Does it catch the technique? (If verification passed, score HIGH. If failed, score LOW)
 2. False Positive Rate: Low false positives? (higher score = fewer false positives)
 3. Performance: Efficient query?
 4. Completeness: All necessary fields?
+
+Important: Use the verification result to ground your assessment. If the rule failed to detect the attack in the real SIEM, you MUST downgrade the Detection Coverage score and explain why in "weaknesses".
 
 Provide:
 - Scores for each criterion (0-10)
@@ -501,33 +634,27 @@ Provide:
     
     async def evaluate(self, rule: Dict[str, Any], ttp: Dict[str, Any]) -> Dict[str, Any]:
         """Evaluate rule quality"""
-        try:
-            result = await self.chain.ainvoke({
-                "rule_content": json.dumps(rule, indent=2),
-                "ttp_info": json.dumps({
-                    "name": ttp.get('technique_name', ''),
-                    "id": ttp.get('technique_id', ''),
-                    "tactic": ttp.get('tactic', '')
-                }, indent=2)
-            })
-            
-            # Convert Pydantic model to dict
-            if isinstance(result, RuleEvaluationOutput):
-                return result.model_dump()
-            return result
-            
-        except Exception as e:
-            print(f"Evaluation error: {e}")
-            return {
-                "detection_coverage": 5.0,
-                "false_positive_rate": 5.0,
-                "performance": 5.0,
-                "completeness": 5.0,
-                "overall_score": 5.0,
-                "strengths": [],
-                "weaknesses": [f"Evaluation failed: {str(e)}"],
-                "suggestions": []
-            }
+        # Extract verification result if available
+        verification = rule.get('siem_verification', {})
+        if verification:
+             verification_str = json.dumps(verification, indent=2)
+        else:
+             verification_str = "No verification run performed."
+
+        result = await self.chain.ainvoke({
+            "rule_content": json.dumps(rule, indent=2),
+            "ttp_info": json.dumps({
+                "name": ttp.get('technique_name', ''),
+                "id": ttp.get('technique_id', ''),
+                "tactic": ttp.get('tactic', '')
+            }, indent=2),
+            "verification_result": verification_str
+        })
+        
+        # Convert Pydantic model to dict
+        if isinstance(result, RuleEvaluationOutput):
+            return result.model_dump()
+        return result
 
 
 # ============================================================================

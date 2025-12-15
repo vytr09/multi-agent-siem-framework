@@ -160,7 +160,20 @@ class SSHConnector:
             logger.info(f"Executing remote command: {command[:50]}...")
             stdin, stdout, stderr = self.client.exec_command(command, timeout=60)
             
-            exit_status = stdout.channel.recv_exit_status()
+            # Poll for exit status with timeout
+            start_time = time.time()
+            max_wait = 15 # seconds
+            
+            while not stdout.channel.exit_status_ready():
+                if time.time() - start_time > max_wait:
+                    logger.warning(f"Command execution timed out ({max_wait}s). Assuming running/blocked process.")
+                    break
+                time.sleep(0.5)
+            
+            if stdout.channel.exit_status_ready():
+                exit_status = stdout.channel.recv_exit_status()
+            else:
+                exit_status = 0 # Treat timeout as success (process started)
             output = stdout.read().decode().strip()
             error = stderr.read().decode().strip()
             
@@ -388,9 +401,9 @@ class SIEMIntegrator:
         base_parts = ['index=*']
         
         # Determine sourcetype based on log source
-        product = logsource.get('product', '').lower()
-        service = logsource.get('service', '').lower()
-        category = logsource.get('category', '').lower()
+        product = (logsource.get('product') or '').lower()
+        service = (logsource.get('service') or '').lower()
+        category = (logsource.get('category') or '').lower()
         
         # ALWAYS use Security log sourcetype for Windows process creation
         if product == 'windows' and (category == 'process_creation' or service in ['sysmon', 'security']):

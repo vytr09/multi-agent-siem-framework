@@ -98,8 +98,10 @@ class LangChainExtractorAgent(BaseAgent):
         try:
             if self.langchain_enabled:
                 # Initialize LangChain components
-                llm_wrapper = create_langchain_llm(self.llm_config)
-                self.ttp_chain = create_ttp_extraction_chain(llm_wrapper)
+                # Initialize LangChain components
+                self.llm_wrapper = create_langchain_llm(self.llm_config)
+                self.ttp_chain = create_ttp_extraction_chain(self.llm_wrapper)
+                print(f"DEBUG: Extractor Chain Created: {self.ttp_chain}")
                 
                 self.logger.info("LangChain Extractor Agent started (Enhanced Mode)")
             else:
@@ -228,6 +230,8 @@ class LangChainExtractorAgent(BaseAgent):
         if self.langchain_enabled and self.ttp_chain:
             try:
                 # Build context string
+                print("DEBUG: Starting LLM Extraction")
+                self.logger.info(f"Starting LLM Extraction. Chain exists: {bool(self.ttp_chain)}")
                 context_str = self._build_context_string(report, nlp_results)
                 
                 # Check for IntelEx chunks
@@ -241,8 +245,8 @@ class LangChainExtractorAgent(BaseAgent):
                             # Add chunk context
                             chunk_context = f"{context_str}\n\n[Chunk {i+1}/{len(chunks)}]"
                             
-                            # Execute chain on chunk
-                            ttp_output = await self.ttp_chain.extract(chunk, chunk_context)
+                            # Execute chain on chunk with retry
+                            ttp_output = await self._extract_with_retry(chunk, chunk_context)
                             
                             # Convert and append
                             chunk_ttps = [
@@ -266,8 +270,8 @@ class LangChainExtractorAgent(BaseAgent):
                             continue
                 else:
                     # Fallback to full text if no chunks
-                    self.logger.info(f"No chunks found for {report_id}, using full text")
-                    ttp_output = await self.ttp_chain.extract(report_text, context_str)
+                    self.logger.info(f"No chunks found for {report_id}, using full text. Text length: {len(report_text)}")
+                    ttp_output = await self._extract_with_retry(report_text, context_str)
                     llm_ttps = [
                         {
                             "technique_name": ttp.technique_name,
@@ -285,6 +289,7 @@ class LangChainExtractorAgent(BaseAgent):
                 self.stats["langchain_extractions"] += 1
                 
             except Exception as e:
+                print(f"DEBUG: Extractor LangChain Exception: {e}")
                 self.logger.warning(f"LangChain extraction failed: {e}")
                 llm_ttps = []
         
@@ -576,6 +581,38 @@ class LangChainExtractorAgent(BaseAgent):
         self._is_paused = False
         self._can_execute = True
         self.set_status(AgentStatus.IDLE, "Agent resumed")
+
+    async def _extract_with_retry(self, text: str, context: str) -> Any:
+        """Execute extraction chain with retry on rate limit"""
+        max_retries = 3
+        
+        for attempt in range(max_retries):
+            try:
+                if not self.ttp_chain:
+                    raise Exception("TTP Chain not initialized")
+                    
+                return await self.ttp_chain.extract(text, context)
+                
+            except Exception as e:
+                error_msg = str(e).lower()
+                is_rate_limit = "429" in error_msg or "quota" in error_msg or "resourceexhausted" in error_msg or "rate limit" in error_msg or "too many requests" in error_msg
+                
+                if is_rate_limit and attempt < max_retries - 1:
+                    self.logger.warning(f"Rate limit hit ({e}). Rotating provider and retrying [{attempt+1}/{max_retries}]...")
+                    
+                    # Rotate Provider
+                    try:
+                        self.llm_wrapper.rotate_provider()
+                        # Rebuild Chain
+                        self.ttp_chain = create_ttp_extraction_chain(self.llm_wrapper)
+                        await asyncio.sleep(1) # Brief cool-off
+                        continue
+                    except Exception as rot_e:
+                        self.logger.error(f"Rotation failed: {rot_e}")
+                        raise e # Propagate original error if rotation fails
+                
+                # If not rate limit or out of retries
+                raise e
 
     async def shutdown(self):
         """Shutdown agent"""

@@ -5,7 +5,11 @@ Structured logging system for the Multi-Agent SIEM Framework.
 import logging
 import logging.config
 import sys
+import warnings
 from typing import Optional
+
+# Suppress annoying Google API version warnings
+warnings.filterwarnings("ignore", category=FutureWarning, module="google.api_core")
 
 class AgentLogger:
     """Agent-specific logger that provides additional context and functionality."""

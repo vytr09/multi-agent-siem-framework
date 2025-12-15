@@ -65,8 +65,9 @@ class LangChainRuleGenAgent(BaseAgent):
         try:
             if self.langchain_enabled:
                 # Initialize LangChain components
-                llm_wrapper = create_langchain_llm(self.llm_config)
-                self.sigma_chain = create_sigma_rule_chain(llm_wrapper)
+                self.llm_wrapper = create_langchain_llm(self.llm_config)
+                self.sigma_chain = create_sigma_rule_chain(self.llm_wrapper)
+                print(f"DEBUG: RuleGen Chain Created: {self.sigma_chain}")
                 
                 self.logger.info("LangChain RuleGen Agent started with LangChain integration")
             else:
@@ -209,37 +210,56 @@ class LangChainRuleGenAgent(BaseAgent):
         
         # Generate with LangChain
         if self.langchain_enabled and self.sigma_chain:
-            try:
-                sigma_output = await self.sigma_chain.generate(ttp, feedback_text)
-                
-                # Convert to rule format
-                # Convert to rule format
-                rule = {
-                    "title": sigma_output.title,
-                    "description": sigma_output.description,
-                    "logsource": sigma_output.logsource.model_dump() if hasattr(sigma_output.logsource, 'model_dump') else sigma_output.logsource,
-                    "detection": json.loads(sigma_output.detection) if isinstance(sigma_output.detection, str) else sigma_output.detection,
-                    "falsepositives": sigma_output.falsepositives,
-                    "level": sigma_output.level,
-                    "tags": sigma_output.tags,
-                    "ttp_id": ttp_id,
-                    "technique_name": ttp.get("technique_name"),
-                    "generation_method": "langchain"
-                }
-                
-                self.stats["langchain_generations"] += 1
-                
-                return {
-                    "ttp_id": ttp_id,
-                    "technique_name": ttp.get("technique_name"),
-                    "status": "success",
-                    "rule": rule,
-                    "generation_method": "langchain"
-                }
-                
-            except Exception as e:
-                self.logger.warning(f"LangChain generation failed for {ttp_id}: {e}, using fallback")
-                return await self._fallback_rule_generation(ttp)
+            # Retry loop for rate limits
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    print(f"DEBUG: Generating rule for {ttp_id} using LangChain")
+                    sigma_output = await self.sigma_chain.generate(ttp, feedback_text)
+                    
+                    # Convert to rule format
+                    rule = {
+                        "title": sigma_output.title,
+                        "description": sigma_output.description,
+                        "logsource": sigma_output.logsource.model_dump() if hasattr(sigma_output.logsource, 'model_dump') else sigma_output.logsource,
+                        "detection": json.loads(sigma_output.detection) if isinstance(sigma_output.detection, str) else sigma_output.detection,
+                        "falsepositives": sigma_output.falsepositives,
+                        "level": sigma_output.level,
+                        "tags": sigma_output.tags,
+                        "ttp_id": ttp_id,
+                        "technique_name": ttp.get("technique_name"),
+                        "generation_method": "langchain"
+                    }
+                    
+                    self.stats["langchain_generations"] += 1
+                    
+                    return {
+                        "ttp_id": ttp_id,
+                        "technique_name": ttp.get("technique_name"),
+                        "status": "success",
+                        "rule": rule,
+                        "generation_method": "langchain"
+                    }
+                    
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    is_rate_limit = "429" in error_msg or "quota" in error_msg or "rate limit" in error_msg or "too many requests" in error_msg
+                    
+                    if is_rate_limit and attempt < max_retries - 1:
+                        self.logger.warning(f"Rate limit hit ({e}). Rotating provider and retrying [{attempt+1}/{max_retries}]...")
+                        try:
+                             if hasattr(self, 'llm_wrapper'):
+                                self.llm_wrapper.rotate_provider()
+                                self.sigma_chain = create_sigma_rule_chain(self.llm_wrapper)
+                                await asyncio.sleep(1)
+                                continue
+                        except Exception as rot_e:
+                            self.logger.error(f"Rotation failed: {rot_e}")
+                    
+                    if attempt == max_retries - 1:
+                        print(f"DEBUG: RuleGen LangChain Exception: {e}")
+                        self.logger.warning(f"LangChain generation failed for {ttp_id}: {e}, using fallback")
+                        return await self._fallback_rule_generation(ttp)
         else:
             return await self._fallback_rule_generation(ttp)
     

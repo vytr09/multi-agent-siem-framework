@@ -1,0 +1,51 @@
+# LLM Provider Configuration for Rotation Strategy
+# Usage: Used by core/langchain_integration.py -> ProviderRotationManager
+# Keys:
+#   name: Identifier for logs
+#   type: 'openai' or 'gemini'
+#   model: Model name
+#   api_key_env: Name of environment variable containing the key
+#   base_url: Optional, for compatible APIs like Cerebras
+#   priority: Lower number = tried first
+
+providers:
+  - name: cerebras
+    type: openai
+    model: llama-3.3-70b
+    api_key_env: CEREBRAS_API_KEY
+    base_url: https://api.cerebras.ai/v1
+    priority: 
+
+  # GitHub Models (Free Tier via GitHub Token)
+  - name: github-gpt4o
+    type: openai
+    model: gpt-4o
+    api_key_env: GITHUB_TOKEN
+    base_url: https://models.github.ai/inference
+    priority: 
+
+  - name: mistral
+    type: openai
+    model: codestral-latest
+    api_key_env: CODESTRAL_API_KEY
+    base_url: https://codestral.mistral.ai/v1
+    priority: 
+
+  # - name: nvidia
+  #   type: openai
+  #   model: meta/llama-3.3-70b-instruct
+  #   base_url: https://integrate.api.nvidia.com/v1
+  #   api_key_env: NVIDIA_API_KEY
+  #   priority: 4
+
+  - name: gemini
+    type: gemini
+    model: gemini-1.5-flash
+    api_key_env: GEMINI_API_KEY
+    priority: 
+
+  # - name: openai
+  #   type: openai
+  #   model: gpt-4o
+  #   api_key_env: OPENAI_API_KEY
+  #   priority: 6

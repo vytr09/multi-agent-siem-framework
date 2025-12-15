@@ -69,8 +69,8 @@ class LangChainAttackGenAgent(BaseAgent):
             
             if self.langchain_enabled:
                 # Initialize LangChain components
-                llm_wrapper = create_langchain_llm(self.llm_config)
-                self.attack_chain = create_attack_gen_chain(llm_wrapper)
+                self.llm_wrapper = create_langchain_llm(self.llm_config)
+                self.attack_chain = create_attack_gen_chain(self.llm_wrapper)
                 
                 self.logger.info("LangChain AttackGen Agent started with LangChain integration")
             else:
@@ -156,21 +156,46 @@ class LangChainAttackGenAgent(BaseAgent):
                         'platform': platform
                     }
                     
-                    # Generate using LangChain
-                    self.logger.debug(f"Generating commands for {ttp_data['technique_id']} on {platform}")
-                    output = await self.attack_chain.generate(ttp_data)
-                    
-                    self.stats["langchain_generations"] += 1
-                    
-                    # Process and validate commands
-                    for cmd in output.commands:
-                        processed_cmd = await self._process_command(cmd, ttp, platform)
-                        if processed_cmd:
-                            generated_commands.append(processed_cmd)
+                    # Retry loop for rate limits
+                    max_retries = 3
+                    for attempt in range(max_retries):
+                        try:
+                            # Generate using LangChain
+                            self.logger.debug(f"Generating commands for {ttp_data['technique_id']} on {platform}")
+                            output = await self.attack_chain.generate(ttp_data)
                             
-                except Exception as e:
-                    self.logger.error(f"LangChain generation failed for {platform}: {e}")
-                    self.stats["generation_errors"] += 1
+                            self.stats["langchain_generations"] += 1
+                            
+                            # Process and validate commands
+                            for cmd in output.commands:
+                                processed_cmd = await self._process_command(cmd, ttp, platform)
+                                if processed_cmd:
+                                    generated_commands.append(processed_cmd)
+                            break # Success, exit retry loop
+                            
+                        except Exception as e:
+                            error_msg = str(e).lower()
+                            is_rate_limit = "429" in error_msg or "quota" in error_msg or "rate limit" in error_msg or "too many requests" in error_msg
+                            
+                            if is_rate_limit and attempt < max_retries - 1:
+                                self.logger.warning(f"Rate limit hit ({e}). Rotating provider and retrying [{attempt+1}/{max_retries}]...")
+                                try:
+                                    # Access llm_wrapper from somewhere? 
+                                    # Wait, AttackGen doesn't hold reference to llm_wrapper!
+                                    # We need to store it in self.llm_wrapper during start()
+                                    if hasattr(self, 'llm_wrapper'):
+                                        self.llm_wrapper.rotate_provider()
+                                        self.attack_chain = create_attack_gen_chain(self.llm_wrapper)
+                                        await asyncio.sleep(1)
+                                        continue
+                                except Exception as rot_e:
+                                    self.logger.error(f"Rotation failed: {rot_e}")
+                            
+                            if attempt == max_retries - 1:
+                                self.logger.error(f"LangChain generation failed for {platform}: {e}")
+                                self.stats["generation_errors"] += 1
+                except Exception as outer_e:
+                    self.logger.error(f"Unexpected error in AttackGen for {platform}: {outer_e}")
             
         return generated_commands
 
