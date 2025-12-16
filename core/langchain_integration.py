@@ -338,6 +338,71 @@ class LangChainLLMWrapper:
         self._init_from_provider(new_provider)
         return self.llm
     
+    def get_llm(self, temperature: Optional[float] = None, max_tokens: Optional[int] = None) -> BaseChatModel:
+        """Get LLM instance with optional overrides"""
+        # If no overrides, return current instance
+        if temperature is None and max_tokens is None:
+            return self.llm
+            
+        # Create new config with overrides
+        current_config = self.config.copy()
+        if temperature is not None:
+            current_config['temperature'] = temperature
+        if max_tokens is not None:
+            current_config['max_tokens'] = max_tokens
+            
+        # Re-create LLM for this request (using current provider's credentials)
+        # We need to manually construct it to avoid changing self.llm
+        provider = self.provider_manager.get_current_provider()
+        
+        # Prepare temporary config
+        temp_config = {
+            'provider': provider.type,
+            'model': provider.model,
+            'api_key': provider.get_api_key(),
+            'base_url': provider.base_url,
+            'temperature': temperature if temperature is not None else self.config.get('temperature', 0.3),
+            'max_tokens': max_tokens if max_tokens is not None else self.config.get('max_tokens', 2000)
+        }
+        
+        # Helper to create instance without side effects
+        return self._create_llm_instance_direct(temp_config)
+    
+    def _create_llm_instance_direct(self, config: Dict[str, Any]) -> BaseChatModel:
+        """Create LLM instance without setting self.llm"""
+        api_key = config.get('api_key')
+        provider = config.get('provider', 'gemini').lower()
+        
+        if provider == 'openai':
+            if ChatOpenAI is None:
+                raise ImportError("langchain-openai not installed")
+            
+            llm_kwargs = {
+                'model': config.get('model', 'gpt-4'),
+                'temperature': config.get('temperature', 0.3),
+                'api_key': api_key,
+                'max_retries': 0,
+                'timeout': 60.0,
+            }
+            base_url = config.get('base_url', '')
+            max_tokens = config.get('max_tokens', 2000)
+            if base_url:
+                llm_kwargs['base_url'] = base_url
+            if 'mistral' in base_url or 'codestral' in base_url:
+                llm_kwargs['model_kwargs'] = {'max_tokens': max_tokens}
+            else:
+                llm_kwargs['max_tokens'] = max_tokens
+                
+            return ChatOpenAI(**llm_kwargs)
+            
+        else: # Gemini
+            return ChatGoogleGenerativeAI(
+                model=config.get('model', 'gemini-2.0-flash-lite'),
+                temperature=config.get('temperature', 0.3),
+                max_tokens=config.get('max_output_tokens', 2000),
+                google_api_key=api_key
+            )
+
     def get_metrics(self) -> Dict[str, Any]:
         """Get metrics"""
         return self.callback.get_metrics()
@@ -437,6 +502,9 @@ class SigmaRuleChain:
 **Feedback from Previous Iteration:**
 {feedback}
 
+**Similar Verified Rules (Examples):**
+{examples}
+
 Create a comprehensive Sigma rule with:
 
 **1. Log Source (MANDATORY):**
@@ -466,10 +534,11 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
         
         print("[OK] Sigma Rule Chain created")
     
-    async def generate(self, ttp_data: Dict[str, Any], feedback: Optional[str] = None) -> SigmaRuleOutput:
+    async def generate(self, ttp_data: Dict[str, Any], feedback: Optional[str] = None, examples: Optional[str] = None) -> SigmaRuleOutput:
         """Generate Sigma rule"""
         indicators_text = "\n".join(f"- {ind}" for ind in ttp_data.get('indicators', []))
         feedback_text = feedback if feedback else "No previous feedback"
+        examples_text = examples if examples else "No examples available"
         
         result = await self.chain.ainvoke({
             "ttp_name": ttp_data.get('technique_name', ''),
@@ -477,7 +546,8 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
             "tactic": ttp_data.get('tactic', ''),
             "description": ttp_data.get('description', '')[:500],
             "indicators": indicators_text,
-            "feedback": feedback_text
+            "feedback": feedback_text,
+            "examples": examples_text
         })
         
         # Post-process: Parse detection JSON string to dict
@@ -538,7 +608,11 @@ class AttackCommandGenerationChain:
 - Name: {technique_name}
 - Tactic: {tactic}
 - Platform: {platform}
+- Platform: {platform}
 - Description: {description}
+
+**Verified Attack Examples (for reference):**
+{examples}
 
 Generate 2-3 realistic attack commands that demonstrate this technique on {platform}.
 
@@ -548,6 +622,12 @@ Generate 2-3 realistic attack commands that demonstrate this technique on {platf
 3. Specify if admin/root privileges required
 4. Describe expected behavior
 5. Mark safety level appropriately
+
+**Platform Constraints (CRITICAL):**
+- **Windows**: Use ONLY built-in tools (PowerShell, CMD, CertUtil, Bitsadmin).
+- **Start PowerShell commands with**: `powershell -Command "..."` or `powershell -EncodedCommand ...`
+- **Do NOT use**: Python, Perl, Ruby, gcc, or 'base64' (use CertUtil instead).
+- **Do NOT assume** internet access or specific file paths (use %TEMP%).
 
 **Safety Guidelines:**
 - Use test/benign strings where possible
@@ -568,16 +648,18 @@ Return a list of attack commands with metadata."""
         
         print("[OK] Attack Command Generation Chain created")
     
-    async def generate(self, ttp_data: Dict[str, Any]) -> AttackCommandListOutput:
+    async def generate(self, ttp_data: Dict[str, Any], examples: Optional[str] = None) -> AttackCommandListOutput:
         """Generate attack commands for a TTP"""
         platform = ttp_data.get('platform', 'windows')
+        examples_text = examples if examples else "No examples available"
         
         result = await self.chain.ainvoke({
             "technique_name": ttp_data.get('technique_name', ttp_data.get('name', 'Unknown')),
             "technique_id": ttp_data.get('technique_id', 'T1059'),
             "tactic": ttp_data.get('tactic', 'execution'),
             "platform": platform,
-            "description": ttp_data.get('description', '')[:500]
+            "description": ttp_data.get('description', '')[:500],
+            "examples": examples_text
         })
         
         return result
@@ -711,9 +793,32 @@ class LangChainManager:
         print("\n[OK] LangChain Integration Ready")
         print("="*80 + "\n")
     
+    def get_chat_model(self, temperature: Optional[float] = None, max_tokens: Optional[int] = None) -> BaseChatModel:
+        """Get underlying chat model"""
+        return self.llm_wrapper.get_llm(temperature, max_tokens)
+    
     def get_metrics(self) -> Dict[str, Any]:
         """Get all metrics"""
         return {
             "llm": self.llm_wrapper.get_metrics(),
             "timestamp": datetime.utcnow().isoformat()
         }
+    
+    def rotate_provider(self):
+        """Force rotation of LLM provider"""
+        print(f"[LangChainManager] Rotating LLM provider...")
+        return self.llm_wrapper.rotate_provider()
+# ============================================================================
+# Global Accessor
+# ============================================================================
+
+_llm_manager_instance: Optional[LangChainManager] = None
+
+def get_llm_manager(config: Optional[Dict[str, Any]] = None) -> LangChainManager:
+    """Get or create singleton LLM manager"""
+    global _llm_manager_instance
+    if _llm_manager_instance is None:
+        if config is None:
+            config = {} # Defaults
+        _llm_manager_instance = LangChainManager(config)
+    return _llm_manager_instance

@@ -17,6 +17,7 @@ from core.langchain_integration import (
     SigmaRuleChain
 )
 from agents.evaluator.feedback_manager import FeedbackManager
+from core.knowledge_base import get_kb_manager
 
 
 class LangChainRuleGenAgent(BaseAgent):
@@ -208,6 +209,23 @@ class LangChainRuleGenAgent(BaseAgent):
                         for sug in suggestions[:3]:
                             feedback_text += f"- {sug}\n"
         
+        # Knowledge Base: Retrieve similar rules (Few-Shot)
+        examples_text = ""
+        kb = get_kb_manager()
+        if kb and kb.enabled:
+            query = f"{ttp.get('technique_name', '')} {ttp.get('description', '')}"
+            try:
+                examples = await kb.query_similar_rules(query, n_results=2)
+                if examples:
+                    for ex in examples:
+                        title = ex.get('title', 'Unknown')
+                        detection = ex.get('detection', 'Unknown')
+                        # Format as compact YAML-ish for the prompt
+                        examples_text += f"Rule: {title}\nDetection: {detection}\n\n"
+                    print(f"DEBUG: Found {len(examples)} examples from KB for {ttp_id}")
+            except Exception as e:
+                self.logger.warning(f"KB Query Failed: {e}")
+        
         # Generate with LangChain
         if self.langchain_enabled and self.sigma_chain:
             # Retry loop for rate limits
@@ -215,7 +233,7 @@ class LangChainRuleGenAgent(BaseAgent):
             for attempt in range(max_retries):
                 try:
                     print(f"DEBUG: Generating rule for {ttp_id} using LangChain")
-                    sigma_output = await self.sigma_chain.generate(ttp, feedback_text)
+                    sigma_output = await self.sigma_chain.generate(ttp, feedback_text, examples=examples_text)
                     
                     # Convert to rule format
                     rule = {

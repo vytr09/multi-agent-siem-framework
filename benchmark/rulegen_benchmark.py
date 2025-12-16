@@ -1407,7 +1407,7 @@ async def run_rulegen_benchmark(
             "model": "gemini-2.0-flash-lite",
             "temperature": 0.3,
             "max_tokens": 4000,
-            "batch_size": 4,     # ADD THIS - evaluate 4 criteria per call
+            "batch_size": 2,     # Reduced batch size to 2 to avoid rate limits
             "persona": "expert SIEM engineer and threat detection specialist",
             "detailed_feedback": True,
             "confidence_scores": True

@@ -6,7 +6,7 @@ import asyncio
 import os
 from pathlib import Path
 import json
-from typing import Dict, Any, List, Literal
+from typing import Dict, Any, List, Literal, Optional
 from datetime import datetime
 
 # Traditional agents
@@ -25,6 +25,7 @@ from core.siem_integration import SIEMIntegrator, SIEMMetricsCalculator
 
 from core.config import get_config
 from core.logging import get_agent_logger
+from core.knowledge_base import get_kb_manager
 
 
 AgentMode = Literal["traditional", "langchain", "hybrid"]
@@ -216,17 +217,24 @@ class LangChainOrchestrator:
         else:
             raise ValueError(f"Unknown agent: {agent_name}")
     
-    async def run_pipeline(self, cti_reports: List[Dict]) -> Dict[str, Any]:
+    async def run_pipeline(self, cti_reports: List[Dict], context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Run full pipeline with feedback loop
         """
         self.logger.info(f"Running {self.mode} pipeline with {len(cti_reports)} CTI reports")
         
+        if context is None:
+            context = {}
+        
         # Stage 1: Extract TTPs
         self.logger.info("Stage 1: Extracting TTPs...")
-        extraction_result = await self.extractor.execute({
-            'reports': cti_reports
-        })
+        
+        # Merge context into input payload
+        extraction_payload = {'reports': cti_reports}
+        if context:
+            extraction_payload.update(context)
+            
+        extraction_result = await self.extractor.execute(extraction_payload)
         
         if extraction_result['status'] != 'success':
             return extraction_result
@@ -416,6 +424,17 @@ class LangChainOrchestrator:
             'timestamp': datetime.now().isoformat()
         }
         
+        # Knowledge Base Learning
+        kb = get_kb_manager()
+        if kb and kb.enabled:
+            # Learn from best result
+            for rule in best_result.get('rules', {}).get('rules', []):
+                siem_ver = rule.get('siem_verification', {})
+                # If rule was verified by SIEM detection
+                if siem_ver.get('detected', False):
+                    self.logger.info(f"Learning verified rule: {rule.get('title')}")
+                    await kb.add_sigma_rule(rule, status="verified")
+
         # Write final result
         final_file = self.output_dir / self.mode / 'pipeline_result.json'
         final_file.parent.mkdir(parents=True, exist_ok=True)

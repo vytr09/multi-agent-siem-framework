@@ -26,6 +26,7 @@ from core.langchain_integration import (
     create_ttp_extraction_chain,
     TTPExtractionChain
 )
+from core.knowledge_base import get_kb_manager
 
 
 class LangChainExtractorAgent(BaseAgent):
@@ -146,9 +147,12 @@ class LangChainExtractorAgent(BaseAgent):
             # Extract from reports
             extraction_results = []
             
+            # Check both context and input_data for the flag
+            ignore_duplicates = context.get("ignore_duplicates", False) or input_data.get("ignore_duplicates", False)
+            
             for report in reports:
                 try:
-                    result = await self._extract_from_report(report)
+                    result = await self._extract_from_report(report, ignore_duplicates=ignore_duplicates)
                     extraction_results.append(result)
                     self.stats["total_reports_processed"] += 1
                     
@@ -193,7 +197,7 @@ class LangChainExtractorAgent(BaseAgent):
                 "error": str(e)
             }
     
-    async def _extract_from_report(self, report: Dict[str, Any]) -> Dict[str, Any]:
+    async def _extract_from_report(self, report: Dict[str, Any], ignore_duplicates: bool = False) -> Dict[str, Any]:
         """Extract TTPs from a single report using the full pipeline"""
         report_id = report.get("report_id", "unknown")
         
@@ -206,6 +210,21 @@ class LangChainExtractorAgent(BaseAgent):
         
         # Report text
         report_text = report.get("text") or report.get("description") or report.get("content", "")
+        
+        # Knowledge Base Deduplication
+        kb = get_kb_manager()
+        
+        if kb and kb.enabled and not ignore_duplicates:
+            is_dup = await kb.check_duplicate_report(report_text)
+            if is_dup:
+                self.logger.info(f"Report {report_id} is a duplicate. Skipping extraction.")
+                return {
+                    "report_id": report_id,
+                    "status": "skipped",
+                    "reason": "duplicate_content",
+                    "ttps": [],
+                    "timestamp": datetime.utcnow().isoformat()
+                }
         
         # Step 1: NLP Preprocessing
         nlp_start = datetime.utcnow()
@@ -339,6 +358,14 @@ class LangChainExtractorAgent(BaseAgent):
             }
         }
         
+        # Register to Knowledge Base
+        if kb and kb.enabled:
+            await kb.register_report(report_text, {"title": report.get("title", "Unknown"), "id": report_id})
+            
+            # Save TTPs for future context
+            for ttp in all_ttps:
+                await kb.add_ttp(ttp, report_id)
+
         # Cache
         if self.enable_caching:
             self._extraction_cache[report_id] = result

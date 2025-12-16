@@ -19,6 +19,7 @@ from core.langchain_integration import (
     create_attack_gen_chain,
     AttackCommandGenerationChain
 )
+from core.knowledge_base import get_kb_manager
 
 
 class LangChainAttackGenAgent(BaseAgent):
@@ -158,11 +159,27 @@ class LangChainAttackGenAgent(BaseAgent):
                     
                     # Retry loop for rate limits
                     max_retries = 3
+
+                    # Knowledge Base RAG
+                    kb = get_kb_manager()
+                    examples_text = ""
+                    if kb and kb.enabled:
+                        try:
+                            # Find similar TTPs that have attack commands
+                            query = f"{ttp_data['technique_name']} {ttp_data['description']}"
+                            examples = await kb.query_similar_rules(query, n_results=2)
+                            if examples:
+                                for ex in examples:
+                                    title = ex.get('title', 'Unknown')
+                                    examples_text += f"- Related TTP: {title}\n"
+                        except Exception:
+                            pass # Fail silently
+                    
                     for attempt in range(max_retries):
                         try:
                             # Generate using LangChain
                             self.logger.debug(f"Generating commands for {ttp_data['technique_id']} on {platform}")
-                            output = await self.attack_chain.generate(ttp_data)
+                            output = await self.attack_chain.generate(ttp_data, examples=examples_text)
                             
                             self.stats["langchain_generations"] += 1
                             

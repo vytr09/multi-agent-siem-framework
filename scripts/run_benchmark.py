@@ -23,6 +23,8 @@ from core.logging import get_agent_logger
 from core.logging import get_agent_logger
 from core.langchain_orchestrator import LangChainOrchestrator
 from agents.collector.normalizers.pdf_normalizer import PDFDatasetNormalizer
+from benchmark.rulegen_benchmark import RuleGenBenchmark
+from benchmark.attackgen_benchmark import AttackGenBenchmark
 try:
     from pypdf import PdfReader
 except ImportError:
@@ -36,7 +38,7 @@ logger = get_agent_logger("benchmark")
 DATA_DIR = Path("data/APTnotes/2023")
 OUTPUT_DIR = Path("data/benchmark_results")
 
-async def run_benchmark(limit: int = None):
+async def run_benchmark(limit: int = None, delay: int = 60, force: bool = False):
     """Run benchmark on reports"""
     
     # Setup directories
@@ -104,7 +106,7 @@ async def run_benchmark(limit: int = None):
                 report_data = normalizer.normalize_event(raw_event)
             
             # Run Pipeline
-            pipeline_result = await orchestrator.run_pipeline([report_data])
+            pipeline_result = await orchestrator.run_pipeline([report_data], context={"ignore_duplicates": force})
             
             # Collect Metrics
             duration = time.time() - start_time
@@ -118,9 +120,83 @@ async def run_benchmark(limit: int = None):
             rules = pipeline_result.get('rules', {}).get('rules', [])
             rule_count = len(rules)
             
-            siem_verified_count = sum(1 for r in rules if r.get('siem_verification', {}).get('status') == 'detected')
+            # SIEM Verification results are at top level
+            siem_results = pipeline_result.get('siem_verification', [])
+            # ------------------------------------------------------------------
+            # Stage 6: Quality Assessment (Legacy Benchmark Integration)
+            # ------------------------------------------------------------------
+            logger.info("Stage 6: Running Quality Assessment (LLM-as-Judge)...")
+            
+            # Configure Benchmarks
+            benchmark_config = {
+                "llm_judge": {
+                    "enabled": True, 
+                    "model": "gemini-2.5-flash-lite", # Example, LLM Manager handles actual selection
+                    "temperature": 0.3
+                }
+            }
+            
+            rulegen_benchmark = RuleGenBenchmark(benchmark_config)
+            attackgen_benchmark = AttackGenBenchmark(benchmark_config)
+            
+            # Prepare data for benchmarking
+            generated_rules = pipeline_result.get('rules', {}).get('rules', [])
+            attack_commands = pipeline_result.get('attacks', []) # Attack results are flat list in 'attacks' key check orchestrator
+            
+            # Note: orchestrator.py saves attack results in variable 'attack_results' but puts them in final_result? 
+            # Checking pipeline_result structure... 
+            # It seems Orchestrator result structure might need verification.
+            # Assuming 'attacks' key based on Orchestrator logic (Stage 3)
+            # Actually, `siem_results` zip(rules, attack_results). 
+            # Looking at previous file view of Orchestrator:
+            # It returns final_result with 'extraction', 'rules', 'evaluation', 'siem_verification'
+            # It DOES NOT seem to explicitly export attack commands in the top level final_result!
+            # We need to extract them from siem_verification or rules if embedded.
+            
+            # Workaround: Extract attack commands from siem_verification if available, or just skip if missing.
+            # Re-checking Orchestrator code:
+            # final_result = { ..., "siem_verification": siem_results, ... }
+            # siem_results items have 'attack_id'.
+            # We might need to access the raw attack command data.
+            # Let's check generated_rules.json or similar.
+            
+            # Actually, for now let's just run RuleGenBenchmark since we have the rules.
+            # We'll skip AttackGenBenchmark integration in this script until we confirm where attack commands are stored.
+            
+            quality_scores = {}
+            
+            if generated_rules:
+                logger.info(f"Arguments for RuleGenBenchmark: {len(generated_rules)} rules")
+                # Format rules for benchmark (expects list of dicts)
+                # The benchmark expects specific keys (sigma_rule, platform_rules). 
+                # Our pipeline output might differ. 
+                # RuleGenAgent output format: { "rules": [ { "title": "...", "detection": ... } ] }
+                # RuleGenBenchmark expects: item with "sigma_rule" key.
+                
+                # Adapting structure
+                benchmark_input = []
+                for r in generated_rules:
+                    benchmark_input.append({
+                        "sigma_rule": r,
+                        "attack_id": r.get("tags", ["T1059"])[0] if r.get("tags") else "T1059", # Fallback
+                        "technique_name": r.get("title", "Unknown"),
+                        "tactic": "execution"
+                    })
+                
+                rule_quality_results = await rulegen_benchmark.evaluate_batch(benchmark_input)
+                quality_scores['rulegen_avg'] = rulegen_benchmark.get_statistics().get('average_score', 0)
+                
+                # Save detailed quality report
+                quality_file = OUTPUT_DIR / f"quality_report_{file_path.stem}.json"
+                rulegen_benchmark.export_results(str(quality_file))
+                logger.info(f"Quality report saved to {quality_file}")
+            
+            # ------------------------------------------------------------------    
+            
+            siem_verified_count = sum(1 for r in siem_results if r.get('detected') is True)
             
             eval_score = pipeline_result.get('evaluation', {}).get('average_quality_score', 0)
+            quality_score_avg = quality_scores.get('rulegen_avg', 0)
             
             result_entry = {
                 "file": file_path.name,
@@ -129,11 +205,14 @@ async def run_benchmark(limit: int = None):
                 "ttps_found": ttp_count,
                 "rules_generated": rule_count,
                 "siem_detections": siem_verified_count,
-                "evaluatior_score": eval_score,
-                "error": pipeline_result.get('error')
+                "eval_score": round(eval_score, 2),
+                "quality_score": round(quality_score_avg, 2)
             }
-            
             results.append(result_entry)
+            
+            logger.info(f"Finished {file_path.name}: {ttp_count} TTPs, {rule_count} Rules, {siem_verified_count} Verified, Quality: {quality_score_avg:.2f}")
+
+
             
             # Save individual result
             with open(OUTPUT_DIR / f"result_{file_path.stem}.json", "w") as f:
@@ -148,6 +227,11 @@ async def run_benchmark(limit: int = None):
                 "status": "error",
                 "error": str(e)
             })
+
+        # Rate limiting delay (skip after last item)
+        if i < len(files) - 1 and delay > 0:
+            logger.info(f"Sleeping for {delay}s to respect rate limits...")
+            time.sleep(delay)
             
     # 5. Generate Summary
     logger.info("\nGenerating Benchmark Summary...")
@@ -169,7 +253,8 @@ async def run_benchmark(limit: int = None):
             "avg_ttps_per_report": statistics.mean([r['ttps_found'] for r in success_runs]),
             "avg_rules_per_report": statistics.mean([r['rules_generated'] for r in success_runs]),
             "avg_siem_detection_rate": statistics.mean([r['siem_detections'] for r in success_runs]), # Raw count
-             "avg_quality_score": statistics.mean([r['evaluatior_score'] for r in success_runs])
+            "avg_eval_score": statistics.mean([r['eval_score'] for r in success_runs]),
+            "avg_quality_score": statistics.mean([r['quality_score'] for r in success_runs])
         }
     
     summary["detailed_results"] = results
@@ -195,9 +280,11 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--limit", type=int, default=None, help="Limit number of files to process")
+    parser.add_argument("--delay", type=int, default=60, help="Delay (seconds) between reports to avoid rate limits")
+    parser.add_argument("--force", action="store_true", help="Force reprocessing (ignore duplicates)")
     args = parser.parse_args()
     
     if sys.platform == 'win32':
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         
-    asyncio.run(run_benchmark(args.limit))
+    asyncio.run(run_benchmark(limit=args.limit, delay=args.delay, force=args.force))

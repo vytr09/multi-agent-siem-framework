@@ -1,31 +1,21 @@
 """
 LLM-as-Judge Evaluator
-Uses Gemini API to evaluate agent outputs with structured prompts
-FIXED: Batch evaluation to avoid JSON truncation
+Uses Core Framework's LLMProviderManager for evaluation
+Refactored to remove direct google.genai dependency
 """
 from dotenv import load_dotenv
 load_dotenv()
 
 import asyncio
 import json
-import os
 import re
 from typing import Dict, Any, List, Optional
-try:
-    from google import genai
-    from google.genai import types
-except ImportError:
-    genai = None
-    # Mock types for environments without the SDK
-    class MockTypes:
-        GenerateContentConfig = Any
-        SafetySetting = Any
-    types = MockTypes()
-
+from langchain_core.messages import HumanMessage
+from core.langchain_integration import get_llm_manager
 
 class LLMJudge:
     """
-    LLM-as-Judge evaluator using Gemini API.
+    LLM-as-Judge evaluator using Framework's LLM Integration.
     
     Provides structured evaluation of agent outputs with scoring
     and detailed explanations.
@@ -34,18 +24,13 @@ class LLMJudge:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         
-        # Get API key
-        self.api_key = config.get("api_key") or os.getenv("GEMINI_API_KEY")
-        if not self.api_key:
-            raise ValueError("Gemini API key required for LLM Judge")
+        # Initialize LLM Manager
+        self.llm_manager = get_llm_manager()
         
         # Model configuration
-        self.model_name = config.get("model", "gemini-2.0-flash-lite")
+        self.model_name = config.get("model", "default") # Will use provider manager's default
         self.temperature = config.get("temperature", 0.3)
-        self.max_tokens = config.get("max_tokens", 4000)  # Increased default
-        
-        # Initialize client
-        self.client = genai.Client(api_key=self.api_key)
+        self.max_tokens = config.get("max_tokens", 4000)
         
         # Judge configuration
         self.judge_persona = config.get(
@@ -55,16 +40,26 @@ class LLMJudge:
         
         self.enable_detailed_feedback = config.get("detailed_feedback", True)
         self.enable_confidence_scores = config.get("confidence_scores", True)
+
+    async def _get_llm(self):
+        """Get configured LLM from manager"""
+        # Try to get specific model if configured, else default
+        # Note: LLMProviderManager logic handles fallback
+        return self.llm_manager.get_chat_model(
+            temperature=self.temperature,
+            max_tokens=self.max_tokens
+        )
     
     async def test_connection(self) -> bool:
         """Test LLM connection with a simple query"""
         try:
-            print("[LLM Judge] Testing connection to Gemini API...")
+            print("[LLM Judge] Testing connection to LLM Provider...")
+            llm = await self._get_llm()
             test_prompt = "Respond with only the JSON: {\"status\": \"ok\", \"message\": \"connection successful\"}"
-            response = await self._generate(test_prompt, max_retries=2)
+            response = await llm.ainvoke([HumanMessage(content=test_prompt)])
             
-            if response and len(response.strip()) > 0:
-                print("[LLM Judge] Connection successful")
+            if response and response.content:
+                print(f"[LLM Judge] Connection successful (Provider: {type(llm).__name__})")
                 return True
             else:
                 print("[LLM Judge] Empty response from API")
@@ -73,36 +68,6 @@ class LLMJudge:
         except Exception as e:
             print(f"[LLM Judge] Connection failed: {e}")
             return False
-    
-    def _get_generation_config(self) -> types.GenerateContentConfig:
-        """Create generation configuration without safety_settings"""
-        return types.GenerateContentConfig(
-            temperature=self.temperature,
-            max_output_tokens=self.max_tokens,
-            top_p=0.95,
-            top_k=40
-        )
-    
-    def _get_safety_settings(self) -> List[types.SafetySetting]:
-        """Create safety settings separately"""
-        return [
-            types.SafetySetting(
-                category='HARM_CATEGORY_HARASSMENT',
-                threshold='BLOCK_NONE'
-            ),
-            types.SafetySetting(
-                category='HARM_CATEGORY_HATE_SPEECH',
-                threshold='BLOCK_NONE'
-            ),
-            types.SafetySetting(
-                category='HARM_CATEGORY_SEXUALLY_EXPLICIT',
-                threshold='BLOCK_NONE'
-            ),
-            types.SafetySetting(
-                category='HARM_CATEGORY_DANGEROUS_CONTENT',
-                threshold='BLOCK_NONE'
-            ),
-        ]
     
     async def evaluate(
         self,
@@ -113,15 +78,6 @@ class LLMJudge:
     ) -> Dict[str, Any]:
         """
         Evaluate an item against multiple criteria with automatic batching.
-        
-        Args:
-            item: Item to evaluate
-            criteria: List of evaluation criteria with descriptions
-            context: Optional additional context
-            batch_size: Number of criteria to evaluate per API call (default: 4)
-            
-        Returns:
-            Evaluation results with scores and explanations
         """
         
         # If criteria count <= batch_size, evaluate all at once
@@ -145,13 +101,13 @@ class LLMJudge:
                 batch_evals = result.get("evaluations", [])
                 all_evaluations.extend(batch_evals)
                 
-                # Small delay between batches to avoid rate limiting
+                # Delay between batches to avoid rate limiting
                 if i + batch_size < len(criteria):
-                    await asyncio.sleep(0.5)
+                    print(f"[LLM Judge] Sleeping 10s between batches...")
+                    await asyncio.sleep(10)
                     
             except Exception as e:
                 print(f"[LLM Judge] Batch {batch_num} failed: {e}")
-                # Add fallback scores for this batch
                 all_evaluations.extend([
                     {
                         "criterion": c["name"],
@@ -185,7 +141,6 @@ class LLMJudge:
             response = await self._generate(prompt)
             result = self._parse_evaluation_response(response)
             
-            # Validate result structure
             if not result.get("evaluations"):
                 print(f"[LLM Judge] Warning: No evaluations in result")
                 return self._get_fallback_result(criteria)
@@ -219,7 +174,6 @@ class LLMJudge:
             ""
         ]
         
-        # Add context if provided
         if context:
             prompt_parts.extend([
                 "=== ADDITIONAL CONTEXT ===",
@@ -227,7 +181,6 @@ class LLMJudge:
                 ""
             ])
         
-        # Add evaluation criteria
         prompt_parts.extend([
             "=== EVALUATION CRITERIA ===",
             ""
@@ -236,12 +189,11 @@ class LLMJudge:
         for i, criterion in enumerate(criteria, 1):
             prompt_parts.extend([
                 f"**Criterion {i}: {criterion['name']}**",
-                f"Description: {criterion['description'][:500]}",  # Truncate long descriptions
+                f"Description: {criterion['description'][:500]}",
                 f"Weight: {criterion.get('weight', 1.0)}",
                 ""
             ])
         
-        # Add output format
         prompt_parts.extend([
             "=== OUTPUT FORMAT ===",
             "Respond with ONLY valid JSON in this exact format:",
@@ -267,63 +219,21 @@ class LLMJudge:
         
         return "\n".join(prompt_parts)
     
-    async def _generate(self, prompt: str, max_retries: int = 3) -> str:
-        """Generate response from Gemini with retry logic"""
+    async def _generate(self, prompt: str, max_retries: int = 5) -> str:
+        """Generate response using Framework LLM with retry logic"""
         
-        def _generate_sync():
-            config = self._get_generation_config()
-            
-            # Try to pass safety_settings in generate_content call
-            try:
-                response = self.client.models.generate_content(
-                    model=self.model_name,
-                    contents=prompt,
-                    config=config,
-                    safety_settings=self._get_safety_settings()
-                )
-            except TypeError:
-                # If safety_settings not supported in generate_content, try without it
-                response = self.client.models.generate_content(
-                    model=self.model_name,
-                    contents=prompt,
-                    config=config
-                )
-            
-            # Extract text
-            if hasattr(response, 'text') and response.text:
-                return response.text
-            
-            if hasattr(response, "candidates") and response.candidates:
-                candidate = response.candidates[0]
-                if hasattr(candidate, 'content'):
-                    content = candidate.content
-                    if hasattr(content, "parts") and content.parts:
-                        texts = []
-                        for part in content.parts:
-                            if hasattr(part, "text") and part.text:
-                                texts.append(part.text)
-                        if texts:
-                            return ''.join(texts)
-            
-            # Check for blocked content or errors
-            if hasattr(response, "candidates") and response.candidates:
-                candidate = response.candidates[0]
-                if hasattr(candidate, 'finish_reason'):
-                    finish_reason = str(candidate.finish_reason)
-                    if 'SAFETY' in finish_reason or 'BLOCKED' in finish_reason:
-                        raise ValueError(f"Content blocked by safety filters: {finish_reason}")
-            
-            return ""
+        # Initial get
+        llm = await self._get_llm()
         
-        # Retry logic
         last_error = None
         for attempt in range(max_retries):
             try:
-                loop = asyncio.get_event_loop()
-                result = await loop.run_in_executor(None, _generate_sync)
+                # Use ainvoke for async execution
+                response = await llm.ainvoke([HumanMessage(content=prompt)])
+                content = response.content
                 
-                if result and len(result.strip()) > 0:
-                    return result
+                if content and len(content.strip()) > 0:
+                    return content
                 else:
                     last_error = ValueError("Empty response from LLM")
                     if attempt < max_retries - 1:
@@ -333,12 +243,38 @@ class LLMJudge:
             except Exception as e:
                 last_error = e
                 if attempt < max_retries - 1:
-                    print(f"[LLM Judge] Error: {e}, retrying ({attempt + 1}/{max_retries})...")
-                    await asyncio.sleep(2)
+                    print(f"[LLM Judge] Error: {repr(e)}")
+                    
+                    # Backoff strategy with Rotation
+                    # Check for various forms of rate limit errors
+                    error_str = str(e).lower()
+                    error_repr = repr(e).lower()
+                    
+                    if ("429" in error_str or 
+                        "too many requests" in error_str or 
+                        "ratelimit" in error_repr or 
+                        "quota" in error_str):
+                        
+                        print(f"[LLM Judge] Hit Rate Limit (429/Quota). Initiating Provider Rotation...")
+                        
+                        # Force provider rotation
+                        if hasattr(self.llm_manager, 'rotate_provider'):
+                            self.llm_manager.rotate_provider()
+                            # CRITICAL: Invalidate local cache and re-fetch LLM
+                            self.llm = None
+                            llm = await self._get_llm()
+                            print(f"[LLM Judge] Rotated to new provider: {type(llm).__name__}")
+                        
+                        # Small delay to let rotation settle (2s)
+                        await asyncio.sleep(2)
+                    else:
+                        # Exponential backoff for other errors: 2, 4, 8...
+                        sleep_time = 2 ** (attempt + 1)
+                        print(f"[LLM Judge] Retrying in {sleep_time}s...")
+                        await asyncio.sleep(sleep_time)
                 else:
                     print(f"[LLM Judge] All retries failed: {e}")
         
-        # If all retries failed, raise the last error
         if last_error:
             raise last_error
         else:
@@ -346,19 +282,11 @@ class LLMJudge:
     
     def _parse_evaluation_response(self, response: str) -> Dict[str, Any]:
         """Parse LLM evaluation response with robust error handling"""
-        
-        # Clean response
         response = response.strip()
         
         if not response:
-            print(f"[LLM Judge] Empty response received")
-            return {
-                "evaluations": [],
-                "overall_assessment": "Empty response from LLM",
-                "recommendations": []
-            }
+            return self._get_empty_response()
         
-        # Remove markdown code blocks
         if response.startswith("```"):
             lines = response.split("\n")
             if len(lines) > 2:
@@ -366,49 +294,40 @@ class LLMJudge:
                 if response.startswith("json"):
                     response = "\n".join(response.split("\n")[1:])
         
-        # Try to fix common JSON issues
         response = self._fix_json_issues(response)
         
-        # Try to find and parse JSON
         try:
-            # First try direct parsing
             return json.loads(response)
         except json.JSONDecodeError as e:
             print(f"[LLM Judge] JSON parse error: {e}")
             
-            # Try to extract and fix JSON
             json_text = self._extract_json(response)
             if json_text:
                 try:
                     return json.loads(json_text)
                 except json.JSONDecodeError:
-                    print(f"[LLM Judge] Failed to parse extracted JSON")
+                    pass
             
-            # Last resort: try to salvage partial evaluations
             salvaged = self._salvage_partial_json(response)
             if salvaged and salvaged.get("evaluations"):
-                print(f"[LLM Judge] Salvaged {len(salvaged['evaluations'])} partial evaluations")
                 return salvaged
             
-            print(f"[LLM Judge] Response preview: {response[:500]}")
-            return {
-                "evaluations": [],
-                "overall_assessment": "Failed to parse LLM response",
-                "recommendations": []
-            }
-    
+            return self._get_empty_response("Failed to parse LLM response")
+            
+    def _get_empty_response(self, msg="Empty response") -> Dict[str, Any]:
+        return {
+            "evaluations": [],
+            "overall_assessment": msg,
+            "recommendations": []
+        }
+
     def _fix_json_issues(self, text: str) -> str:
-        """Fix common JSON formatting issues"""
-        # Remove trailing commas before closing brackets
         text = re.sub(r',(\s*[}\]])', r'\1', text)
         return text
     
     def _extract_json(self, text: str) -> Optional[str]:
-        """Extract JSON object from text"""
-        # Find outermost JSON object
         brace_count = 0
         start_idx = -1
-        
         for i, char in enumerate(text):
             if char == '{':
                 if brace_count == 0:
@@ -418,14 +337,10 @@ class LLMJudge:
                 brace_count -= 1
                 if brace_count == 0 and start_idx >= 0:
                     return text[start_idx:i+1]
-        
         return None
     
     def _salvage_partial_json(self, text: str) -> Dict[str, Any]:
-        """Try to salvage partial evaluations from incomplete JSON"""
         evaluations = []
-        
-        # Look for evaluation objects
         pattern = r'\{\s*"criterion":\s*"([^"]+)"[^}]*"score":\s*(\d+\.?\d*)[^}]*"explanation":\s*"([^"]*)"'
         matches = re.finditer(pattern, text, re.DOTALL)
         
@@ -435,10 +350,10 @@ class LLMJudge:
                 evaluations.append({
                     "criterion": criterion,
                     "score": float(score),
-                    "explanation": explanation[:500],  # Truncate long explanations
+                    "explanation": explanation[:500],
                     "strengths": [],
                     "weaknesses": [],
-                    "confidence": 0.7  # Lower confidence for partial data
+                    "confidence": 0.5
                 })
             except (ValueError, TypeError):
                 continue
@@ -446,38 +361,28 @@ class LLMJudge:
         if evaluations:
             return {
                 "evaluations": evaluations,
-                "overall_assessment": "Partial evaluation recovered from incomplete response",
-                "recommendations": ["Re-run for complete evaluation"]
+                "overall_assessment": "Partial evaluation recovered",
+                "recommendations": []
             }
-        
-        return {
-            "evaluations": [],
-            "overall_assessment": "Failed to parse response",
-            "recommendations": []
-        }
+        return {}
     
     def _get_fallback_result(self, criteria: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Get fallback result when LLM fails - with better default scores"""
         return {
             "evaluations": [
                 {
                     "criterion": c["name"],
-                    "score": 5.0,  # Neutral score
-                    "explanation": f"LLM evaluation unavailable - using neutral score for {c['name']}",
-                    "strengths": ["Unable to evaluate - LLM error"],
-                    "weaknesses": ["Evaluation not performed due to technical error"],
+                    "score": 5.0,
+                    "explanation": f"LLM evaluation unavailable - using neutral score",
+                    "strengths": [],
+                    "weaknesses": [],
                     "confidence": 0.0
                 }
                 for c in criteria
             ],
-            "overall_assessment": "Evaluation failed - LLM unavailable. Scores defaulted to neutral (5.0/10). Manual review recommended.",
-            "recommendations": [
-                "Re-run evaluation with working LLM connection",
-                "Check API key and network connectivity",
-                "Review Gemini API quotas and rate limits"
-            ]
+            "overall_assessment": "Evaluation failed - LLM unavailable.",
+            "recommendations": []
         }
-    
+
     async def compare(
         self,
         item_a: Dict[str, Any],
@@ -485,52 +390,21 @@ class LLMJudge:
         criteria: str,
         context: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """
-        Compare two items against a criterion.
-        
-        Args:
-            item_a: First item
-            item_b: Second item
-            criteria: Comparison criteria
-            context: Optional context
-            
-        Returns:
-            Comparison result with preference and reasoning
-        """
+        """Compare two items"""
         prompt = self._build_comparison_prompt(item_a, item_b, criteria, context)
-        
         try:
             response = await self._generate(prompt)
-            result = self._parse_comparison_response(response)
-            return result
-            
+            return self._parse_comparison_response(response)
         except Exception as e:
             print(f"[LLM Judge] Comparison error: {e}")
-            return {
-                "preference": "neutral",
-                "reasoning": f"Comparison failed: {e}",
-                "confidence": 0.0
-            }
-    
-    def _build_comparison_prompt(
-        self,
-        item_a: Dict[str, Any],
-        item_b: Dict[str, Any],
-        criteria: str,
-        context: Optional[Dict[str, Any]]
-    ) -> str:
-        """Build comparison prompt"""
-        
+            return {"preference": "neutral", "reasoning": str(e), "confidence": 0.0}
+
+    def _build_comparison_prompt(self, item_a, item_b, criteria, context) -> str:
         prompt_parts = [
             f"You are an {self.judge_persona} comparing two cybersecurity artifacts.",
             "",
             "=== COMPARISON TASK ===",
             f"Compare Item A and Item B based on: {criteria}",
-            "",
-            "Provide:",
-            "1. Which item is better (A, B, or neutral)",
-            "2. Detailed reasoning for your choice",
-            "3. Confidence in your assessment (0-1)",
             "",
             "=== ITEM A ===",
             json.dumps(item_a, indent=2),
@@ -539,48 +413,24 @@ class LLMJudge:
             json.dumps(item_b, indent=2),
             ""
         ]
-        
         if context:
-            prompt_parts.extend([
-                "=== CONTEXT ===",
-                json.dumps(context, indent=2),
-                ""
-            ])
-        
-        prompt_parts.extend([
+            prompt_parts += ["=== CONTEXT ===", json.dumps(context, indent=2), ""]
+            
+        prompt_parts += [
             "=== OUTPUT FORMAT ===",
-            "Respond with ONLY valid JSON:",
-            "{",
-            '  "preference": "A" | "B" | "neutral",',
-            '  "reasoning": "detailed explanation",',
-            '  "confidence": 0.0-1.0,',
-            '  "item_a_strengths": ["strength 1", "strength 2"],',
-            '  "item_b_strengths": ["strength 1", "strength 2"]',
-            "}",
-            "",
-            "Begin comparison:"
-        ])
-        
+            "Respond with ONLY valid JSON: { \"preference\": \"A\" | \"B\" | \"neutral\", \"reasoning\": \"...\", \"confidence\": 0.9 }"
+        ]
         return "\n".join(prompt_parts)
-    
+
     def _parse_comparison_response(self, response: str) -> Dict[str, Any]:
-        """Parse comparison response"""
-        
         response = response.strip()
-        
         if response.startswith("```"):
-            lines = response.split("\n")
-            response = "\n".join(lines[1:-1])
-            if response.startswith("json"):
-                response = "\n".join(response.split("\n")[1:])
-        
+             lines = response.split("\n")
+             if len(lines) > 2:
+                response = "\n".join(lines[1:-1])
+                if response.startswith("json"):
+                    response = "\n".join(response.split("\n")[1:])
         try:
             return json.loads(response)
-        except json.JSONDecodeError:
-            return {
-                "preference": "neutral",
-                "reasoning": "Failed to parse response",
-                "confidence": 0.0,
-                "item_a_strengths": [],
-                "item_b_strengths": []
-            }
+        except:
+             return {"preference": "neutral", "reasoning": "Failed to parse", "confidence": 0.0}
