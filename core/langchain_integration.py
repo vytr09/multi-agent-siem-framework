@@ -624,10 +624,11 @@ Generate 2-3 realistic attack commands that demonstrate this technique on {platf
 5. Mark safety level appropriately
 
 **Platform Constraints (CRITICAL):**
-- **Windows**: Use ONLY built-in tools (PowerShell, CMD, CertUtil, Bitsadmin).
-- **Start PowerShell commands with**: `powershell -Command "..."` or `powershell -EncodedCommand ...`
-- **Do NOT use**: Python, Perl, Ruby, gcc, or 'base64' (use CertUtil instead).
-- **Do NOT assume** internet access or specific file paths (use %TEMP%).
+- **Windows**: Use ONLY built-in tools.
+- **Preference**: PREFER legacy binaries (net.exe, sc.exe, whoami.exe, ipconfig.exe, certutil.exe) over PowerShell Cmdlets whenever possible, as they are cleaner for detection matching.
+- **PowerShell**: Use it if no binary exists (e.g. for encoded commands). Start with `powershell -Command "..."`.
+- **Do NOT use**: Python, Perl, Ruby, gcc.
+- **Do NOT assume** internet access (use %TEMP% for files).
 
 **Safety Guidelines:**
 - Use test/benign strings where possible

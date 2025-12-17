@@ -145,7 +145,18 @@ class LangChainAttackGenAgent(BaseAgent):
         """Generate commands for a single TTP"""
         generated_commands = []
         
-        for platform in self.supported_platforms:
+        # Determine target platforms
+        target_platforms = self.supported_platforms
+        if ttp.get('platform'):
+            p = ttp.get('platform', '').lower()
+            # Map common names
+            if 'win' in p: p = 'windows'
+            elif 'lin' in p: p = 'linux'
+            
+            if p in self.supported_platforms:
+                target_platforms = [p]
+
+        for platform in target_platforms:
             if self.langchain_enabled and self.attack_chain:
                 try:
                     # Prepare TTP data with platform

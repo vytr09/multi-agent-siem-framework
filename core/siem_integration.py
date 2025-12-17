@@ -333,9 +333,9 @@ class SIEMIntegrator:
         if self.simulation_mode:
             return self._simulate_verification(rule, attack)
             
-        # Capture start time (minus small buffer for clock skew)
+        # Capture start time (minus buffer for clock skew)
         # Use epoch time for Splunk 'earliest'
-        start_time = time.time() - 2
+        start_time = time.time() - 300  # 5 minutes buffer
             
         # 1. Execute Attack
         logger.info(f"Executing attack: {attack.get('command')}")
@@ -344,10 +344,6 @@ class SIEMIntegrator:
         if exec_result['status'] != 'success':
             logger.warning(f"Attack execution failed: {exec_result.get('error')}. Proceeding to verification anyway (Event ID 4688 should still be generated).")
             # We continue instead of returning error
-            # return DetectionResult(
-            #     detected=False, events_found=0, query_time_ms=0, historical_events=0,
-            #     status="error", message=f"Attack execution failed: {exec_result.get('error')}", raw_events=[]
-            # )
             
         # 2. Wait for indexing (configurable)
         wait_time = self.config.get('indexing_wait_time', 10)
@@ -384,14 +380,14 @@ class SIEMIntegrator:
             message="Verification complete",
             raw_events=detect_result.get('results', [])
         )
-        
+
     def _extract_query(self, rule: Dict[str, Any]) -> str:
-        """Extract Splunk query from Sigma rule using robust conversion logic"""
+        """Extract Splunk query from Sigma rule"""
         # Check for pre-built Splunk query
-        if 'splunk_query' in rule:
+        if rule.get('splunk_query'):
             return rule['splunk_query']
             
-        # Initialize mappings if not already done (could be moved to __init__ but keeping here for now)
+        # Initialize mappings
         self._init_mappings()
         
         detection = rule.get('detection', {})
@@ -405,20 +401,19 @@ class SIEMIntegrator:
         service = (logsource.get('service') or '').lower()
         category = (logsource.get('category') or '').lower()
         
-        # ALWAYS use Security log sourcetype for Windows process creation
-        if product == 'windows' and (category == 'process_creation' or service in ['sysmon', 'security']):
-            base_parts.append('sourcetype="WinEventLog:Security"')
-            if category == 'process_creation':
-                base_parts.append('EventCode=4688')
-        elif product == 'windows':
-            if service == 'sysmon':
-                base_parts.append('sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"')
-            elif service == 'security':
-                base_parts.append('sourcetype="WinEventLog:Security"')
-        else:
-            base_parts.append('sourcetype="WinEventLog:Security"')
+        # Handle Windows log sources
+        if product == 'windows':
+            # Force Security Log for all process creation to handle missing Sysmon
+            # if service == 'sysmon': ... (Ignored)
             
-        # Extract condition and detection blocks
+            if category == 'process_creation' or service == 'sysmon' or service == 'security':
+                # Fallback to EventCode 4688 (Security)
+                base_parts.append('sourcetype="WinEventLog:Security"')
+                if category == 'process_creation':
+                    base_parts.append('EventCode=4688')
+            else:
+                base_parts.append('sourcetype="WinEventLog:Security"')
+
         condition = detection.get('condition', '')
         detection_blocks = {k: v for k, v in detection.items() if k != 'condition'}
         
@@ -486,18 +481,36 @@ class SIEMIntegrator:
             'user.name': 'Subject_User_Name',
             'event.code': 'EventCode',
         }
+        self.sysmon_mapping = {
+            'EventID': 'EventCode',
+            'process.executable': 'Image',
+            'process.command_line': 'CommandLine',
+            'process.parent.executable': 'ParentImage',
+            'process.parent.command_line': 'ParentCommandLine',
+            'user.name': 'User',
+            'file.path': 'TargetFilename',
+            'Image': 'Image',
+            'CommandLine': 'CommandLine',
+            'ParentImage': 'ParentImage',
+            'User': 'User'
+        }
 
     def _convert_field_name(self, field: str, logsource: Dict = None) -> str:
         """Convert Sigma field to Splunk field"""
+        # Always use traditional mapping (force fallback to Security logs)
+        mapping = self.traditional_mapping
+        
         if '.' in field:
             return self.ecs_mapping.get(field, field)
-        return self.traditional_mapping.get(field, field)
+            
+        return mapping.get(field, field)
 
     def _escape_splunk_value(self, value: str) -> str:
         """Escape Splunk value"""
         if not isinstance(value, str):
             value = str(value)
-        return value.replace('"', '\\"')
+        # Escape backslashes first to avoid double escaping quotes
+        return value.replace('\\', '\\\\').replace('"', '\\"')
 
     def _process_modifier(self, field: str, modifier: str, value: Any, logsource: Dict = None) -> str:
         """Process Sigma modifiers"""
