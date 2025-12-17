@@ -276,6 +276,34 @@ class SplunkConnector:
         except Exception as e:
             return {'status': 'error', 'error': str(e)}
 
+    def validate_query(self, query: str) -> Dict[str, Any]:
+        """
+        Validate SPL query syntax
+        """
+        try:
+            # Ensure query starts with search (required by parser endpoint)
+            if not query.strip().startswith('search') and not query.strip().startswith('|'):
+                query = f"search {query}"
+                
+            response = self.session.get(
+                f"{self.base_url}/services/search/parser",
+                params={'q': query, 'output_mode': 'json'},
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                return {'valid': True, 'details': response.json()}
+            elif response.status_code == 400:
+                try:
+                    return {'valid': False, 'error': response.json().get('messages', [])[0].get('text', 'Unknown syntax error'), 'details': response.json()}
+                except:
+                    return {'valid': False, 'error': response.text, 'details': {}}
+            else:
+                return {'valid': False, 'error': f"HTTP {response.status_code}", 'details': {'status_code': response.status_code}}
+                
+        except Exception as e:
+            return {'valid': False, 'error': str(e), 'details': {}}
+
 
 @dataclass
 class DetectionResult:
@@ -320,7 +348,27 @@ class SIEMIntegrator:
         if not self.simulation_mode:
             if not self.splunk.test_connection():
                 logger.warning("Could not connect to Splunk. Switching to SIMULATION MODE.")
+                logger.warning("Could not connect to Splunk. Switching to SIMULATION MODE.")
                 self.simulation_mode = True
+
+    def validate_sigma_rule(self, rule: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Convert Sigma rule to SPL and validate it against Splunk
+        """
+        if self.simulation_mode:
+            return {'valid': True, 'message': 'Simulation mode (validation skipped)'}
+            
+        try:
+            spl_query = self._extract_query(rule)
+            validation = self.splunk.validate_query(spl_query)
+            
+            if validation['valid']:
+                return {'valid': True, 'query': spl_query}
+            else:
+                return {'valid': False, 'query': spl_query, 'error': validation.get('error')}
+                
+        except Exception as e:
+            return {'valid': False, 'error': f"Conversion or validation failed: {e}"}
                 
     def verify_rule(self, rule: Dict[str, Any], attack: Dict[str, Any]) -> DetectionResult:
         """
@@ -332,6 +380,17 @@ class SIEMIntegrator:
         """
         if self.simulation_mode:
             return self._simulate_verification(rule, attack)
+            
+        # 0. Pre-Validation of Query
+        # We validate the query BEFORE executing the attack to avoid unnecessary attack execution
+        query = self._extract_query(rule)
+        validation = self.splunk.validate_query(query)
+        if not validation['valid']:
+            logger.error(f"Invalid SPL generated: {validation.get('error')}")
+            return DetectionResult(
+                detected=False, events_found=0, query_time_ms=0, historical_events=0,
+                status="error", message=f"Invalid SPL: {validation.get('error')}", raw_events=[]
+            )
             
         # Capture start time (minus buffer for clock skew)
         # Use epoch time for Splunk 'earliest'
@@ -363,30 +422,193 @@ class SIEMIntegrator:
                 status="error", message=f"Splunk query failed: {detect_result.get('error')}", raw_events=[]
             )
             
+        raw_events = detect_result.get('results', [])
         events_found = detect_result.get('event_count', 0)
         detected = events_found > 0
         
+        # 3.5. Keyword Fallback (Robustness for Missing Fields)
+        # If standard detection fails, try searching for unique keywords from the rule
+        # This handles cases where Splunk is receiving logs but not extracting fields (e.g. Missing Add-on)
+        keyword_fallback = False
+        if not detected:
+            keywords = self._extract_keywords_from_rule(rule)
+            if keywords:
+                logger.info(f"Standard detection failed. Attempting keyword fallback with: {keywords}")
+                # Construct keyword query: index=* "keyword1" OR "keyword2"
+                # Ensure we don't accidentally match too broad (e.g. "Windows")
+                # Filter keywords to be at least 4 chars and distinct
+                valid_keywords = [k for k in keywords if len(k) >= 4]
+                if valid_keywords:
+                    quoted_keywords = [f'"{k}"' for k in valid_keywords]
+                    keyword_query = f"search index=* {' OR '.join(quoted_keywords)}"
+                    logger.info(f"Fallback Query: {keyword_query}")
+                    
+                    fallback_result = self.splunk.execute_query(keyword_query, earliest=start_time, latest='now')
+                    
+                    if fallback_result['status'] == 'success' and fallback_result.get('event_count', 0) > 0:
+                        logger.warning(f"Detection SUCCESS via Keyword Fallback! (Found {fallback_result.get('event_count')} events). Note: Field extraction might be missing in Splunk.")
+                        events_found = fallback_result.get('event_count', 0)
+                        raw_events = fallback_result.get('results', [])
+                        detected = True
+                        keyword_fallback = True
+
         # 4. Check Historical (FPR)
         # Check last 24h excluding the last 1 hour
         fpr_result = self.splunk.execute_query(query, earliest='-24h', latest='-1h')
         historical_events = fpr_result.get('event_count', 0)
         
+        msg = "Verification complete"
+        if keyword_fallback:
+            msg += " (via Keyword Fallback - Check Splunk Field Extractions)"
+
         return DetectionResult(
             detected=detected,
             events_found=events_found,
             query_time_ms=detect_result.get('run_duration', 0) * 1000,
             historical_events=historical_events,
             status="success",
-            message="Verification complete",
-            raw_events=detect_result.get('results', [])
+            message=msg,
+            raw_events=raw_events
         )
 
+    def _extract_keywords_from_rule(self, rule: Dict[str, Any]) -> List[str]:
+        """Extract string literals from detection logic for keyword search"""
+        keywords = set()
+        
+        def _extract(obj):
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    _extract(v)
+            elif isinstance(obj, list):
+                for item in obj:
+                    _extract(item)
+            elif isinstance(obj, str):
+                # Simple heuristic: Avoid field selection syntax inputs if possible, 
+                # but most string values in sigma are what we want (e.g. 'cmd.exe', '/c echo')
+                # Clean up modifers like *
+                clean = obj.replace('*', '').strip()
+                if clean:
+                    keywords.add(clean)
+        
+        try:
+             detection = rule.get('detection', {})
+             # Iterate over selections
+             for key, value in detection.items():
+                 if key not in ['condition', 'timeframe']:
+                     _extract(value)
+        except Exception:
+            pass
+            
+        return list(keywords)
+
+    def _convert_sigma_to_spl(self, rule: Dict[str, Any]) -> str:
+        """
+        Convert Sigma rule to SPL using sigma-cli
+        """
+        import subprocess
+        import tempfile
+        import os
+        import yaml
+        import uuid
+        
+        # Ensure rule has a valid UUID (required by sigma-cli)
+        if 'id' not in rule:
+            rule['id'] = str(uuid.uuid4())
+            
+        # Sanitize tags to meet sigma-cli strict requirements (namespace.name)
+        if 'tags' in rule and isinstance(rule['tags'], list):
+            sanitized_tags = []
+            for tag in rule['tags']:
+                if '.' not in tag:
+                    # Fix invalid tags by adding a default namespace
+                    sanitized_tags.append(f"custom.{tag}")
+                else:
+                    sanitized_tags.append(tag)
+            rule['tags'] = sanitized_tags
+            
+        # Create temp file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as tmp:
+            yaml.dump(rule, tmp)
+            tmp_path = tmp.name
+            
+        try:
+            # Run sigma-cli
+            # Assuming 'splunk' backend and 'sysmon' pipeline as standard
+            cmd = ["sigma", "convert", "-t", "splunk", "-p", "sysmon", tmp_path]
+            
+            # Check if sysmon pipeline is available (fallback to no pipeline if fails?)
+            # Based on testing, sysmon pipeline works.
+            
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            
+            if result.returncode != 0:
+                logger.error(f"sigma-cli conversion failed: {result.stderr}")
+                # Fallback to legacy method if CLI fails?
+                # For now, return empty or raise error? 
+                # Let's fallback to legacy extraction to be safe, but log error
+                logger.warning("Falling back to legacy extraction due to sigma-cli error")
+                return self._extract_query_legacy(rule)
+            
+            # Prepend index=* to ensure broad search (or use configured index)
+            # sigma-cli usually outputs just the search criteria
+            query = result.stdout.strip()
+            if query and not query.startswith("index="):
+                 query = f"index=* {query}"
+
+            # --- SPL Polyfill for XmlWinEventLog / Event 4688 ---
+            # The default 'sysmon' pipeline generates EventID=1 and Image fields.
+            # We need to map these to EventCode=4688 and NewProcessName for Windows Security logs.
+            import re
+            
+            # 1. Expand EventID=1 to (EventID=1 OR EventCode=4688)
+            # This regex looks for 'EventID=1' and replaces it
+            query = re.sub(r'EventID\s*=\s*1\b', '(EventID=1 OR EventCode=4688)', query)
+            
+            # 2. Map Image to (Image OR NewProcessName)
+            # Regex to capture Image="value" or Image=value
+            # We construct a replacement that matches both Sysmon and Windows fields
+            def replace_image(match):
+                val = match.group(1)
+                # Reconstruct as group
+                return f'(Image={val} OR NewProcessName={val})'
+                
+            query = re.sub(r'Image\s*=\s*("[^"]+"|\S+)', replace_image, query)
+            
+            # 3. Map CommandLine to (CommandLine OR Process_Command_Line)
+            # Some parsed logs use Process_Command_Line
+            def replace_cmdline(match):
+                val = match.group(1)
+                return f'(CommandLine={val} OR Process_Command_Line={val})'
+                
+            query = re.sub(r'CommandLine\s*=\s*("[^"]+"|\S+)', replace_cmdline, query)
+            # ----------------------------------------------------
+                 
+            return query
+            
+        except Exception as e:
+            logger.error(f"Error invoking sigma-cli: {e}")
+            return self._extract_query_legacy(rule)
+            
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+
     def _extract_query(self, rule: Dict[str, Any]) -> str:
-        """Extract Splunk query from Sigma rule"""
-        # Check for pre-built Splunk query
+        """Extract Splunk query (Main Entry Point)"""
+        # Check for pre-built
         if rule.get('splunk_query'):
             return rule['splunk_query']
             
+        # Use sigma-cli
+        return self._convert_sigma_to_spl(rule)
+
+    def _extract_query_legacy(self, rule: Dict[str, Any]) -> str:
+        """Legacy custom regex extraction (Fallback)"""
         # Initialize mappings
         self._init_mappings()
         

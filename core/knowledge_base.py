@@ -3,6 +3,8 @@ Local Knowledge Base Implementation
 Uses ChromaDB and Local Embeddings (SentenceTransformers)
 """
 import os
+# Disable ChromaDB telemetry to prevent errors
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
 import json
 import logging
 import hashlib

@@ -38,7 +38,7 @@ logger = get_agent_logger("benchmark")
 DATA_DIR = Path("data/APTnotes/2023")
 OUTPUT_DIR = Path("data/benchmark_results")
 
-async def run_benchmark(limit: int = None, delay: int = 60, force: bool = False):
+async def run_benchmark(limit: int = None, delay: int = 60, force: bool = False, skip: int = 0):
     """Run benchmark on reports"""
     
     # Setup directories
@@ -48,6 +48,9 @@ async def run_benchmark(limit: int = None, delay: int = 60, force: bool = False)
     logger.info(f"Scanning {DATA_DIR} for reports...")
     files = list(DATA_DIR.glob("*.pdf")) + list(DATA_DIR.glob("*.txt"))
     
+    if skip:
+        files = files[skip:]
+        
     if limit:
         files = files[:limit]
         
@@ -282,9 +285,10 @@ if __name__ == "__main__":
     parser.add_argument("--limit", type=int, default=None, help="Limit number of files to process")
     parser.add_argument("--delay", type=int, default=60, help="Delay (seconds) between reports to avoid rate limits")
     parser.add_argument("--force", action="store_true", help="Force reprocessing (ignore duplicates)")
+    parser.add_argument("--skip", type=int, default=0, help="Number of files to skip")
     args = parser.parse_args()
     
     if sys.platform == 'win32':
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         
-    asyncio.run(run_benchmark(limit=args.limit, delay=args.delay, force=args.force))
+    asyncio.run(run_benchmark(limit=args.limit, delay=args.delay, force=args.force, skip=args.skip))
