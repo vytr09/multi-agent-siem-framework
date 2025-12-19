@@ -319,6 +319,7 @@ class LangChainOrchestrator:
         best_result = {
             'rules': rulegen_result,
             'evaluation': evaluation_result,
+            'attacks': attack_results,
             'siem_verification': siem_results,
             'siem_metrics': siem_metrics,
             'score': score,
@@ -394,6 +395,7 @@ class LangChainOrchestrator:
                 best_result = {
                     'rules': rulegen_result,
                     'evaluation': evaluation_result,
+                    'attacks': attack_results,
                     'siem_verification': siem_results,
                     'siem_metrics': siem_metrics,
                     'score': score,
@@ -417,6 +419,7 @@ class LangChainOrchestrator:
             'extraction': extraction_result,
             'rules': rulegen_result,
             'evaluation': evaluation_result,
+            'attacks': best_result.get('attacks', []),
             'siem_verification': siem_results,
             'siem_metrics': siem_metrics.to_dict(),
             'iterations': iteration,
