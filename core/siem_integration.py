@@ -157,6 +157,11 @@ class SSHConnector:
                 return {'status': 'error', 'error': 'Not connected'}
                 
         try:
+            # Safety guard against recursive root listing
+            if "-Recurse" in command and ("C:\\" in command or "C:/" in command or "C: " in command):
+                 logger.warning(f"Blocked dangerous command: {command}")
+                 return {'status': 'error', 'error': 'Blocked dangerous recursive root command'}
+
             logger.info(f"Executing remote command: {command[:50]}...")
             stdin, stdout, stderr = self.client.exec_command(command, timeout=60)
             
@@ -569,23 +574,27 @@ class SIEMIntegrator:
             # This regex looks for 'EventID=1' and replaces it
             query = re.sub(r'EventID\s*=\s*1\b', '(EventID=1 OR EventCode=4688)', query)
             
-            # 2. Map Image to (Image OR NewProcessName)
+            # 2. Map Image to (Image OR NewProcessName) - Use \b to avoid matching ParentImage
             # Regex to capture Image="value" or Image=value
-            # We construct a replacement that matches both Sysmon and Windows fields
             def replace_image(match):
                 val = match.group(1)
-                # Reconstruct as group
                 return f'(Image={val} OR NewProcessName={val})'
                 
-            query = re.sub(r'Image\s*=\s*("[^"]+"|\S+)', replace_image, query)
+            query = re.sub(r'\bImage\s*=\s*("[^"]+"|\S+)', replace_image, query)
             
             # 3. Map CommandLine to (CommandLine OR Process_Command_Line)
-            # Some parsed logs use Process_Command_Line
             def replace_cmdline(match):
                 val = match.group(1)
                 return f'(CommandLine={val} OR Process_Command_Line={val})'
                 
-            query = re.sub(r'CommandLine\s*=\s*("[^"]+"|\S+)', replace_cmdline, query)
+            query = re.sub(r'\bCommandLine\s*=\s*("[^"]+"|\S+)', replace_cmdline, query)
+
+            # 4. Map ParentImage to (ParentImage OR ParentProcessName)
+            def replace_parent(match):
+                val = match.group(1)
+                return f'(ParentImage={val} OR ParentProcessName={val})'
+
+            query = re.sub(r'\bParentImage\s*=\s*("[^"]+"|\S+)', replace_parent, query)
             # ----------------------------------------------------
                  
             return query

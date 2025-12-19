@@ -270,7 +270,8 @@ class LangChainLLMWrapper:
             'api_key': provider.get_api_key(),
             'base_url': provider.base_url,
             'temperature': self.config.get('temperature', 0.3),
-            'max_tokens': self.config.get('max_tokens', 2000)
+            'temperature': self.config.get('temperature', 0.3),
+            'max_tokens': self.config.get('max_tokens', 8000)
         }
         self._create_llm_instance(config)
         self.current_provider_name = provider.name
@@ -307,7 +308,7 @@ class LangChainLLMWrapper:
             
             # Handle max_tokens vs max_completion_tokens for Mistral/Others
             base_url = config.get('base_url', '')
-            max_tokens = config.get('max_tokens', 2000)
+            max_tokens = config.get('max_tokens', 8000)
             
             if base_url:
                 llm_kwargs['base_url'] = base_url
@@ -326,7 +327,7 @@ class LangChainLLMWrapper:
             self.llm = ChatGoogleGenerativeAI(
                 model=config.get('model', 'gemini-2.5-flash-lite'),
                 temperature=config.get('temperature', 0.3),
-                max_tokens=config.get('max_output_tokens', 2000),
+                max_tokens=config.get('max_output_tokens', 8000),
                 google_api_key=api_key
             )
             
@@ -362,7 +363,7 @@ class LangChainLLMWrapper:
             'api_key': provider.get_api_key(),
             'base_url': provider.base_url,
             'temperature': temperature if temperature is not None else self.config.get('temperature', 0.3),
-            'max_tokens': max_tokens if max_tokens is not None else self.config.get('max_tokens', 2000)
+            'max_tokens': max_tokens if max_tokens is not None else self.config.get('max_tokens', 8000)
         }
         
         # Helper to create instance without side effects
@@ -385,7 +386,7 @@ class LangChainLLMWrapper:
                 'timeout': 60.0,
             }
             base_url = config.get('base_url', '')
-            max_tokens = config.get('max_tokens', 2000)
+            max_tokens = config.get('max_tokens', 8000)
             if base_url:
                 llm_kwargs['base_url'] = base_url
             if 'mistral' in base_url or 'codestral' in base_url:
@@ -399,7 +400,7 @@ class LangChainLLMWrapper:
             return ChatGoogleGenerativeAI(
                 model=config.get('model', 'gemini-2.0-flash-lite'),
                 temperature=config.get('temperature', 0.3),
-                max_tokens=config.get('max_output_tokens', 2000),
+                max_tokens=config.get('max_output_tokens', 8000),
                 google_api_key=api_key
             )
 
@@ -440,6 +441,10 @@ Text: {text}
 IMPORTANT: Even if the text is short, you MUST extract at least one TTP if any attack behavior is described.
 If a technique ID is mentioned (e.g., T1059.001), use it.
 If keywords like "PowerShell", "cmd", "malware" are present, infer the corresponding technique.
+**CRITICAL:**
+- Extract specific file paths (e.g. %ALLUSERSPROFILE%\Start Menu) instead of generic ones.
+- Identify Parent-Child process relationships (e.g. "Word initiated command prompt") and list them in the description or indicators.
+- Do not ignore IP addresses or Domains if they appear in the text.
 
 EXAMPLES:
 Input: "The attacker used PowerShell to execute a base64 encoded command."
@@ -519,12 +524,20 @@ Create a comprehensive Sigma rule with:
    - Use 'contains', 'endswith', 'startswith' operators
    - Example: {{"selection": {{"Image|endswith": "\\\\powershell.exe", "CommandLine|contains": "Invoke-WebRequest"}}, "condition": "selection"}}
 
-**3. False Positives:**
+**3. CRITICAL RULES (Strict Enforcement):**
+   - **NO PIPES in condition:** Do NOT use pipes in 'condition' (e.g. `selection | count()`). This is deprecated. Use simple boolean logic (and/or/not).
+   - **NO DEPRECATED MODIFIERS:** Do NOT use `|greater`, `|less`. Use standard operators or aggregations separately (though aggregations are not supported in basic matches).
+   - **NO HALLUCINATIONS:** DO NOT invent IPs (e.g. 192.168.1.1), domains, or filenames. Use ONLY what is provided in the **Indicators** section.
+   - **Source-Only:** If no specific IP/Domain is provided, use GENERIC behavioral patterns (e.g. command line flags like `-enc`), do not make up values.
+   - **Phishing Logic:** For T1566/Phishing, detect Office processes (WINWORD.EXE) spawning command shells (cmd.exe, powershell.exe), rather than looking for specific document names unless provided.
+   - **Specificity:** Weigh specific file paths (%ALLUSERSPROFILE%) higher than generic wildcards.
+
+**4. False Positives:**
    - List legitimate scenarios that might trigger
 
-**4. Severity:** low, medium, high, or critical
+**5. Severity:** low, medium, high, or critical
 
-**5. Tags:** Include attack.{ttp_id} tag
+**6. Tags:** Include attack.{ttp_id} tag
 
 Generate a complete, valid Sigma rule that will actually detect this technique."""
         )
@@ -617,11 +630,17 @@ class AttackCommandGenerationChain:
 Generate 2-3 realistic attack commands that demonstrate this technique on {platform}.
 
 **Requirements:**
+
 1. Commands must be executable and realistic
 2. Include variations (basic, intermediate, advanced)
 3. Specify if admin/root privileges required
 4. Describe expected behavior
 5. Mark safety level appropriately
+6. **Execution Robustness (CRITICAL):**
+   - Use `-Force` ONLY for file operations that support it (e.g. `Compress-Archive`, `Set-Content`, `Remove-Item`). **Do NOT** use `-Force` with `Invoke-WebRequest`.
+   - Use `-ErrorAction SilentlyContinue` if a cleanup step might fail.
+   - **Escaping:** Ensure all quotes in PowerShell (`'`) are properly escaped or use distinct quoting (e.g. `" 'string' "`). Do NOT leave unclosed strings.
+
 
 **Platform Constraints (CRITICAL):**
 - **Windows**: Use ONLY built-in tools.
@@ -633,7 +652,9 @@ Generate 2-3 realistic attack commands that demonstrate this technique on {platf
 **Safety Guidelines:**
 - Use test/benign strings where possible
 - Avoid actual malicious payloads
+- **FORBIDDEN COMMANDS:** Do NOT generate commands that recursively list the entire file system (e.g. `Get-ChildItem -Path C:\ -Recurse` or `dir C:\ /s`). These cause system freezes.
 - Mark destructive commands as high safety risk
+
 - All commands are for TESTING ONLY in isolated environments
 
 **PowerShell Specifics:**
@@ -694,13 +715,16 @@ Evaluate this Sigma rule for quality and effectiveness.
 **Real-World Verification Result:**
 {verification_result}
 
+
 Evaluate on these criteria (score each 0-10):
 1. Detection Coverage: Does it catch the technique? (If verification passed, score HIGH. If failed, score LOW)
 2. False Positive Rate: Low false positives? (higher score = fewer false positives)
 3. Performance: Efficient query?
 4. Completeness: All necessary fields?
 
-Important: Use the verification result to ground your assessment. If the rule failed to detect the attack in the real SIEM, you MUST downgrade the Detection Coverage score and explain why in "weaknesses".
+Important: Use the verification result to ground your assessment.
+- **CRITICAL:** If the rule failed to detect the attack (0 verified events) in the real SIEM, you **MUST** score Detection Coverage below 5/10.
+- Check for hallucinations: If the rule contains IPs/Domains not present in the TTP info, mention this as a weakness.
 
 Provide:
 - Scores for each criterion (0-10)

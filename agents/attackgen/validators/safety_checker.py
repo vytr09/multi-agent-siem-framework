@@ -20,6 +20,8 @@ class SafetyChecker:
             r':(){ :|:& };:',  # Fork bomb
             r'mkfs\.',  # Format filesystem
             r'fdisk.*--delete',  # Delete partitions
+            r'Get-ChildItem.*-Recurse',  # Dangerous recursive listing (Freeze Risk)
+            r'dir\s.*\/s',  # Recursive dir (Freeze Risk)
         ]
         
         # Medium risk patterns that need careful review

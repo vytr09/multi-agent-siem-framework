@@ -11,10 +11,15 @@ import asyncio
 import json
 import logging
 import time
+import yaml
 from pathlib import Path
 from typing import List, Dict, Any
 from datetime import datetime
 import statistics
+
+# Disable ChromaDB/PostHog Telemetry locally
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+
 
 # Add project root to sys.path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
@@ -128,16 +133,28 @@ async def run_benchmark(limit: int = None, delay: int = 60, force: bool = False,
             # ------------------------------------------------------------------
             # Stage 6: Quality Assessment (Legacy Benchmark Integration)
             # ------------------------------------------------------------------
+            # Stage 6: Running Quality Assessment (LLM-as-Judge)
+            # ------------------------------------------------------------------
             logger.info("Stage 6: Running Quality Assessment (LLM-as-Judge)...")
             
-            # Configure Benchmarks
-            benchmark_config = {
-                "llm_judge": {
-                    "enabled": True, 
-                    "model": "gemini-2.5-flash-lite", # Example, LLM Manager handles actual selection
-                    "temperature": 0.3
+            # Load Configuration
+            config_path = Path("config/benchmark_config.yaml")
+            if config_path.exists():
+                with open(config_path, "r") as f:
+                    config_str = f.read()
+                    # Expand environment variables
+                    for key, value in os.environ.items():
+                        config_str = config_str.replace(f"${{{key}}}", value)
+                    benchmark_config = yaml.safe_load(config_str)
+            else:
+                logger.warning("benchmark_config.yaml not found, using defaults")
+                benchmark_config = {
+                    "llm_judge": {
+                        "enabled": True, 
+                        "model": "gemini-2.0-flash", 
+                        "temperature": 0.3
+                    }
                 }
-            }
             
             rulegen_benchmark = RuleGenBenchmark(benchmark_config)
             attackgen_benchmark = AttackGenBenchmark(benchmark_config)

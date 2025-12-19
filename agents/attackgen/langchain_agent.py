@@ -235,6 +235,13 @@ class LangChainAttackGenAgent(BaseAgent):
             
             # Extract command data
             command = cmd_dict.get('command', '')
+            
+            # Clean up command (remove trailing braces if LLM hallucinated them)
+            if command:
+                command = command.strip()
+                if command.endswith('}') and not command.count('{') == command.count('}'):
+                     command = command.rstrip('}').strip()
+            
             description = cmd_dict.get('description', '')
             technique_id = cmd_dict.get('technique_id', ttp.get('technique_id', 'T1059'))
             
@@ -243,11 +250,11 @@ class LangChainAttackGenAgent(BaseAgent):
                 self.logger.warning("Empty command generated, skipping")
                 return None
             
-            # Basic safety check
-            dangerous_keywords = ['rm -rf /', 'format', 'del /f /s /q C:\\']
-            if any(keyword in command.lower() for keyword in dangerous_keywords):
+            # Safety validation via SafetyChecker
+            is_safe = await self.safety_checker.is_safe({'command': command}, safety_level=self.safety_level)
+            if not is_safe:
                 self.stats['safety_violations'] += 1
-                self.logger.warning(f"Command failed safety check: {command[:50]}")
+                self.logger.warning(f"Command failed enhanced safety check: {command[:50]}")
                 return None
             
             # Build final command structure

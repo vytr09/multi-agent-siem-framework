@@ -122,6 +122,9 @@ Generate a high-quality Sigma detection rule for the following MITRE ATT&CK tech
 6. Set appropriate severity level (low/medium/high/critical)
 7. Include specific false positive scenarios
 8. Add MITRE ATT&CK tags
+9. **CRITICAL: STRICTLY use ONLY the IOCs, malware, and tools provided in the input. DO NOT invent IPs (e.g. 192.168.1.1), domains, or filenames.**
+10. If specific IOCs are missing, use generic behavioral patterns (e.g. command line flags), do NOT hallucinate values.
+11. Weigh specific file paths (e.g. %ALLUSERSPROFILE%, %TEMP%) higher than generic wildcards.
 
 **Output Format:**
 Return ONLY a valid JSON object with this structure:
@@ -156,9 +159,10 @@ Return ONLY a valid JSON object with this structure:
 **Important Detection Logic Rules:**
 1. For credential dumping (T1003): Detect mimikatz.exe, procdump.exe accessing lsass, NOT lsass.exe itself
 2. For PowerShell (T1059.001): Look for encoded commands, download cradles, execution bypasses
-3. For phishing (T1566): Detect Office spawning processes, not generic "malicious.doc"
+3. For phishing (T1566): Detect Office spawning processes (ParentImage: WINWORD.EXE -> Image: cmd.exe/powershell.exe)
 4. Use process relationships (ParentImage → Image) when relevant
 5. Include both binary name AND command line patterns
+6. **Hallucination Check:** Do not include "192.168.x.x" or "example.com" unless explicitly in the Input IOCs.
 
 Generate the Sigma rule now:"""
         
