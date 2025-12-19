@@ -504,7 +504,8 @@ class SigmaRuleChain:
 **Indicators:**
 {indicators}
 
-**Feedback from Previous Iteration:**
+**CRITICAL - Feedback from Previous Iteration:**
+You MUST address the following feedback to improve the rule. If the rule failed verification, FIX the detection logic. if it had weak score, improve specificity.
 {feedback}
 
 **Similar Verified Rules (Examples):**
