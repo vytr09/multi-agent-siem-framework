@@ -207,16 +207,35 @@ async def run_benchmark(limit: int = None, delay: int = 60, force: bool = False,
                 quality_scores['rulegen_avg'] = rulegen_benchmark.get_statistics().get('average_score', 0)
                 
                 # Save detailed quality report
-                quality_file = OUTPUT_DIR / f"quality_report_{file_path.stem}.json"
+                quality_file = OUTPUT_DIR / f"quality_report_rulegen_{file_path.stem}.json"
                 rulegen_benchmark.export_results(str(quality_file))
-                logger.info(f"Quality report saved to {quality_file}")
+                logger.info(f"RuleGen quality report saved to {quality_file}")
+            
+            if attack_commands:
+                logger.info(f"Arguments for AttackGenBenchmark: {len(attack_commands)} commands")
+                # Format for benchmark
+                # AttackGenBenchmark expects command dicts
+                
+                attack_quality_results = await attackgen_benchmark.evaluate_batch(attack_commands)
+                quality_scores['attackgen_avg'] = attackgen_benchmark.get_statistics().get('average_score', 0)
+                
+                # Save detailed quality report
+                quality_file = OUTPUT_DIR / f"quality_report_attackgen_{file_path.stem}.json"
+                attackgen_benchmark.export_results(str(quality_file))
+                logger.info(f"AttackGen quality report saved to {quality_file}")
+            
+            # Combine quality scores
+            if quality_scores:
+                # Average of available scores
+                quality_score_avg = sum(quality_scores.values()) / len(quality_scores)
+            else:
+                quality_score_avg = 0
             
             # ------------------------------------------------------------------    
             
             siem_verified_count = sum(1 for r in siem_results if r.get('detected') is True)
             
             eval_score = pipeline_result.get('evaluation', {}).get('average_quality_score', 0)
-            quality_score_avg = quality_scores.get('rulegen_avg', 0)
             
             result_entry = {
                 "file": file_path.name,
