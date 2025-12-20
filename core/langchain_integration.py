@@ -390,7 +390,12 @@ class LangChainLLMWrapper:
             if base_url:
                 llm_kwargs['base_url'] = base_url
             if 'mistral' in base_url or 'codestral' in base_url:
+                # Mistral/Codestral does NOT support max_completion_tokens (O1 param)
+                # We must force max_tokens in model_kwargs and NULLIFY standard params to prevent auto-injection
                 llm_kwargs['model_kwargs'] = {'max_tokens': max_tokens}
+                llm_kwargs['max_tokens'] = None
+                # Explicitly unset max_completion_tokens if the library supports it to prevent body injection
+                llm_kwargs['max_completion_tokens'] = None 
             else:
                 llm_kwargs['max_tokens'] = max_tokens
                 
@@ -401,7 +406,8 @@ class LangChainLLMWrapper:
                 model=config.get('model', 'gemini-2.0-flash-lite'),
                 temperature=config.get('temperature', 0.3),
                 max_tokens=config.get('max_output_tokens', 8000),
-                google_api_key=api_key
+                google_api_key=api_key,
+                max_retries=0
             )
 
     def get_metrics(self) -> Dict[str, Any]:
