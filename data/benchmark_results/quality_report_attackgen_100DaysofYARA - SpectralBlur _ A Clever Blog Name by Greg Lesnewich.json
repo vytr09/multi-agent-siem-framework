@@ -1,0 +1,4558 @@
+{
+  "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+  "timestamp": "2025-12-20T15:09:40.448148",
+  "config": {
+    "llm_judge": {
+      "enabled": true,
+      "api_key": "csk-r8teckw2m2h5rhcfx59m3hnje5x8cfr2vxpm4tr2x44ye5v5",
+      "model": "llama-3.3-70b",
+      "temperature": 0.1,
+      "max_tokens": 4096,
+      "timeout": 60,
+      "persona": "expert cybersecurity researcher and red team operator with deep knowledge of MITRE ATT&CK framework and detection engineering",
+      "detailed_feedback": true,
+      "confidence_scores": true,
+      "enable_comparison": true,
+      "max_requests_per_minute": 60,
+      "retry_attempts": 3,
+      "retry_delay": 2
+    },
+    "attackgen_benchmark": {
+      "enabled": true,
+      "use_llm_evaluation": true,
+      "use_rule_based_evaluation": true,
+      "min_passing_score": 0.6,
+      "high_quality_threshold": 0.85,
+      "metrics": {
+        "technical_correctness": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "attack_alignment": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "platform_compatibility": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "operational_realism": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "threat_actor_alignment": {
+          "weight": 1.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "testing_safety": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "controlled_impact": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "detection_value": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "artifact_generation": {
+          "weight": 1.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "completeness": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "documentation_quality": {
+          "weight": 1.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        }
+      },
+      "top_performers_count": 10,
+      "bottom_performers_count": 5,
+      "enable_comparative_analysis": true,
+      "export_format": "json",
+      "export_detailed_results": true,
+      "export_statistics": true
+    },
+    "rulegen_benchmark": {
+      "enabled": true,
+      "use_llm_evaluation": true,
+      "use_rule_based_evaluation": true,
+      "min_passing_score": 0.6,
+      "metrics": {
+        "sigma_completeness": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "detection_logic_correctness": {
+          "weight": 3.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "platform_syntax_correctness": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "field_mapping_accuracy": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "detection_specificity": {
+          "weight": 3.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "detection_sensitivity": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "metadata_richness": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "optimization_level": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "attack_coverage": {
+          "weight": 3.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "false_positive_resistance": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "contextual_awareness": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "operational_deployability": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "performance_efficiency": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "analyst_actionability": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "evasion_resistance": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "multi_stage_detection": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        }
+      }
+    },
+    "general": {
+      "max_concurrent_evaluations": 3,
+      "batch_size": 5,
+      "enable_caching": true,
+      "cache_ttl": 3600,
+      "log_level": "INFO",
+      "log_file": "logs/benchmark.log",
+      "log_format": "json",
+      "output_directory": "data/benchmark_results",
+      "create_timestamp_subdirs": true,
+      "calculate_statistics": true,
+      "generate_summary_report": true,
+      "export_csv": true,
+      "generate_plots": false,
+      "plot_format": "png"
+    },
+    "comparison": {
+      "enabled": true,
+      "criteria": [
+        "overall quality",
+        "technical correctness",
+        "operational realism",
+        "testing safety"
+      ],
+      "significant_difference_threshold": 0.1
+    },
+    "regression": {
+      "enabled": false,
+      "baseline_file": "baselines/attackgen_baseline.json",
+      "alert_on_degradation": true,
+      "degradation_threshold": 0.05,
+      "track_history": true,
+      "history_file": "history/benchmark_history.json"
+    },
+    "alerting": {
+      "enabled": false,
+      "low_score_threshold": 0.5,
+      "alert_channels": [
+        "email",
+        "slack"
+      ],
+      "email": {
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "from_address": "benchmark@example.com",
+        "to_addresses": [
+          "team@example.com"
+        ]
+      },
+      "slack": {
+        "webhook_url": "${SLACK_WEBHOOK_URL}",
+        "channel": "#siem-benchmarks"
+      }
+    },
+    "advanced": {
+      "ensemble_evaluation": {
+        "enabled": false,
+        "models": [
+          "gemini-2.0-flash-lite"
+        ],
+        "aggregation_method": "weighted_average"
+      },
+      "ground_truth": {
+        "enabled": false,
+        "dataset_path": "datasets/ground_truth.json",
+        "calculate_accuracy": true
+      },
+      "custom_metrics": {
+        "enabled": false,
+        "metrics_file": "config/custom_metrics.yaml"
+      },
+      "debug": {
+        "enabled": false,
+        "save_prompts": true,
+        "save_responses": true,
+        "verbose_logging": true
+      }
+    }
+  },
+  "statistics": {
+    "total_evaluations": 21,
+    "average_score": 0.5686274509803922,
+    "category_averages": {
+      "correctness": 0.6261904761904763,
+      "realism": 0.6134920634920634,
+      "safety": 0.7351190476190477,
+      "detectability": 0.5057142857142858,
+      "effectiveness": 0.19619047619047628
+    },
+    "metric_averages": {
+      "technical_correctness": 0.7404761904761906,
+      "attack_alignment": 0.5023809523809524,
+      "operational_realism": 0.6738095238095239,
+      "threat_actor_alignment": 0.4928571428571428,
+      "testing_safety": 0.5761904761904761,
+      "detection_value": 0.6428571428571429,
+      "documentation_quality": 0.19047619047619052,
+      "platform_compatibility": 0.5976190476190476,
+      "completeness": 0.20000000000000004,
+      "controlled_impact": 1.0,
+      "artifact_generation": 0.29999999999999993
+    },
+    "score_distribution": {
+      "excellent (>=0.9)": 0,
+      "good (0.8-0.9)": 0,
+      "fair (0.7-0.8)": 0,
+      "poor (0.6-0.7)": 9,
+      "failing (<0.6)": 12
+    }
+  },
+  "results": [
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5955882352941178,
+      "category_scores": {
+        "correctness": 0.635,
+        "realism": 0.7333333333333334,
+        "safety": 0.6875,
+        "detectability": 0.6000000000000001,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command follows correct Windows syntax for creating a local account and will succeed when run with administrative privileges. It does not handle pre\u2011existing accounts or password\u2011policy failures.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "strengths": [
+              "Valid net user syntax",
+              "Directly executable on Windows"
+            ],
+            "weaknesses": [
+              "Assumes admin rights without verification",
+              "No error handling for duplicate user or policy restrictions"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "While the command is executed via a command interpreter, its primary effect is account creation (ATT&CK T1136), not the core behavior of the \"Command and Scripting Interpreter\" technique (T1059). Alignment is therefore partial.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "strengths": [
+              "Uses a native command\u2011line utility",
+              "Demonstrates execution via the interpreter"
+            ],
+            "weaknesses": [
+              "Focuses on a different ATT&CK technique (Create Account)",
+              "Does not illustrate typical interpreter capabilities like script execution"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "Adding a local user with net user is a common post\u2011compromise action observed in many real\u2011world intrusions. The command mirrors tactics used by both script\u2011based and manual attackers.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "strengths": [
+              "Reflects a realistic post\u2011exploitation step",
+              "Matches tools seen in actual campaigns"
+            ],
+            "weaknesses": [
+              "Lacks context of how the attacker gains admin rights first",
+              "Does not include cleanup or persistence considerations"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "Many threat groups (e.g., APT28, FIN7) have used net user to create accounts, but without a specific actor reference the alignment is generic. The technique is within the capability set of most opportunistic actors.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "strengths": [
+              "Consistent with tactics of multiple known actors",
+              "Simple enough for low\u2011skill adversaries"
+            ],
+            "weaknesses": [
+              "No attribution to a particular threat actor or campaign",
+              "Does not demonstrate advanced or actor\u2011specific nuances"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command creates a local user, which is non\u2011destructive but introduces a persistent change to the system. Absence of cleanup instructions makes it risky for long\u2011running or production\u2011like environments.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "strengths": [
+              "Non\u2011destructive operation",
+              "Predictable and reversible if manually removed"
+            ],
+            "weaknesses": [
+              "No automated cleanup provided",
+              "Persistent account may affect system security"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "Adding a user triggers well\u2011known Windows security events (e.g., Event ID 4720) that are easy to capture for detection rules. The command is simple, so it does not heavily evade logging mechanisms.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "strengths": [
+              "Generates clear, logged artifacts",
+              "Facilitates creation of SIEM signatures"
+            ],
+            "weaknesses": [
+              "Easily blocked by account\u2011creation policies",
+              "Limited stealth; low evasion complexity"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry lacks an explanation, prerequisites, expected indicators, and cleanup steps, making it hard for operators to understand context or safely execute.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "strengths": [
+              "Command syntax is explicit"
+            ],
+            "weaknesses": [
+              "Missing explanatory text",
+              "No listed prerequisites or cleanup",
+              "No indicator guidance"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:05:38.361984",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.596/1.0\n\nCategory Scores:\n  - realism: 0.733\n  - safety: 0.688\n  - correctness: 0.635\n  - detectability: 0.600\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:05:38.361984",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Command and Scripting Interpreter",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5367647058823529,
+      "category_scores": {
+        "correctness": 0.555,
+        "realism": 0.6666666666666666,
+        "safety": 0.625,
+        "detectability": 0.5399999999999999,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command uses built\u2011in Windows utilities and attempts to create an auto\u2011start service, but the binPath syntax is incomplete (missing cmd.exe and proper quoting), which may cause execution failure.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:05:50.536918",
+          "metadata": {
+            "strengths": [
+              "Leverages native Windows tools (sc, net)",
+              "Attempts to create a persistent auto\u2011start service"
+            ],
+            "weaknesses": [
+              "Incorrect binPath quoting and missing cmd.exe",
+              "No error handling or verification of success"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The activity is more representative of Service Creation (T1543.003) than the Command and Scripting Interpreter technique; it only indirectly uses a command interpreter.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:05:50.536918",
+          "metadata": {
+            "strengths": [
+              "Executes a command via the Windows command line",
+              "Demonstrates use of a scripting interpreter"
+            ],
+            "weaknesses": [
+              "Primary action is service creation, not interpreter use",
+              "Does not cover broader aspects of T1059"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "Creating a service to run a command is a common real\u2011world persistence method seen in many campaigns, making the technique realistic despite its simplicity.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:05:50.536918",
+          "metadata": {
+            "strengths": [
+              "Uses native, widely\u2011available tools",
+              "Mimics a known persistence pattern"
+            ],
+            "weaknesses": [
+              "Lacks stealth (no hidden service name or description)",
+              "Simplified command may be noisy and easily detected"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "Many threat actors employ sc create for persistence, but the straightforward net user addition reflects lower\u2011sophistication tactics rather than advanced APT behavior.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:05:50.536918",
+          "metadata": {
+            "strengths": [
+              "Aligns with known TTPs of using sc for persistence",
+              "Employs native Windows commands common to many actors"
+            ],
+            "weaknesses": [
+              "Low sophistication; typical of script\u2011kiddie activity",
+              "No actor\u2011specific nuances or advanced evasion"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The command creates a new Windows service that adds a privileged local account, which changes system state and can persist beyond the test. No cleanup instructions are provided, making it risky for production-like environments.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:05:50.536918",
+          "metadata": {
+            "strengths": [
+              "Uses built\u2011in Windows utilities (sc, net) that are predictable",
+              "The action is reversible (service and user can be removed manually)"
+            ],
+            "weaknesses": [
+              "Introduces a new privileged user, a security\u2011impacting change",
+              "Lacks any automated cleanup or rollback steps",
+              "Potentially disruptive if run on production systems"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "Creating a service and adding a user generates distinct Windows event logs (Service Control Manager, Security) that are valuable for building detection rules. The command is simple, so it may be caught by existing signatures, but it still provides useful telemetry.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:05:50.536918",
+          "metadata": {
+            "strengths": [
+              "Produces multiple observable artifacts (service creation, account creation)",
+              "Leverages common Windows commands that are well\u2011instrumented in logs"
+            ],
+            "weaknesses": [
+              "Low complexity makes it easy for defenders to already have signatures",
+              "Evasion techniques (e.g., obfuscation) are not demonstrated"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry lacks any explanatory text, prerequisites, expected indicators, or cleanup guidance, making it hard for testers to understand context or safely execute the command. Only the raw command is provided.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:05:50.536918",
+          "metadata": {
+            "strengths": [
+              "Command syntax is clear and self\u2011contained",
+              "Specifies service name and start mode"
+            ],
+            "weaknesses": [
+              "No description of purpose or effect",
+              "Missing prerequisites, indicator list, and cleanup steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.5,
+          "normalized_score": 0.65,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:05:50.537425",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:05:50.537425",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:05:50.537425",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:05:50.537425",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.537/1.0\n\nCategory Scores:\n  - realism: 0.667\n  - safety: 0.625\n  - correctness: 0.555\n  - detectability: 0.540\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:05:50.537425",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Command and Scripting Interpreter",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5794117647058824,
+      "category_scores": {
+        "correctness": 0.75,
+        "realism": 0.5,
+        "safety": 0.6875,
+        "detectability": 0.5399999999999999,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command is syntactically valid for Windows cmd, correctly chains two commands with '&', and uses built\u2011in utilities (ping, reg) to add a Run key. It will execute as intended provided the user has administrative rights.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:02.461411",
+          "metadata": {
+            "strengths": [
+              "Valid cmd syntax and proper use of '&' operator",
+              "Uses native Windows tools that are always available"
+            ],
+            "weaknesses": [
+              "Requires elevated privileges to modify HKLM",
+              "No error handling or verification of success"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command demonstrates the Command and Scripting Interpreter technique (T1059) by invoking cmd.exe, but the primary effect is persistence via a Registry Run key (T1547.001), which is only tangentially related to the listed technique.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:06:02.461411",
+          "metadata": {
+            "strengths": [
+              "Executes via the command interpreter as required by T1059",
+              "Creates a persistent artifact that aligns with ATT&CK tactics"
+            ],
+            "weaknesses": [
+              "Focuses on persistence rather than pure command execution",
+              "Does not illustrate broader aspects of the technique (e.g., script execution, command chaining for lateral movement)"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "Adding a Run key with reg.exe is a common real\u2011world method, but the preceding ping command is artificial and unlikely in actual adversary workflows, reducing overall realism.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:06:02.463240",
+          "metadata": {
+            "strengths": [
+              "Uses a legitimate Windows utility that attackers frequently employ",
+              "Implements a well\u2011known persistence mechanism"
+            ],
+            "weaknesses": [
+              "Inclusion of a dummy ping adds unrealistic noise",
+              "Lacks stealth considerations (e.g., using hidden reg keys or PowerShell)"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "Many threat groups employ Registry Run keys for persistence, so the technique is broadly applicable, but the command does not reflect any specific actor\u2019s preferred tooling or sophistication level.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:06:02.463240",
+          "metadata": {
+            "strengths": [
+              "Matches a generic TTP used by numerous actors",
+              "Demonstrates a low\u2011skill, high\u2011impact persistence method"
+            ],
+            "weaknesses": [
+              "No indication of actor\u2011specific nuances (e.g., encoded commands, PowerShell)",
+              "Lacks complexity that would differentiate advanced actors"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command performs a harmless ping and adds a Run\u2011key persistence entry, which is non\u2011destructive but permanent until manually removed. Lack of cleanup instructions makes it risky for long\u2011running test environments.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:02.463240",
+          "metadata": {
+            "strengths": [
+              "No immediate destructive impact",
+              "Predictable and easily reproducible behavior"
+            ],
+            "weaknesses": [
+              "Creates persistent registry modification",
+              "No provided cleanup to revert the change"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "Adding a Run\u2011key generates clear, well\u2011known detection artifacts (registry modification, command\u2011line logging) useful for building SIEM and EDR rules. However, the technique is common and may be heavily filtered in mature environments.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:02.463240",
+          "metadata": {
+            "strengths": [
+              "Produces observable registry change",
+              "Command line can be captured by process monitoring"
+            ],
+            "weaknesses": [
+              "Limited variety of artifacts beyond the Run key",
+              "Easily whitelisted by attackers familiar with this pattern"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry lacks any explanatory text, prerequisites, expected indicators, or cleanup guidance, making it hard for users to understand intent or safely execute.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:06:02.463240",
+          "metadata": {
+            "strengths": [
+              "Command itself is self\u2011contained"
+            ],
+            "weaknesses": [
+              "No description of purpose or effect",
+              "Missing cleanup steps and indicator expectations"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 7.0,
+          "normalized_score": 0.7,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:02.463615",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:02.463615",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:02.463615",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:02.463615",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.579/1.0\n\nCategory Scores:\n  - correctness: 0.750\n  - safety: 0.688\n  - detectability: 0.540\n  - realism: 0.500\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:06:02.463615",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Command and Scripting Interpreter",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6176470588235295,
+      "category_scores": {
+        "correctness": 0.62,
+        "realism": 0.7999999999999999,
+        "safety": 0.75,
+        "detectability": 0.6000000000000001,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command uses valid CertUtil syntax on Windows to download a file and write it to %TEMP%\\malware.exe. It performs the intended action, though it lacks error handling or verification of the download.",
+          "confidence": 0.93,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "strengths": [
+              "Correct use of CertUtil flags (-urlcache -split -f)",
+              "Works on default Windows installations without extra tools"
+            ],
+            "weaknesses": [
+              "No checks for download success or file integrity",
+              "Assumes HTTP endpoint is reachable and trusted"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The command matches the ATT&CK concept of Ingress Tool Transfer (T1105) but the provided technique label \"Malware\" is vague and does not map cleanly to a specific ATT&CK technique.",
+          "confidence": 0.78,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "strengths": [
+              "Creates a downloadable payload, a core element of many ATT&CK techniques",
+              "Uses a legitimate Windows utility to evade detection"
+            ],
+            "weaknesses": [
+              "Mis\u2011labelled technique reduces clarity",
+              "Does not cover post\u2011download execution or persistence steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "CertUtil\u2011based payload download is a well\u2011documented, real\u2011world method used by multiple threat groups. The command mirrors how an attacker would quickly fetch a binary onto a compromised host.",
+          "confidence": 0.91,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "strengths": [
+              "Reflects common attacker behavior",
+              "Requires no additional software, fitting low\u2011skill actors"
+            ],
+            "weaknesses": [
+              "Relies on clear\u2011text HTTP, which is less common in modern campaigns",
+              "No stealth measures such as randomised filenames"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "Many known actors (e.g., APT33, FIN7) have employed CertUtil for file transfer, so the technique aligns with generic threat\u2011actor toolsets, though it lacks actor\u2011specific nuances.",
+          "confidence": 0.84,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "strengths": [
+              "Matches tactics used by a broad set of actors",
+              "Fits the capability level of both script\u2011kiddies and more sophisticated groups"
+            ],
+            "weaknesses": [
+              "No indication of actor\u2011specific customisation",
+              "Absent context (e.g., staging server, command\u2011and\u2011control) limits precise mapping"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command only downloads a file to %TEMP% and does not perform destructive actions, making it generally safe in isolated test labs. However, the lack of cleanup instructions and the use of a real network download could leave artifacts on the host, reducing safety for production\u2011like environments.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "strengths": [
+              "Non\u2011destructive operation (no system modification beyond file write)",
+              "Predictable behavior (simple download and write)"
+            ],
+            "weaknesses": [
+              "No cleanup guidance to remove the downloaded file",
+              "Potential for unintended execution of malicious payload if URL is not controlled"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "CertUtil usage for remote file retrieval is a well\u2011known ATT&CK technique (T1105/T1106) that generates clear telemetry: process creation, network connection to an IP, and a new executable in %TEMP%. This provides solid data for SIEM rules and endpoint detection. The lack of explicit indicator examples limits immediate rule creation but the underlying activity is highly valuable.",
+          "confidence": 0.92,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "strengths": [
+              "Produces observable events (process, network, file creation)",
+              "Aligns with a known ATT&CK technique, aiding rule mapping"
+            ],
+            "weaknesses": [
+              "No pre\u2011defined IOCs or hash values supplied",
+              "Evasion potential if the attacker uses obfuscation or alternate download tools"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry lacks any explanatory text, prerequisite details, indicator list, or cleanup steps, making it difficult for analysts to understand intent or safely execute the command. The missing fields reduce its usefulness as a reusable playbook component.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "strengths": [
+              "Command syntax is complete and syntactically correct"
+            ],
+            "weaknesses": [
+              "No description of purpose or expected outcome",
+              "Absent cleanup instructions and indicator guidance"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:14.411727",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.618/1.0\n\nCategory Scores:\n  - realism: 0.800\n  - safety: 0.750\n  - correctness: 0.620\n  - detectability: 0.600\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:06:14.411727",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Malware",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.4058823529411764,
+      "category_scores": {
+        "correctness": 0.4699999999999999,
+        "realism": 0.4666666666666666,
+        "safety": 0.5,
+        "detectability": 0.3,
+        "effectiveness": 0.16
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command uses a valid Windows environment variable (%TEMP%) and a correct path syntax, allowing the executable to be launched directly. However, it lacks any error handling, verification of file existence, or use of a launcher (e.g., start, cmd /c).",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "strengths": [
+              "Correct Windows path syntax",
+              "Direct execution without extra wrappers"
+            ],
+            "weaknesses": [
+              "No existence or integrity checks",
+              "No error handling or fallback logic"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The item is labeled under a generic \"Malware\" technique, which does not map cleanly to a specific MITRE ATT&CK technique. Execution of a dropped binary aligns loosely with T1204 (User Execution) or T1059 (Command Execution) but the description is too vague.",
+          "confidence": 0.75,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "strengths": [
+              "Represents execution of malicious payload",
+              "Uses a common drop location (Temp folder)"
+            ],
+            "weaknesses": [
+              "Technique name is non\u2011standard in ATT&CK",
+              "Lacks detail on how the command fits a specific technique"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "Running malware from %TEMP% mirrors real\u2011world attacker behavior, as many campaigns drop payloads to the temp directory before execution. The simplicity of the command is realistic, though missing context such as how the file arrived there.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "strengths": [
+              "Reflects common attacker drop location",
+              "Simple, plausible execution step"
+            ],
+            "weaknesses": [
+              "No surrounding steps (e.g., download, persistence)",
+              "Assumes the file already exists without justification"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "Without a specified threat actor, the command cannot be tied to any known TTPs. While many actors use temp\u2011directory execution, the lack of attribution or sophistication details limits alignment.",
+          "confidence": 0.65,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "strengths": [
+              "Technique is used by a broad range of actors"
+            ],
+            "weaknesses": [
+              "No actor\u2011specific tactics or tools referenced",
+              "Too generic to demonstrate actor maturity"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The command launches an unspecified executable from %TEMP% without any description of its behavior, cleanup steps, or safeguards, making it potentially destructive and unsafe for production\u2011like environments.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "strengths": [
+              "Simple command that can be executed on any Windows host",
+              "Uses a common temporary directory, reducing path\u2011related errors"
+            ],
+            "weaknesses": [
+              "No indication of benign or controlled behavior",
+              "Lacks cleanup instructions to remove artifacts after testing"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "Without listed indicators, behavior description, or context, the command provides minimal material for building detection rules, limiting its usefulness for detection engineering.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "strengths": [
+              "Execution of a file from %TEMP% is a known suspicious pattern",
+              "Can trigger file\u2011creation and process\u2011creation logs useful for baseline detection"
+            ],
+            "weaknesses": [
+              "No explicit IOCs (hashes, filenames, registry keys) supplied",
+              "Unclear whether the payload attempts evasion, reducing relevance for advanced detection"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 1,
+          "normalized_score": 0.1,
+          "explanation": "The artifact lacks any explanatory text, prerequisites, expected indicators, or cleanup guidance, making it difficult for analysts to understand or safely reproduce.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "strengths": [
+              "Provides the exact command string to be run",
+              "Specifies the target platform (Windows)"
+            ],
+            "weaknesses": [
+              "Missing description of what the executable does",
+              "No guidance on required environment setup or post\u2011run remediation"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:27.341623",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.406/1.0\n\nCategory Scores:\n  - safety: 0.500\n  - correctness: 0.470\n  - realism: 0.467\n  - detectability: 0.300\n  - effectiveness: 0.160\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:06:27.341623",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Malware",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5720588235294118,
+      "category_scores": {
+        "correctness": 0.635,
+        "realism": 0.7999999999999999,
+        "safety": 0.5625,
+        "detectability": 0.6000000000000001,
+        "effectiveness": 0.16
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell one\u2011liner is syntactically valid on Windows and correctly downloads and executes a remote script. It lacks error handling, verification, and uses clear\u2011text HTTP, which are practical shortcomings.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax for direct execution",
+              "Concise single\u2011command delivery of payload"
+            ],
+            "weaknesses": [
+              "No TLS/HTTPS \u2013 exposes traffic to interception",
+              "No error handling or verification of downloaded content"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command maps to ATT&CK techniques such as T1059.001 (PowerShell) and T1105 (Ingress Tool Transfer), but the provided \"Malware\" label is not a defined ATT&CK technique, reducing alignment clarity.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "strengths": [
+              "Executes PowerShell, matching T1059.001",
+              "Performs remote script download, matching T1105"
+            ],
+            "weaknesses": [
+              "Incorrect or vague technique designation (\"Malware\")",
+              "Does not explicitly cover persistence or defense evasion aspects"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "Downloading and invoking a script via PowerShell is a common pattern observed in real\u2011world campaigns and red\u2011team engagements, making the command highly realistic.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "strengths": [
+              "Reflects widely used attacker behavior",
+              "Fits typical initial\u2011access or execution phases"
+            ],
+            "weaknesses": [
+              "Assumes unrestricted outbound network access",
+              "Relies on default PowerShell execution policy being permissive"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "Many threat groups (e.g., APT28, FIN7) employ PowerShell IEX download patterns, so the command aligns with generic actor TTPs, though no specific actor is referenced.",
+          "confidence": 0.6,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "strengths": [
+              "Matches tactics used by multiple known actors",
+              "Low technical barrier \u2013 fits a range of actor skill levels"
+            ],
+            "weaknesses": [
+              "Lacks actor\u2011specific nuances (e.g., obfuscation, staging)",
+              "No indication of follow\u2011on actions or command\u2011and\u2011control"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The command downloads and executes remote PowerShell code, which can be destructive depending on the payload. No cleanup steps are provided, making it unsafe for production-like environments.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "strengths": [
+              "No immediate local file writes",
+              "Execution is limited to a single PowerShell process"
+            ],
+            "weaknesses": [
+              "Executes unverified remote code",
+              "Lacks cleanup or rollback instructions"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The pattern is a well\u2011known PowerShell download\u2011and\u2011execute technique, yielding clear IOC such as IEX, Net.WebClient, and the URL, useful for SIEM and EDR rule creation.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "strengths": [
+              "Generates distinctive PowerShell command line artifacts",
+              "Maps to ATT&CK techniques (T1059.001, T1105)"
+            ],
+            "weaknesses": [
+              "Evasion possible by encoding or obfuscating the command",
+              "Limited to a single observable behavior"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 1,
+          "normalized_score": 0.1,
+          "explanation": "The entry provides no explanation, prerequisites, expected indicators, or cleanup guidance, making it difficult for users to understand or safely execute.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "strengths": [
+              "Command itself is syntactically correct"
+            ],
+            "weaknesses": [
+              "Missing description of intent and effect",
+              "No listed indicators or cleanup steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:39.632375",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.572/1.0\n\nCategory Scores:\n  - realism: 0.800\n  - correctness: 0.635\n  - detectability: 0.600\n  - safety: 0.562\n  - effectiveness: 0.160\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:06:39.632375",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Malware",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.47058823529411764,
+      "category_scores": {
+        "correctness": 0.44000000000000006,
+        "realism": 0.3333333333333333,
+        "safety": 0.8125,
+        "detectability": 0.42000000000000004,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The certutil syntax is valid and will download the file, but the output path \"C:\\%TEMP%\\dns_tunnel_test.txt\" is malformed and will likely fail. Additionally, the command does not implement DNS tunneling as claimed.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "strengths": [
+              "Uses built\u2011in Windows utility (certutil) requiring no extra binaries",
+              "Simple one\u2011liner that performs a download"
+            ],
+            "weaknesses": [
+              "Incorrect temp directory expansion (C:\\%TEMP% is invalid)",
+              "Does not achieve DNS tunneling; it uses HTTP"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The command does not generate DNS queries or encode data in DNS, which is the core of the ATT&CK DNS Tunneling technique, so alignment is poor.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "strengths": [
+              "Attempts to retrieve external data for later use"
+            ],
+            "weaknesses": [
+              "Mislabels the activity as DNS tunneling",
+              "Produces HTTP traffic instead of DNS artifacts"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "While certutil downloads are seen in real attacks, using it for DNS tunneling is unrealistic; threat actors typically employ dedicated DNS tunneling tools.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "strengths": [
+              "Leverages a legitimate Windows binary commonly abused",
+              "Command is concise and could be executed stealthily"
+            ],
+            "weaknesses": [
+              "Technique does not match the claimed DNS tunneling objective",
+              "Lacks realistic data encoding/exfiltration via DNS"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "Known actors that perform DNS tunneling (e.g., APT33, FIN7) use DNS\u2011specific tools, not plain HTTP downloads via certutil, so the command does not reflect typical TTPs.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "strengths": [
+              "Uses a native Windows tool that some actors abuse"
+            ],
+            "weaknesses": [
+              "Technique mismatch with DNS tunneling TTPs",
+              "Insufficient sophistication for typical DNS tunneling actors"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The command only downloads a file to a temporary location using a legitimate Windows utility, which is non\u2011destructive. However, there is no cleanup step and the file persists, which could affect repeatable testing.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "strengths": [
+              "Uses built\u2011in, non\u2011privileged tool (certutil)",
+              "No system modifications beyond file creation"
+            ],
+            "weaknesses": [
+              "Lacks explicit cleanup instructions",
+              "Potential for leftover artifacts on the host"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The activity generates observable artifacts (certutil execution, HTTP request, file creation) useful for detection, but the command is generic and mislabeled as DNS tunneling, limiting its relevance for specific DNS\u2011tunnel detection development.",
+          "confidence": 0.78,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "strengths": [
+              "Triggers known LOLBin (certutil) alerts",
+              "Creates network and file\u2011system indicators"
+            ],
+            "weaknesses": [
+              "Technique label does not match actual HTTP download behavior",
+              "No unique indicators (e.g., encoded payload) provided"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry provides only the raw command with no explanation, prerequisites, expected indicators, or cleanup guidance, making it difficult for analysts to understand intent or reproduce safely.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "strengths": [
+              "Command syntax is complete and executable"
+            ],
+            "weaknesses": [
+              "Missing description of purpose and expected outcome",
+              "No listed indicators or cleanup steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:06:51.498197",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.471/1.0\n\nCategory Scores:\n  - safety: 0.812\n  - correctness: 0.440\n  - detectability: 0.420\n  - realism: 0.333\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:06:51.498197",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Domain Name System (DNS) Tunneling",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5161764705882355,
+      "category_scores": {
+        "correctness": 0.545,
+        "realism": 0.5,
+        "safety": 0.75,
+        "detectability": 0.42000000000000004,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell command is syntactically valid, creates a WebClient, builds a URL, and calls DownloadString inside a try/catch block, which will execute on Windows without errors. Error handling is minimal (exceptions are silently ignored) and the command assumes network connectivity to an HTTP endpoint.",
+          "confidence": 0.93,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "strengths": [
+              "Correct PowerShell syntax and object usage",
+              "Simple, self\u2011contained execution flow"
+            ],
+            "weaknesses": [
+              "Swallows all errors, making troubleshooting difficult",
+              "Hard\u2011coded HTTP URL limits flexibility and security"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The command performs HTTP\u2011based data exfiltration, which does not match the MITRE ATT&CK technique \"Domain Name System (DNS) Tunneling\" that requires DNS queries for covert channeling. Consequently, the artifact does not represent the stated technique.",
+          "confidence": 0.96,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "strengths": [
+              "Demonstrates data exfiltration concept",
+              "Uses a native Windows tool (PowerShell) for network I/O"
+            ],
+            "weaknesses": [
+              "Mislabels the technique; no DNS traffic is generated",
+              "Fails to cover key DNS tunneling behaviors (e.g., encoded subdomains)"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "PowerShell\u2011based HTTP exfiltration is common in real\u2011world attacks, so the command is realistic in that sense. However, presenting it as DNS tunneling reduces realism because actual DNS tunneling tools behave differently (e.g., using DNS queries, encoding data in subdomains).",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "strengths": [
+              "Reflects typical PowerShell usage by threat actors",
+              "Simple enough to be employed in many compromise scenarios"
+            ],
+            "weaknesses": [
+              "Lacks DNS query generation required for true tunneling",
+              "Overly simplistic; does not mimic evasion techniques (e.g., traffic shaping)"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "While many actors leverage PowerShell for exfiltration, the specific technique of DNS tunneling is not demonstrated, limiting alignment with groups known for DNS\u2011based C2 (e.g., APT33, FIN7). The command therefore only loosely matches generic exfiltration behavior.",
+          "confidence": 0.88,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "strengths": [
+              "Uses a tool (PowerShell) commonly employed by many threat actors",
+              "Shows basic data\u2011leak capability"
+            ],
+            "weaknesses": [
+              "Does not exhibit DNS tunneling tactics used by known actors",
+              "Insufficient sophistication to reflect advanced threat\u2011actor pipelines"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command only performs a harmless HTTP GET and catches errors, so it does not modify the host. However it contacts an external server, which may be undesirable in production, and there is no cleanup guidance.",
+          "confidence": 0.78,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "strengths": [
+              "No destructive or privileged actions",
+              "Error handling prevents crashes"
+            ],
+            "weaknesses": [
+              "External network traffic may violate test\u2011environment policies",
+              "Lacks explicit cleanup or rollback steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The activity generates a clear network indicator (HTTP request to a suspicious domain) useful for detection rules, but the command is overly simplistic and mislabeled as DNS tunneling, limiting its relevance for broader ATT&CK detection development.",
+          "confidence": 0.73,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "strengths": [
+              "Produces a concrete observable (outbound HTTP request)",
+              "Easy to replicate for rule testing"
+            ],
+            "weaknesses": [
+              "Technique label (DNS tunneling) does not match the actual behavior",
+              "Limited evasion; easily flagged by basic URL filtering"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry provides no explanation, prerequisites, expected indicators, or cleanup instructions, making it difficult for analysts to understand intent or reproduce safely.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "strengths": [
+              "Command syntax is syntactically correct"
+            ],
+            "weaknesses": [
+              "Missing description of purpose and behavior",
+              "No listed indicators or cleanup steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:03.367049",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.516/1.0\n\nCategory Scores:\n  - safety: 0.750\n  - correctness: 0.545\n  - realism: 0.500\n  - detectability: 0.420\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:07:03.367049",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Domain Name System (DNS) Tunneling",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6426470588235295,
+      "category_scores": {
+        "correctness": 0.6950000000000001,
+        "realism": 0.6166666666666667,
+        "safety": 0.9375,
+        "detectability": 0.5399999999999999,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell syntax is valid and the command correctly base64\u2011encodes a payload and issues a DNS A\u2011record query via Resolve\u2011DnsName. Error handling with try/catch prevents crashes, though the escaping may need adjustment depending on the invoking shell.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell constructs and encoding logic",
+              "Uses built\u2011in Resolve\u2011DnsName for DNS queries",
+              "Graceful error handling prevents interruption"
+            ],
+            "weaknesses": [
+              "Escaping of quotes may break in some shells (e.g., cmd.exe)",
+              "Only handles a single static string, not scalable for larger exfiltration",
+              "Hard\u2011coded public DNS server (8.8.8.8) reduces stealth"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The command embodies the core of MITRE ATT&CK\u2019s DNS Tunneling technique (T1071.004) by embedding data in a DNS query. It lacks bidirectional communication and does not demonstrate covert channel management, which are typical aspects of the technique.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "strengths": [
+              "Encodes data in the sub\u2011domain as prescribed by the technique",
+              "Generates observable DNS traffic that matches ATT&CK expectations"
+            ],
+            "weaknesses": [
+              "No reception of data from the DNS server (unidirectional only)",
+              "Missing persistence or channel management components"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 6.5,
+          "normalized_score": 0.65,
+          "explanation": "PowerShell\u2011based DNS exfiltration is observed in real campaigns, but attackers usually leverage the victim\u2019s resolver or custom tools rather than a public DNS server. The use of Resolve\u2011DnsName is plausible but less common than lower\u2011level socket calls.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "strengths": [
+              "Uses native Windows tooling that does not require external binaries",
+              "Reflects a simple, quick\u2011hit exfiltration scenario seen in early\u2011stage attacks"
+            ],
+            "weaknesses": [
+              "Public DNS server choice reduces stealth and realism",
+              "Lacks mechanisms for chunking larger payloads or handling responses"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Many APT groups employ DNS tunneling via PowerShell, yet this command is overly simplistic and does not exhibit the sophistication or custom tooling typical of known actors. It aligns at a high\u2011level but not with specific TTP fingerprints.",
+          "confidence": 0.75,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "strengths": [
+              "PowerShell usage matches common threat\u2011actor habits",
+              "DNS\u2011based data exfiltration is a documented actor technique"
+            ],
+            "weaknesses": [
+              "Absence of advanced features (encryption, dynamic domain generation) seen in actor\u2011specific toolsets",
+              "Hard\u2011coded resolver and static payload limit realistic actor mimicry"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The command only performs a DNS lookup using a harmless base64 payload, causing no system changes or destructive actions. It runs within PowerShell and includes error handling, making its behavior predictable and safe for most test environments.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "strengths": [
+              "Non\u2011destructive, only generates network traffic",
+              "Uses built\u2011in PowerShell cmdlet with try/catch for stability"
+            ],
+            "weaknesses": [
+              "Relies on an external DNS server (8.8.8.8), which may be blocked in restricted labs",
+              "No explicit cleanup steps provided"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The script creates a visible DNS query containing a base64\u2011encoded string, which is a classic indicator for DNS tunneling detection. However, it issues only a single query, limiting the richness of data for rule development.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "strengths": [
+              "Produces a clear, observable DNS request that can be logged",
+              "Leverages a common Windows utility, reflecting realistic attacker behavior"
+            ],
+            "weaknesses": [
+              "Single\u2011shot exfiltration limits pattern generation for detection",
+              "Uses a public resolver; some environments may not capture these logs"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The provided artifact lacks any explanatory text, prerequisites, expected indicators, or cleanup guidance, making it difficult for analysts to understand intent or reproduce safely. Essential documentation fields are empty.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "strengths": [
+              "Command itself is fully specified and syntactically correct",
+              "Includes basic error handling"
+            ],
+            "weaknesses": [
+              "No description of what the command does or its purpose",
+              "Missing indicators, prerequisites, and cleanup instructions"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:15.637543",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.643/1.0\n\nCategory Scores:\n  - safety: 0.938\n  - correctness: 0.695\n  - realism: 0.617\n  - detectability: 0.540\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:07:15.637543",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Domain Name System (DNS) Tunneling",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5220588235294118,
+      "category_scores": {
+        "correctness": 0.5349999999999999,
+        "realism": 0.4666666666666666,
+        "safety": 0.8125,
+        "detectability": 0.42000000000000004,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The command is syntactically valid on Windows, correctly chains three actions (launch Word, wait, launch a hidden cmd via PowerShell). It will execute as written, though it assumes WinWord is installed and does not handle failures.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:27.413231",
+          "metadata": {
+            "strengths": [
+              "Valid Windows command syntax",
+              "Logical sequencing with && operators",
+              "Uses built\u2011in utilities (cmd, timeout, PowerShell)"
+            ],
+            "weaknesses": [
+              "No error handling if winword.exe is missing",
+              "Hard\u2011coded 5\u2011second delay may be unreliable"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The command is labeled as the \"Phishing\" technique, but it performs local execution rather than the delivery or credential\u2011harvesting aspects described by ATT&CK T1566. It aligns more with execution techniques (e.g., T1059, T1059.001).",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:07:27.413231",
+          "metadata": {
+            "strengths": [
+              "Demonstrates execution of a payload after user interaction"
+            ],
+            "weaknesses": [
+              "Does not reflect phishing delivery or social engineering",
+              "Missing ATT&CK sub\u2011technique mapping for the observed behavior"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "Launching a legitimate Office binary followed by a hidden command shell mimics tactics seen in post\u2011phishing malware, yet the raw command line is more typical of a test script than a real\u2011world payload.",
+          "confidence": 0.75,
+          "timestamp": "2025-12-20T15:07:27.413231",
+          "metadata": {
+            "strengths": [
+              "Uses common Windows binaries (winword.exe, PowerShell)",
+              "Shows a staged execution pattern"
+            ],
+            "weaknesses": [
+              "Lacks the obfuscation or delivery mechanisms used in actual campaigns",
+              "Straight\u2011forward syntax is less realistic for sophisticated actors"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "Many threat groups could employ this simple execution chain, but it does not exhibit distinctive TTPs of any specific actor. It reflects generic capability rather than a tailored profile.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:07:27.413231",
+          "metadata": {
+            "strengths": [
+              "Applicable to a broad range of actors with basic Windows access"
+            ],
+            "weaknesses": [
+              "No unique tools, scripts, or patterns that tie to known groups",
+              "Insufficient sophistication to match advanced APT behavior"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The command only launches benign applications (WinWord and a hidden cmd) and does not perform destructive actions, making it generally safe for test environments. However, the lack of cleanup instructions and the hidden cmd could lead to lingering processes if not manually terminated.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:27.413231",
+          "metadata": {
+            "strengths": [
+              "No destructive or irreversible actions",
+              "Predictable behavior (process launches only)"
+            ],
+            "weaknesses": [
+              "No cleanup guidance provided",
+              "Hidden cmd may persist unintentionally"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command generates observable process creation events (winword.exe, powershell.exe, cmd.exe) that can be used for detection, but the pattern is common and lacks distinctive indicators, limiting its utility for robust rule development.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:07:27.413231",
+          "metadata": {
+            "strengths": [
+              "Creates clear process creation logs",
+              "Shows a multi\u2011stage execution chain"
+            ],
+            "weaknesses": [
+              "Artifacts are generic and easily mimicked by legitimate activity",
+              "No unique IOCs or contextual data supplied"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry provides no explanation of intent, no prerequisites, no expected indicators, and no cleanup steps, making it difficult for analysts to understand or reproduce the scenario.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:27.413231",
+          "metadata": {
+            "strengths": [
+              "Command syntax is complete and executable"
+            ],
+            "weaknesses": [
+              "Missing description of what the command achieves",
+              "Absent prerequisites, indicators, and cleanup instructions"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.5,
+          "normalized_score": 0.65,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:27.413742",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:27.413742",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:27.413742",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:27.413742",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.522/1.0\n\nCategory Scores:\n  - safety: 0.812\n  - correctness: 0.535\n  - realism: 0.467\n  - detectability: 0.420\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:07:27.414197",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Phishing",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.4882352941176471,
+      "category_scores": {
+        "correctness": 0.5900000000000001,
+        "realism": 0.26666666666666666,
+        "safety": 0.75,
+        "detectability": 0.42000000000000004,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell command is syntactically valid and correctly uses Start-Process with appropriate arguments, including -PassThru to capture the PID. It lacks error handling and assumes a fixed Word installation path, which could cause failures on some systems.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:39.288986",
+          "metadata": {
+            "strengths": [
+              "Correct PowerShell syntax and use of Start-Process",
+              "Captures child process ID via -PassThru",
+              "Hides the Word window to reduce visibility"
+            ],
+            "weaknesses": [
+              "Hard\u2011coded file path may not exist on all hosts",
+              "No error checking or fallback logic"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The command does not embody the core objectives of the MITRE ATT&CK Phishing technique, which focuses on credential harvesting via deceptive communications. It merely launches Word and a dummy cmd process, producing artifacts unrelated to phishing.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:07:39.288986",
+          "metadata": {
+            "strengths": [
+              "Attempts to simulate a phishing\u2011related message via echo",
+              "Uses legitimate binaries, which could be part of a broader phishing payload"
+            ],
+            "weaknesses": [
+              "No email, link, or credential\u2011stealing component",
+              "Artifacts generated (PID output) are not typical of phishing attacks"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "While launching a legitimate Office executable mirrors real\u2011world abuse of trusted binaries, the overall flow (hidden Word, dummy ping) is not representative of how adversaries conduct phishing campaigns. The simplicity reduces realism.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:07:39.288986",
+          "metadata": {
+            "strengths": [
+              "Uses trusted Windows binaries (WINWORD.EXE, cmd.exe)",
+              "Executes in a stealthy manner (hidden window)"
+            ],
+            "weaknesses": [
+              "Lacks social\u2011engineering or malicious attachment elements",
+              "Ping loop adds no realistic malicious behavior"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The snippet does not map to any known threat\u2011actor TTPs for phishing; it is generic and low\u2011sophistication. No actor\u2011specific tools or patterns are evident.",
+          "confidence": 0.75,
+          "timestamp": "2025-12-20T15:07:39.288986",
+          "metadata": {
+            "strengths": [
+              "Relies on common Windows utilities found in many actor toolkits",
+              "Low complexity could fit low\u2011skill actors"
+            ],
+            "weaknesses": [
+              "No alignment with documented actor campaigns or techniques",
+              "Simplistic payload does not reflect typical actor sophistication"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command only launches legitimate binaries (Word and cmd) and performs a local ping, which are non\u2011destructive. However, it leaves a hidden Word process running and provides no cleanup steps, which could affect long\u2011running test environments.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:07:39.288986",
+          "metadata": {
+            "strengths": [
+              "No file system or network damage",
+              "Predictable, low\u2011impact behavior"
+            ],
+            "weaknesses": [
+              "Leaves hidden processes running",
+              "Missing explicit cleanup instructions"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The script generates observable events such as process creation for winword.exe and cmd.exe with command\u2011line arguments, useful for detection rule development. Yet, it does not closely emulate a realistic phishing attack and lacks external network activity, limiting its relevance to the Phishing technique.",
+          "confidence": 0.78,
+          "timestamp": "2025-12-20T15:07:39.288986",
+          "metadata": {
+            "strengths": [
+              "Creates clear process\u2011creation artifacts",
+              "Command\u2011line arguments are logged by most EDRs"
+            ],
+            "weaknesses": [
+              "Technique label (Phishing) is mismatched to behavior",
+              "No external communication to trigger network\u2011based detections"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry provides no explanation, prerequisites, expected indicators, or cleanup guidance, making it hard for analysts to understand intent or reproduce safely. The lack of detail reduces its utility for sharing or training.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:39.288986",
+          "metadata": {
+            "strengths": [
+              "Command syntax is syntactically correct"
+            ],
+            "weaknesses": [
+              "Missing description of purpose",
+              "No listed indicators or expected outcomes",
+              "Absence of cleanup steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 7.0,
+          "normalized_score": 0.7,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:39.293843",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:39.293843",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:39.293843",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:39.293843",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.488/1.0\n\nCategory Scores:\n  - safety: 0.750\n  - correctness: 0.590\n  - detectability: 0.420\n  - realism: 0.267\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:07:39.293843",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Phishing",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5088235294117647,
+      "category_scores": {
+        "correctness": 0.5599999999999999,
+        "realism": 0.6333333333333333,
+        "safety": 0.5625,
+        "detectability": 0.48,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell one\u2011liner is syntactically valid on Windows, correctly assigns a Base64 string, launches a hidden Word process, pauses, and then invokes another hidden PowerShell with -EncodedCommand. No obvious syntax errors, but it lacks error handling and validation of the encoded payload.",
+          "confidence": 0.88,
+          "timestamp": "2025-12-20T15:07:51.609975",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax and proper quoting",
+              "Correct use of Start-Process and -EncodedCommand for stealth"
+            ],
+            "weaknesses": [
+              "No error handling or output capture",
+              "Assumes the Base64 payload is well\u2011formed; no verification"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The command performs local execution of PowerShell and Word, which does not match the MITRE ATT&CK Phishing technique (T1566) that focuses on delivery via social engineering. It aligns more with Execution sub\u2011techniques.",
+          "confidence": 0.92,
+          "timestamp": "2025-12-20T15:07:51.609975",
+          "metadata": {
+            "strengths": [
+              "Uses PowerShell, a common delivery vector in phishing payloads"
+            ],
+            "weaknesses": [
+              "No phishing delivery component (e.g., email, malicious attachment)",
+              "Mislabels the technique; does not reflect Phishing objectives"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "Launching hidden processes and using Base64\u2011encoded PowerShell mirrors real\u2011world attacker behavior aimed at evading detection. The extra Word launch is plausible for sandbox evasion, though not universally observed.",
+          "confidence": 0.84,
+          "timestamp": "2025-12-20T15:07:51.609975",
+          "metadata": {
+            "strengths": [
+              "Employs common stealth tactics (hidden windows, encoded commands)",
+              "Uses native Windows utilities that attackers frequently abuse"
+            ],
+            "weaknesses": [
+              "The standalone Word launch adds limited value and may look suspicious",
+              "Lacks persistence or lateral movement steps typical of mature campaigns"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "Many APT groups and cybercrime crews use PowerShell encoded commands, so the technique is broadly compatible with known TTPs. However, without a specific actor context, the alignment remains generic.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:07:51.609975",
+          "metadata": {
+            "strengths": [
+              "Reflects widely\u2011used PowerShell execution patterns seen in multiple threat groups",
+              "Stealthy execution aligns with typical actor goals"
+            ],
+            "weaknesses": [
+              "No actor\u2011specific indicators (e.g., custom modules, unique command strings)",
+              "Missing additional tactics (credential dumping, exfiltration) that characterize specific actors"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The command launches hidden processes and runs an encoded PowerShell payload whose behavior is unknown, with no cleanup steps provided. While it does not explicitly delete files or modify system settings, the lack of visibility and cleanup makes it risky for production\u2011like testing.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:07:51.609975",
+          "metadata": {
+            "strengths": [
+              "Uses standard Windows utilities (PowerShell, winword) without obvious destructive actions",
+              "Processes are started hidden, reducing immediate user impact"
+            ],
+            "weaknesses": [
+              "Encoded payload is opaque, potentially executing malicious code",
+              "No cleanup instructions; processes may remain running after testing"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The use of PowerShell's -EncodedCommand flag and hidden process creation provides observable artifacts for detection (e.g., command\u2011line logging, process\u2011creation events). However, the lack of explicit indicator guidance and mis\u2011labeling of the technique limits its utility for building robust detections.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:07:51.609975",
+          "metadata": {
+            "strengths": [
+              "EncodedCommand is a well\u2011known detection indicator for PowerShell abuse",
+              "Creates a chain of process events (winword \u2192 PowerShell) that can be logged"
+            ],
+            "weaknesses": [
+              "No documented IOCs or expected log patterns",
+              "Technique is incorrectly mapped to \"Phishing\" rather than a command\u2011execution technique"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The artifact lacks any explanatory text, prerequisites, indicator list, or cleanup guidance, making it difficult for analysts to understand intent or safely execute it. Only the raw command and platform are provided.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:07:51.609975",
+          "metadata": {
+            "strengths": [
+              "Command string is fully provided for replication",
+              "Platform (Windows) is specified"
+            ],
+            "weaknesses": [
+              "Missing description of what the encoded payload does",
+              "No cleanup steps or guidance on safe execution"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:51.610983",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:51.610983",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:51.610983",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:07:51.610983",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.509/1.0\n\nCategory Scores:\n  - realism: 0.633\n  - safety: 0.562\n  - correctness: 0.560\n  - detectability: 0.480\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:07:51.610983",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Phishing",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6250000000000001,
+      "category_scores": {
+        "correctness": 0.6950000000000001,
+        "realism": 0.5333333333333333,
+        "safety": 0.9375,
+        "detectability": 0.48,
+        "effectiveness": 0.24000000000000005
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command `net.exe view` is syntactically valid on Windows and will enumerate visible SMB shares/computers. It runs without additional arguments, but the snippet lacks error handling or guidance for required network permissions.",
+          "confidence": 0.88,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "strengths": [
+              "Correct Windows syntax",
+              "Executes without extra setup"
+            ],
+            "weaknesses": [
+              "No handling of permission errors",
+              "No options to refine output"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "`net view` aligns with ATT&CK T1046 (Network Scanning) by discovering hosts on the local network via SMB. It covers only a subset of scanning capabilities (share enumeration) and does not perform broader port or service discovery.",
+          "confidence": 0.84,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "strengths": [
+              "Maps to network discovery intent",
+              "Produces observable artifacts (SMB queries)"
+            ],
+            "weaknesses": [
+              "Limited to SMB, not full network scan",
+              "Missing coverage of typical scanning techniques (e.g., ping sweep, port scan)"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "Real attackers sometimes use native Windows tools like `net view` for quick reconnaissance, especially low\u2011skill actors. However, sophisticated campaigns favor PowerShell, nmap, or custom scripts, making this command less representative of advanced threat activity.",
+          "confidence": 0.81,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "strengths": [
+              "Uses a native, widely\u2011available tool",
+              "Simple and fast for on\u2011premises discovery"
+            ],
+            "weaknesses": [
+              "Not typical of high\u2011skill or stealthy operations",
+              "Provides limited visibility compared to dedicated scanners"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The command is generic and not tied to any specific threat actor TTPs; many actors could employ it, but it lacks the distinctiveness seen in known campaigns (e.g., use of PowerShell Empire, Cobalt Strike).",
+          "confidence": 0.73,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "strengths": [
+              "Applicable to a broad range of actors",
+              "Low barrier to entry"
+            ],
+            "weaknesses": [
+              "No clear association with documented actor behavior",
+              "Insufficient sophistication to match advanced APT profiles"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The net.exe view command only enumerates visible network hosts and does not modify system state, making it non\u2011destructive and safe for most test environments. No cleanup is required, though the lack of explicit cleanup guidance is a minor omission.",
+          "confidence": 0.92,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "strengths": [
+              "Non\u2011destructive operation",
+              "Predictable and repeatable output",
+              "No privileged changes or side effects"
+            ],
+            "weaknesses": [
+              "No cleanup instructions provided (even if unnecessary)",
+              "May generate network traffic that could be noisy in tightly controlled labs"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "Running net.exe view creates observable artifacts such as process creation events and SMB enumeration traffic, which are useful for detection rules. However, the artifact description is absent, limiting immediate rule\u2011writing value.",
+          "confidence": 0.88,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "strengths": [
+              "Produces clear process creation logs (e.g., Event ID 4688)",
+              "Triggers SMB/NetBIOS traffic that can be logged"
+            ],
+            "weaknesses": [
+              "No explicit indicator list (e.g., command line, network signatures)",
+              "No discussion of evasion techniques or variations"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 3,
+          "normalized_score": 0.3,
+          "explanation": "The entry lacks an explanation of the command\u2019s purpose, prerequisites, expected indicators, and cleanup steps, making it difficult for users to understand or reproduce the test. The only provided field is the raw command.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "strengths": [
+              "Command syntax is correct for Windows",
+              "Technique label (Network Scanning) is present"
+            ],
+            "weaknesses": [
+              "Missing description of what net.exe view does",
+              "No listed prerequisites or environment assumptions",
+              "No expected detection artifacts or cleanup guidance"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:03.377823",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.625/1.0\n\nCategory Scores:\n  - safety: 0.938\n  - correctness: 0.695\n  - realism: 0.533\n  - detectability: 0.480\n  - effectiveness: 0.240\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:08:03.377823",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Network Scanning",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6485294117647059,
+      "category_scores": {
+        "correctness": 0.7450000000000001,
+        "realism": 0.7000000000000001,
+        "safety": 0.875,
+        "detectability": 0.48,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8.5,
+          "normalized_score": 0.85,
+          "explanation": "The PowerShell command is syntactically valid and correctly uses the .NET Ping class to sweep a /24 subnet, filtering for successful replies and outputting useful fields. Error handling is minimal but present via try/catch. The hard\u2011coded subnet and lack of parallelism limit scalability.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:15.524384",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax with proper use of .NET classes",
+              "Filters for successful pings and formats output clearly",
+              "Includes basic try/catch error handling"
+            ],
+            "weaknesses": [
+              "Subnet is hard\u2011coded, reducing flexibility",
+              "Linear loop can be slow on larger networks",
+              "Limited error handling for individual ping failures"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 8.0,
+          "normalized_score": 0.8,
+          "explanation": "The command performs an ICMP sweep, which directly maps to MITRE ATT&CK network\u2011scanning techniques (e.g., T1018, T1046). It achieves the core objective of discovering live hosts. However, it does not cover port/service enumeration which many scanning techniques also include.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:08:15.524384",
+          "metadata": {
+            "strengths": [
+              "Implements core ICMP host discovery",
+              "Uses native Windows capabilities, matching ATT&CK expectations",
+              "Produces observable artifacts (IP, status) useful for detection"
+            ],
+            "weaknesses": [
+              "Only discovers hosts, no service/port information",
+              "Limited to a single /24 range",
+              "Lacks stealth or evasion tactics often associated with advanced scans"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7.5,
+          "normalized_score": 0.75,
+          "explanation": "A PowerShell\u2011based ping sweep is a realistic technique employed by many red teams and threat actors for quick internal discovery. The approach is straightforward and mirrors real\u2011world low\u2011complexity attacks, though its sequential execution makes it noisy and slower than typical adversary tools.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:08:15.524384",
+          "metadata": {
+            "strengths": [
+              "Uses built\u2011in tools, avoiding external binaries",
+              "Reflects tactics seen in many post\u2011exploitation scripts",
+              "Easy to execute on compromised Windows hosts"
+            ],
+            "weaknesses": [
+              "Sequential processing increases detection window",
+              "No randomization or timing control to mimic human behavior",
+              "Scans only one subnet, limiting operational scope"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "While many threat groups perform network discovery, this specific PowerShell ping sweep is generic and not tied to any particular actor\u2019s documented TTPs. It demonstrates basic capability but lacks the sophistication or custom tooling seen in advanced campaigns.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:08:15.524384",
+          "metadata": {
+            "strengths": [
+              "Generic technique used by a wide range of actors",
+              "Fits low\u2011skill or early\u2011stage intrusion phases",
+              "Requires no additional tooling, matching resource\u2011constrained actors"
+            ],
+            "weaknesses": [
+              "No association with known actor\u2011specific scripts or frameworks",
+              "Lacks advanced evasion or stealth features common in sophisticated groups",
+              "Simplistic implementation may not reflect higher\u2011level threat actor behavior"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell ping sweep is non\u2011destructive and predictable, making it safe for most test environments. However, it lacks explicit cleanup guidance and generates network traffic that could affect production or trigger alerts.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:08:15.524384",
+          "metadata": {
+            "strengths": [
+              "No destructive actions",
+              "Predictable behavior and clear output"
+            ],
+            "weaknesses": [
+              "No cleanup instructions provided",
+              "Potential impact on network monitoring or firewalls"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command produces observable artifacts such as ICMP echo requests and a PowerShell process, which are useful for building detection rules. Its simplicity and lack of evasion techniques limit the depth of detection scenarios it can support.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:15.524384",
+          "metadata": {
+            "strengths": [
+              "Generates clear network and process logs",
+              "Directly maps to ATT&CK Network Scanning technique"
+            ],
+            "weaknesses": [
+              "Low stealth \u2013 easily whitelisted",
+              "Limited to a single /24 subnet, reducing coverage"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The artifact provides only the raw command with no explanation, prerequisites, expected indicators, or cleanup steps, making it hard for users to understand or safely execute. Minimal documentation limits its usability for reproducible testing.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:15.524384",
+          "metadata": {
+            "strengths": [
+              "Command includes basic error handling",
+              "Self\u2011contained PowerShell one\u2011liner"
+            ],
+            "weaknesses": [
+              "No description of purpose or behavior",
+              "Missing prerequisite and indicator details",
+              "Absent cleanup guidance"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:15.525900",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:15.525900",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:15.525900",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:15.525900",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.649/1.0\n\nCategory Scores:\n  - safety: 0.875\n  - correctness: 0.745\n  - realism: 0.700\n  - detectability: 0.480\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:08:15.525900",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Network Scanning",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6294117647058824,
+      "category_scores": {
+        "correctness": 0.74,
+        "realism": 0.6,
+        "safety": 0.875,
+        "detectability": 0.48,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell syntax is valid and the async TcpClient logic correctly determines open vs closed ports within a 100\u202fms timeout. Error handling is present but limited to a generic catch block and does not cover DNS failures or socket exceptions.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "strengths": [
+              "Valid PowerShell syntax and use of .BeginConnect/.EndConnect",
+              "Simple, deterministic flow that returns structured results"
+            ],
+            "weaknesses": [
+              "No granular exception handling for network errors",
+              "Fixed port list and timeout limit flexibility"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 8.5,
+          "normalized_score": 0.85,
+          "explanation": "The command implements a classic port\u2011scan, directly matching ATT&CK technique T1046 (Network Service Scanning) and T1018 (Remote System Discovery). It produces the expected network connection artifacts.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "strengths": [
+              "Clear mapping to ATT&CK network scanning technique",
+              "Uses native PowerShell without external tools, matching typical ATT&CK implementations"
+            ],
+            "weaknesses": [
+              "Scans only three well\u2011known ports, not representative of broader service discovery",
+              "Does not enumerate additional host information (e.g., banner grabbing) often seen in ATT&CK examples"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 6.5,
+          "normalized_score": 0.65,
+          "explanation": "PowerShell\u2011based port scans are common in real attacks, but threat actors usually scan larger ranges, employ parallelism, and add evasion (random delays, proxying). The script\u2019s limited scope and deterministic timing reduce realism.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "strengths": [
+              "Uses a native Windows language that adversaries frequently leverage",
+              "Implements a quick, low\u2011noise scan suitable for initial foothold validation"
+            ],
+            "weaknesses": [
+              "Static port list and single\u2011threaded execution are atypical for sophisticated actors",
+              "Fixed short timeout may miss slower services, lowering practical effectiveness"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "While many groups employ PowerShell for reconnaissance, the script lacks distinctive characteristics (e.g., encoded commands, custom modules) that tie it to a specific actor\u2019s known TTPs.",
+          "confidence": 0.75,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "strengths": [
+              "Generic PowerShell approach aligns with a broad set of threat actors",
+              "Simple implementation mirrors early\u2011stage reconnaissance tools"
+            ],
+            "weaknesses": [
+              "No unique markers or advanced evasion techniques linked to known actors",
+              "Limited sophistication compared to typical APT\u2011level scanning scripts"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The script only attempts TCP connections to a few well\u2011known ports and never modifies the target system, making it non\u2011destructive. However, the hard\u2011coded IP could unintentionally scan production assets if run in the wrong environment.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "strengths": [
+              "Non\u2011destructive network probes",
+              "Limited scope (three ports only)",
+              "Uses built\u2011in PowerShell objects"
+            ],
+            "weaknesses": [
+              "Hard\u2011coded target may cause accidental production scanning",
+              "No explicit cleanup or rollback steps",
+              "Generates network traffic that could be noisy"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command creates observable events (process creation, outbound TCP connections) that can be leveraged for detection rules. Its simplicity limits the richness of indicators and makes it easy to modify for evasion.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "strengths": [
+              "Produces clear network connection logs",
+              "Triggers PowerShell and Sysmon process events",
+              "Easy to map to existing detection signatures"
+            ],
+            "weaknesses": [
+              "Limited indicator set (only three ports)",
+              "Easily evaded by changing ports or timing",
+              "No stealth techniques incorporated"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The artifact lacks any explanatory text, prerequisites, expected indicators, or cleanup guidance, making it hard for users to understand or safely deploy. Only the raw command is provided.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "strengths": [
+              "Command is self\u2011contained and runnable",
+              "Uses standard PowerShell syntax"
+            ],
+            "weaknesses": [
+              "No description of purpose or behavior",
+              "Missing prerequisites and environment notes",
+              "No cleanup or post\u2011run instructions"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:27.606341",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.629/1.0\n\nCategory Scores:\n  - safety: 0.875\n  - correctness: 0.740\n  - realism: 0.600\n  - detectability: 0.480\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:08:27.606341",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Network Scanning",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6117647058823531,
+      "category_scores": {
+        "correctness": 0.65,
+        "realism": 0.7666666666666666,
+        "safety": 0.75,
+        "detectability": 0.5399999999999999,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command uses valid CertUtil syntax to download a file via HTTP to the %TEMP% directory, which works on Windows. It lacks error handling or quoting for paths with spaces, but the core functionality is sound.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "strengths": [
+              "Correct use of CertUtil's -urlcache -f flags",
+              "Valid Windows environment variables and path"
+            ],
+            "weaknesses": [
+              "No error checking or verification of download success",
+              "Unquoted path could fail with spaces"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "Downloading a payload over HTTP matches the spirit of the Application Layer Protocol technique, but MITRE ATT&CK defines this technique for C2 communication rather than simple ingress transfer, making the alignment partial.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "strengths": [
+              "Uses an application\u2011layer protocol (HTTP) for data transfer",
+              "Leverages a native Windows utility commonly seen in attacks"
+            ],
+            "weaknesses": [
+              "Does not demonstrate C2 or command\u2011and\u2011control usage",
+              "More closely matches Ingress Tool Transfer (T1105) than Application Layer Protocol"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "CertUtil is a well\u2011known tool abused by threat actors for stealthy file download, and the HTTP URL approach mirrors real\u2011world campaigns. The command is realistic for a low\u2011to\u2011moderate skill attacker.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "strengths": [
+              "Reflects tactics used by multiple APT groups",
+              "Simple, low\u2011profile method that avoids third\u2011party tools"
+            ],
+            "weaknesses": [
+              "Assumes outbound HTTP is allowed, which may not hold in locked\u2011down networks",
+              "No obfuscation or evasion steps included"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "Several known actors (e.g., APT28, APT33) have employed CertUtil for payload retrieval, so the technique aligns well with observed TTPs. However, without additional context (e.g., specific actor profiles), the match is generic.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "strengths": [
+              "Matches documented use of CertUtil by multiple actors",
+              "Fits within the capability set of typical ransomware and espionage groups"
+            ],
+            "weaknesses": [
+              "Lacks actor\u2011specific nuances (e.g., custom headers, encoded URLs)",
+              "Does not incorporate follow\u2011up actions that many actors perform after download"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command only downloads a file to a temporary location, which is non\u2011destructive, but it lacks any cleanup steps and could introduce malicious payloads if misused.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "strengths": [
+              "No immediate system modification or privilege escalation",
+              "Operates within user\u2011level temp directory"
+            ],
+            "weaknesses": [
+              "No cleanup instructions to remove the staged file",
+              "Potentially unsafe if the remote payload is malicious"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "Certutil usage for remote file retrieval is a known ATT&CK behavior, providing clear telemetry (process name, command line, network connection) useful for detection rules.",
+          "confidence": 0.88,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "strengths": [
+              "Generates observable process and network artifacts",
+              "Aligns with a well\u2011documented ATT&CK technique"
+            ],
+            "weaknesses": [
+              "No explicit IOCs (e.g., URL, hash) supplied",
+              "Evasion potential if the command line is obfuscated"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry lacks an explanation, prerequisites, expected indicators, and cleanup guidance, making it difficult for operators to understand or safely execute.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "strengths": [
+              "Specifies the exact command syntax"
+            ],
+            "weaknesses": [
+              "Missing description of intent and effect",
+              "No listed indicators or cleanup steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:39.522746",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.612/1.0\n\nCategory Scores:\n  - realism: 0.767\n  - safety: 0.750\n  - correctness: 0.650\n  - detectability: 0.540\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:08:39.522746",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Application Layer Protocol",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6088235294117648,
+      "category_scores": {
+        "correctness": 0.66,
+        "realism": 0.6999999999999998,
+        "safety": 0.8125,
+        "detectability": 0.48,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The PowerShell syntax is mostly valid and Invoke-WebRequest will download the file, but the single\u2011quoted $env:TEMP prevents variable expansion, causing the file to be saved with a literal name. No verification of download success or fallback handling is present.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "strengths": [
+              "Uses built\u2011in PowerShell cmdlet, no external binaries required",
+              "Simple one\u2011liner that executes on default Windows installations"
+            ],
+            "weaknesses": [
+              "Incorrect quoting stops environment variable expansion",
+              "Lacks error checking or confirmation that the file was retrieved"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command employs HTTP (an application\u2011layer protocol) to fetch a remote payload, matching the core intent of ATT&CK T1071 (Application Layer Protocol). It demonstrates the typical use of web traffic for initial payload delivery.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "strengths": [
+              "Directly uses a web protocol for data transfer",
+              "Leverages a legitimate system utility to blend with normal traffic"
+            ],
+            "weaknesses": [
+              "Only performs a one\u2011way download, not full bidirectional C2",
+              "Does not incorporate typical ATT&CK sub\u2011technique nuances such as encoding or custom headers"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "PowerShell\u2011based payload retrieval is common in real\u2011world campaigns, making the technique realistic. However, the quoting error and lack of stealth measures (e.g., User\u2011Agent spoofing, HTTPS) reduce its fidelity to actual threat actor behavior.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "strengths": [
+              "Reflects a widely observed attacker toolset (PowerShell + Invoke-WebRequest)",
+              "Uses a straightforward HTTP GET, mirroring many initial infection steps"
+            ],
+            "weaknesses": [
+              "Variable expansion bug would likely be caught during testing",
+              "Missing evasion tactics that adversaries typically employ"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "Many APT groups (e.g., APT28, FIN7) have used PowerShell to download malicious files over HTTP, so the command aligns with generic threat actor TTPs. It lacks actor\u2011specific nuances such as custom encodings or multi\u2011stage delivery.",
+          "confidence": 0.75,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "strengths": [
+              "Matches common PowerShell download patterns seen across multiple groups",
+              "Fits within the capability set of moderately sophisticated actors"
+            ],
+            "weaknesses": [
+              "No distinctive characteristics tying it to a particular known actor",
+              "Simplistic implementation compared to the layered approaches used by advanced groups"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The command only performs a non\u2011destructive download to the TEMP directory, which is safe for most test environments. However, the lack of any cleanup steps means residual artifacts remain, which could affect repeatable testing.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "strengths": [
+              "No destructive or privileged actions",
+              "Predictable behavior (simple file download)"
+            ],
+            "weaknesses": [
+              "No cleanup instructions provided",
+              "Potential leftover file may interfere with subsequent tests"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The activity generates observable artifacts: an outbound HTTP request and a new file in %TEMP%, both useful for detection rules. Yet the command lacks evasion techniques, making it relatively easy to detect and thus offering limited insight into stealthy behavior.",
+          "confidence": 0.82,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "strengths": [
+              "Creates clear network and file\u2011system indicators",
+              "Works on default Windows PowerShell, easy to reproduce"
+            ],
+            "weaknesses": [
+              "Low stealth; does not test evasion capabilities",
+              "Limited variety of artifacts (only one protocol and file creation)"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry provides almost no documentation: missing explanation, prerequisites, expected indicators, and cleanup guidance. This hampers reproducibility and hampers analysts from understanding intent.",
+          "confidence": 0.78,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "strengths": [
+              "Command syntax is syntactically correct"
+            ],
+            "weaknesses": [
+              "No description of what the command does",
+              "Absent prerequisites and indicator list",
+              "Missing cleanup steps"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:08:51.457806",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.609/1.0\n\nCategory Scores:\n  - safety: 0.812\n  - realism: 0.700\n  - correctness: 0.660\n  - detectability: 0.480\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:08:51.457806",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Application Layer Protocol",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5279411764705882,
+      "category_scores": {
+        "correctness": 0.635,
+        "realism": 0.7333333333333334,
+        "safety": 0.5,
+        "detectability": 0.48,
+        "effectiveness": 0.16
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell one\u2011liner is syntactically valid on Windows and will download and execute the remote script as written. It lacks error handling and uses clear\u2011text HTTP, but the core logic works.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "strengths": [
+              "Correct PowerShell syntax and use of IEX",
+              "Direct download\u2011and\u2011execute flow works without extra steps"
+            ],
+            "weaknesses": [
+              "No error handling or verification of the downloaded content",
+              "Uses insecure HTTP instead of HTTPS"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command uses an application\u2011layer protocol (HTTP) to fetch code, which loosely matches T1071, but the primary ATT&CK focus of the technique is C2 communication rather than ingress tool transfer or execution.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "strengths": [
+              "Leverages HTTP, the core of the Application Layer Protocol technique",
+              "Produces a network artifact (HTTP GET) that aligns with the technique"
+            ],
+            "weaknesses": [
+              "Does not demonstrate typical C2 usage (e.g., beaconing, data exfil)",
+              "More representative of Ingress Tool Transfer (T1105) than pure T1071"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "PowerShell download\u2011and\u2011execute payloads are common in real\u2011world attacks and red\u2011team engagements, making the command realistic and plausible for many threat actors.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "strengths": [
+              "Mirrors observed attacker behavior in multiple campaigns",
+              "Uses native Windows tooling without requiring additional binaries"
+            ],
+            "weaknesses": [
+              "Modern defenses often flag clear\u2011text IEX usage, reducing stealth",
+              "Lacks obfuscation techniques that sophisticated actors employ"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "While no specific actor is named, the technique is employed by a broad set of APT groups (e.g., APT28, FIN7). The simplicity fits lower\u2011to\u2011mid\u2011skill actors, but higher\u2011tier groups may add evasion layers.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "strengths": [
+              "Consistent with tactics used by many known threat actors",
+              "Fits the capability set of both script\u2011kiddie and intermediate groups"
+            ],
+            "weaknesses": [
+              "Does not incorporate advanced evasion (e.g., encoded PowerShell)",
+              "Lacks attribution cues that would tie it to a particular actor"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The command downloads and executes remote code without any validation or cleanup, making its behavior unpredictable and potentially destructive. While it can be run in an isolated sandbox, there are no safeguards to prevent harm in less controlled environments.",
+          "confidence": 0.86,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "strengths": [
+              "Simple one\u2011liner that can be executed quickly",
+              "Can be safely contained within a sandboxed environment"
+            ],
+            "weaknesses": [
+              "Executes untrusted code from an external URL",
+              "No cleanup or rollback steps provided",
+              "Risk of persistence or system compromise if run on production"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The pattern of PowerShell IEX with a WebClient download is a well\u2011known indicator that many detection rules already monitor, offering useful telemetry for SIEMs. However, the lack of explicit IOCs or variations limits its utility for building novel detections.",
+          "confidence": 0.81,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "strengths": [
+              "Generates observable artifacts (PowerShell process, HTTP GET, IEX usage)",
+              "Aligns with known ATT&CK behaviors for execution and command\u2011and\u2011control"
+            ],
+            "weaknesses": [
+              "No explicit indicators (hashes, URLs, command line arguments) supplied",
+              "Easily evadable with obfuscation or alternative download methods"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 1,
+          "normalized_score": 0.1,
+          "explanation": "The entry provides only the raw command with no explanation, prerequisites, expected indicators, or cleanup guidance, making it difficult for analysts to understand intent or safely reproduce.",
+          "confidence": 0.88,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "strengths": [
+              "Command itself is clearly presented"
+            ],
+            "weaknesses": [
+              "Missing description of what the script does",
+              "No listed prerequisites or environment requirements",
+              "Absence of cleanup instructions and indicator examples"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 5.5,
+          "normalized_score": 0.55,
+          "explanation": "Command shows limited windows platform compatibility",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:03.647351",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.528/1.0\n\nCategory Scores:\n  - realism: 0.733\n  - correctness: 0.635\n  - safety: 0.500\n  - detectability: 0.480\n  - effectiveness: 0.160\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:09:03.647351",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Application Layer Protocol",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6338235294117648,
+      "category_scores": {
+        "correctness": 0.7550000000000001,
+        "realism": 0.6666666666666666,
+        "safety": 0.75,
+        "detectability": 0.6000000000000001,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command syntax is valid for Windows cmd and PowerShell; certutil correctly downloads the file and the PowerShell Invoke-WebRequest POSTs it. The && operator ensures sequential execution on success.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:09:15.641398",
+          "metadata": {
+            "strengths": [
+              "Uses native Windows utilities without requiring extra binaries",
+              "Proper chaining with && prevents blind execution of the second step"
+            ],
+            "weaknesses": [
+              "Hard\u2011coded IP and plain\u2011HTTP expose the traffic",
+              "No explicit error handling or logging beyond exit codes"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The activity matches T1041 (Exfiltration Over C2 Channel) by using the same HTTP channel to retrieve and then upload data. It demonstrates the core concept of exfiltration via an existing C2 path.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:09:15.641398",
+          "metadata": {
+            "strengths": [
+              "Leverages the same network channel for download and exfiltration",
+              "Employs legitimate tools to blend with normal traffic"
+            ],
+            "weaknesses": [
+              "Only covers a single, unencrypted HTTP POST; does not illustrate encryption or data encoding",
+              "Does not show staging or compression that many exfil scenarios use"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "Real\u2011world adversaries frequently use certutil and PowerShell for file transfer, making the command realistic. However, the lack of obfuscation or HTTPS reduces its fidelity to more sophisticated campaigns.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:09:15.641398",
+          "metadata": {
+            "strengths": [
+              "Toolset (certutil, PowerShell) is commonly observed in attacks",
+              "Simple one\u2011liner mirrors quick\u2011hit tactics used by threat actors"
+            ],
+            "weaknesses": [
+              "Plain\u2011text HTTP and clear\u2011text file paths are atypical for stealthy actors",
+              "No evasion techniques such as encoding, PowerShell -EncodedCommand, or proxy usage"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "Many APT groups employ certutil and PowerShell for data movement, so the command aligns with generic TTPs. It lacks actor\u2011specific nuances (e.g., custom implants, encrypted channels) that would increase alignment.",
+          "confidence": 0.75,
+          "timestamp": "2025-12-20T15:09:15.641398",
+          "metadata": {
+            "strengths": [
+              "Reflects common tooling seen in multiple threat actor toolkits",
+              "Demonstrates a straightforward exfil method that fits low\u2011to\u2011moderate sophistication actors"
+            ],
+            "weaknesses": [
+              "Absence of advanced evasion (e.g., PowerShell obfuscation) limits relevance to high\u2011skill groups",
+              "No indication of persistence or broader campaign context"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command only downloads a file and posts it back, without modifying system configuration or deleting data, making it generally safe. However, it lacks explicit cleanup instructions and could unintentionally exfiltrate sensitive data if run on a production system.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:09:15.641398",
+          "metadata": {
+            "strengths": [
+              "No destructive actions performed",
+              "Operations are reversible (file can be deleted manually)"
+            ],
+            "weaknesses": [
+              "No cleanup guidance provided",
+              "Potential for accidental data leakage"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The use of certutil and PowerShell Invoke-WebRequest generates clear, observable artifacts (file creation, outbound HTTP GET/POST, command\u2011line arguments) useful for building detection rules. While straightforward, it still offers valuable indicators for both endpoint and network monitoring.",
+          "confidence": 0.92,
+          "timestamp": "2025-12-20T15:09:15.641398",
+          "metadata": {
+            "strengths": [
+              "Produces distinct network traffic (HTTP GET/POST)",
+              "Creates observable command\u2011line activity (certutil, PowerShell)"
+            ],
+            "weaknesses": [
+              "Easily mimicked by legitimate admin tasks",
+              "Limited evasion techniques reduce realism"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry provides no explanation of the command, missing prerequisites, expected indicators, or cleanup steps, making it hard for users to understand intent or safely execute it. The lack of detail hampers reproducibility and learning.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:09:15.641398",
+          "metadata": {
+            "strengths": [
+              "Command syntax is complete and executable"
+            ],
+            "weaknesses": [
+              "No explanatory text or context",
+              "Absent cleanup instructions and indicator list"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.5,
+          "normalized_score": 0.65,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:15.642426",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:15.642426",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:15.642426",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:15.642426",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.634/1.0\n\nCategory Scores:\n  - correctness: 0.755\n  - safety: 0.750\n  - realism: 0.667\n  - detectability: 0.600\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:09:15.642426",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Exfiltration Over C2 Channel",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.6147058823529412,
+      "category_scores": {
+        "correctness": 0.6799999999999999,
+        "realism": 0.7666666666666666,
+        "safety": 0.6875,
+        "detectability": 0.6000000000000001,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell command is syntactically valid on Windows, correctly compresses the target folder, uploads the archive via HTTP POST, and cleans up the temporary file. It relies on cmd\u2011level %TEMP% expansion, which works when invoked from a shell, but could fail if run directly inside PowerShell.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:09:28.083520",
+          "metadata": {
+            "strengths": [
+              "Uses native PowerShell cmdlets (Compress-Archive, Invoke-WebRequest).",
+              "Logical sequence: archive \u2192 upload \u2192 delete.",
+              "Suppresses errors to avoid noisy logs."
+            ],
+            "weaknesses": [
+              "Depends on cmd\u2011style %TEMP% expansion; not portable to pure PowerShell execution.",
+              "No verification of upload success or integrity checks."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The command performs data exfiltration over an HTTP request, which fits the broader intent of exfiltration but does not strictly match the MITRE T1041 \"Exfiltration Over C2 Channel\" description that expects reuse of an existing C2 channel.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:09:28.083520",
+          "metadata": {
+            "strengths": [
+              "Implements core exfiltration behavior (compress \u2192 transmit).",
+              "Uses a common web\u2011based transfer method seen in many ATT&CK techniques."
+            ],
+            "weaknesses": [
+              "Technique label is mismatched; more aligned with T1048.003 (Web Services).",
+              "Lacks features like encryption, chunking, or covert channel usage."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "Compress\u2011and\u2011upload via PowerShell mirrors real\u2011world attacker playbooks and is a frequent pattern in observed campaigns. The cleanup step further mimics operational hygiene.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:09:28.083520",
+          "metadata": {
+            "strengths": [
+              "Reflects typical attacker workflow.",
+              "Uses widely\u2011available Windows tools without requiring extra binaries."
+            ],
+            "weaknesses": [
+              "Assumes the target server accepts unauthenticated HTTP POST, which may be less common.",
+              "No evasion techniques (e.g., obfuscation) are demonstrated."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "Many APT groups employ PowerShell\u2011based exfiltration, but without a specific actor referenced the mapping is generic. The technique is plausible for a range of threat actors, though not uniquely characteristic of any particular group.",
+          "confidence": 0.7,
+          "timestamp": "2025-12-20T15:09:28.083520",
+          "metadata": {
+            "strengths": [
+              "Fits the toolset of many known threat actors (e.g., APT28, FIN7).",
+              "Demonstrates a capability level common to mid\u2011skill actors."
+            ],
+            "weaknesses": [
+              "No actor\u2011specific tooling or tactics are evident.",
+              "Lacks sophistication such as encrypted payloads or multi\u2011stage delivery."
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command operates only in the %TEMP% directory and removes the created archive, limiting persistent changes. However, it initiates an outbound HTTP POST to a malicious host, which is unsafe for non\u2011isolated environments and lacks guidance on network containment.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:09:28.083520",
+          "metadata": {
+            "strengths": [
+              "Uses only temporary files that are deleted after use",
+              "No privileged system modifications or registry changes"
+            ],
+            "weaknesses": [
+              "Performs external data exfiltration without isolation instructions",
+              "Silent error handling may hide failures during testing"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The PowerShell command line, creation of a zip file, and an HTTP POST to a suspicious domain provide clear, observable artifacts for detection rules. While it uses legitimate cmdlets (living\u2011off\u2011the\u2011land), the combination is still valuable for building network and process\u2011based detections.",
+          "confidence": 0.88,
+          "timestamp": "2025-12-20T15:09:28.083520",
+          "metadata": {
+            "strengths": [
+              "Generates distinct process and command\u2011line logs",
+              "Creates a temporary file that can be monitored",
+              "Triggers a network connection to an external URL"
+            ],
+            "weaknesses": [
+              "Uses native PowerShell cmdlets that may blend with benign activity",
+              "Silent error handling could reduce logging detail"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The artifact lacks any explanatory text, prerequisites, expected indicators, or cleanup guidance, making it difficult for analysts to understand intent or reproduce safely. Only the raw command is provided.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:09:28.083520",
+          "metadata": {
+            "strengths": [
+              "Command is self\u2011contained and executable as written"
+            ],
+            "weaknesses": [
+              "No description of what the command does",
+              "Missing prerequisites, indicator expectations, and cleanup steps",
+              "Absent metadata such as attack_id or technique mapping"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:28.084027",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:28.084027",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:28.084027",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:28.084027",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.615/1.0\n\nCategory Scores:\n  - realism: 0.767\n  - safety: 0.688\n  - correctness: 0.680\n  - detectability: 0.600\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:09:28.084027",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Exfiltration Over C2 Channel",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    },
+    {
+      "benchmark_id": "4eb27c48-27d5-485c-8ea5-43ccfe664be5",
+      "item_id": "unknown",
+      "item_type": "attack_command",
+      "overall_score": 0.5852941176470589,
+      "category_scores": {
+        "correctness": 0.5599999999999999,
+        "realism": 0.6333333333333333,
+        "safety": 0.8125,
+        "detectability": 0.6000000000000001,
+        "effectiveness": 0.2
+      },
+      "metric_results": [
+        {
+          "metric_name": "technical_correctness",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command runs on Windows PowerShell and correctly reads a file, encodes it to Base64, and attempts a web request, but the single\u2011quoted URL prevents $b64 expansion and the data is not URL\u2011encoded, causing functional failure.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:09:40.445521",
+          "metadata": {
+            "strengths": [
+              "Uses native PowerShell without external binaries",
+              "Logical flow: read \u2192 encode \u2192 transmit"
+            ],
+            "weaknesses": [
+              "Variable $b64 not expanded due to single quotes",
+              "No URL\u2011encoding or handling of large payloads"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "attack_alignment",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The technique matches T1041 (Exfiltration Over C2 Channel) by sending data over an HTTP request, but it does not reuse an existing C2 channel and relies on a simple GET, which is less representative of the technique\u2019s typical usage.",
+          "confidence": 0.8,
+          "timestamp": "2025-12-20T15:09:40.445521",
+          "metadata": {
+            "strengths": [
+              "Employs a network request to exfiltrate data",
+              "Leverages built\u2011in Windows tooling consistent with the technique"
+            ],
+            "weaknesses": [
+              "Exfiltration is performed to a new endpoint rather than an established C2 channel",
+              "Uses GET without encryption or chunking, which is atypical for stealthy exfil"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "operational_realism",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "PowerShell\u2011based data exfiltration over HTTP is common in real\u2011world incidents, making the approach realistic, though the syntax error and lack of evasion reduce its fidelity to actual attacker behavior.",
+          "confidence": 0.85,
+          "timestamp": "2025-12-20T15:09:40.445521",
+          "metadata": {
+            "strengths": [
+              "Reflects common attacker use of PowerShell for data theft",
+              "Simple, reproducible command that could be executed in the wild"
+            ],
+            "weaknesses": [
+              "Syntax flaw (single\u2011quoted URL) undermines practical execution",
+              "Missing stealth measures such as HTTPS, encoding, or payload chunking"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "threat_actor_alignment",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The command aligns with low\u2011to\u2011moderate sophistication actors that use PowerShell for exfiltration, but it lacks the advanced obfuscation and encrypted channels seen in many APT groups.",
+          "confidence": 0.75,
+          "timestamp": "2025-12-20T15:09:40.445521",
+          "metadata": {
+            "strengths": [
+              "Matches generic PowerShell exfil patterns used by many threat actors",
+              "No reliance on third\u2011party tools, fitting resource\u2011constrained actors"
+            ],
+            "weaknesses": [
+              "Absence of HTTPS or custom C2 protocols reduces alignment with high\u2011skill groups",
+              "Simplistic implementation does not reflect the layered evasion tactics of many APTs"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "testing_safety",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The command only reads a local file and sends its contents over HTTP, which is non\u2011destructive and reversible. However, it lacks explicit cleanup steps and could expose data if run against real production files.",
+          "confidence": 0.9,
+          "timestamp": "2025-12-20T15:09:40.445521",
+          "metadata": {
+            "strengths": [
+              "No file modification or system changes",
+              "Predictable behavior (simple read\u2011and\u2011send)",
+              "Safe to execute in isolated test environments"
+            ],
+            "weaknesses": [
+              "No cleanup instructions to remove artifacts",
+              "Uses clear\u2011text HTTP, potentially leaking data in test nets",
+              "Assumes existence of %TEMP%\\config.txt without validation"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "detection_value",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The command generates observable artifacts such as PowerShell command line logs, file\u2011access events, and outbound HTTP GET requests with base64 payloads, which are useful for building detection rules. Its simplicity makes it easy to model, though it may blend with legitimate traffic.",
+          "confidence": 0.88,
+          "timestamp": "2025-12-20T15:09:40.445521",
+          "metadata": {
+            "strengths": [
+              "Creates distinct network indicator (GET with large query string)",
+              "Triggers PowerShell and file\u2011access logging",
+              "Demonstrates classic exfiltration technique for rule creation"
+            ],
+            "weaknesses": [
+              "Uses common PowerShell cmdlet (Invoke-WebRequest) that may be whitelisted",
+              "Base64 payload can be large and trigger size\u2011based alerts but also cause false positives",
+              "Lacks evasion techniques that would test detection limits"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "documentation_quality",
+          "score": 2,
+          "normalized_score": 0.2,
+          "explanation": "The entry provides only the raw command with no explanation, prerequisites, expected indicators, or cleanup guidance, making it hard for analysts to understand intent or reproduce safely. Essential documentation fields are empty.",
+          "confidence": 0.95,
+          "timestamp": "2025-12-20T15:09:40.445521",
+          "metadata": {
+            "strengths": [
+              "Command syntax is syntactically correct",
+              "Specifies platform (Windows) and technique name"
+            ],
+            "weaknesses": [
+              "Missing description of what the command does",
+              "No listed prerequisites or required files",
+              "Absence of cleanup steps and indicator expectations"
+            ],
+            "source": "llm_judge"
+          }
+        },
+        {
+          "metric_name": "platform_compatibility",
+          "score": 6.0,
+          "normalized_score": 0.6,
+          "explanation": "Command is compatible with windows but could use more platform-specific features",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:40.446306",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "completeness",
+          "score": 2.0,
+          "normalized_score": 0.2,
+          "explanation": "Command is incomplete and missing critical fields",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:40.446306",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "controlled_impact",
+          "score": 10.0,
+          "normalized_score": 1.0,
+          "explanation": "Command has controlled impact and is safe for testing",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:40.446306",
+          "metadata": {
+            "source": "rule_based"
+          }
+        },
+        {
+          "metric_name": "artifact_generation",
+          "score": 3.0,
+          "normalized_score": 0.3,
+          "explanation": "Command generates limited detection artifacts (0)",
+          "confidence": 1.0,
+          "timestamp": "2025-12-20T15:09:40.446306",
+          "metadata": {
+            "source": "rule_based"
+          }
+        }
+      ],
+      "summary": "Evaluation Summary for: Unknown (Unknown)\nOverall Score: 0.585/1.0\n\nCategory Scores:\n  - safety: 0.812\n  - realism: 0.633\n  - detectability: 0.600\n  - correctness: 0.560\n  - effectiveness: 0.200\n\nAssessment: POOR - Significant improvements required",
+      "timestamp": "2025-12-20T15:09:40.446306",
+      "metadata": {
+        "attack_id": "unknown",
+        "technique_name": "Exfiltration Over C2 Channel",
+        "platform": "windows",
+        "tactic": "execution",
+        "confidence_score": 0.8,
+        "source": "langchain"
+      }
+    }
+  ]
+}
