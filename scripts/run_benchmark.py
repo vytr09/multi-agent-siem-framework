@@ -74,6 +74,11 @@ async def run_benchmark(limit: int = None, delay: int = 60, force: bool = False,
     # 4. Processing Loop
     for i, file_path in enumerate(files):
         logger.info(f"\n[{i+1}/{len(files)}] Processing: {file_path.name}")
+        result_file = OUTPUT_DIR / f"result_{file_path.stem}.json"
+        if not force and result_file.exists():
+            logger.info(f"Skipping {file_path.name} (Result exists: {result_file})")
+            continue
+
         start_time = time.time()
         
         try:

@@ -303,16 +303,38 @@ class BaseBenchmark(ABC):
     
     def export_results(self, filepath: str) -> None:
         """Export results to JSON file"""
+        
+        # Sanitize config to remove secrets
+        sanitized_config = self._sanitize_config(self.config)
+        
         output = {
             "benchmark_id": self.benchmark_id,
             "timestamp": datetime.utcnow().isoformat(),
-            "config": self.config,
+            "config": sanitized_config,
             "statistics": self.get_statistics(),
             "results": [r.to_dict() for r in self.results]
         }
         
         with open(filepath, 'w') as f:
             json.dump(output, f, indent=2)
+
+    def _sanitize_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        """Recursively sanitize configuration dictionary"""
+        if not isinstance(config, dict):
+            return config
+            
+        clean_config = {}
+        for k, v in config.items():
+            if "api_key" in k.lower() or "secret" in k.lower() or "token" in k.lower():
+                clean_config[k] = "<REDACTED>"
+            elif isinstance(v, dict):
+                clean_config[k] = self._sanitize_config(v)
+            elif isinstance(v, list):
+                clean_config[k] = [self._sanitize_config(i) if isinstance(i, dict) else i for i in v]
+            else:
+                clean_config[k] = v
+                
+        return clean_config
     
     def get_top_performers(self, n: int = 10) -> List[BenchmarkResult]:
         """Get top N performing items"""
