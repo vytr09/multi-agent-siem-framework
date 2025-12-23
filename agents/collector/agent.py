@@ -217,9 +217,8 @@ class CollectorAgent(BaseAgent):
         # Initialize MISP client if configured
         if "misp" in self.sources_config:
             misp_config = self.sources_config["misp"]
-            use_mock = misp_config.get("use_mock", True)  # Default to mock for development
             
-            self.misp_client = create_misp_client(misp_config, use_mock=use_mock)
+            self.misp_client = create_misp_client(misp_config)
             
             # Test connection
             if hasattr(self.misp_client, "test_connection"):
@@ -228,8 +227,7 @@ class CollectorAgent(BaseAgent):
                     raise MISPConnectionException("Failed to connect to MISP")
             
             self.logger.info("MISP client initialized", 
-                           url=misp_config.get("url", "mock"),
-                           mock=use_mock)
+                           url=misp_config.get("url", "not configured"))
         
         # TODO: Initialize TAXII client
         if "taxii" in self.sources_config:

@@ -16,30 +16,32 @@ from dataclasses import dataclass, field
 
 @dataclass
 class SIEMMetrics:
-    """SIEM-specific detection metrics"""
-    true_positives: int
-    false_positives: int
-    false_negatives: int
-    true_negatives: int
-    precision: float
-    recall: float
-    f1_score: float
-    accuracy: float
-    detection_rate: float
-    false_positive_rate: float
+    """
+    SIEM-specific detection metrics for attack simulation benchmarks.
+    
+    Note: These metrics are calculated in the context of attack simulation where:
+    - Every test case involves executing an attack
+    - True Negatives (TN) are not applicable (no "no attack" baseline tests)
+    - Therefore, accuracy and false_positive_rate are not meaningful
+    
+    detection_rate is mathematically equivalent to recall (TP / (TP + FN))
+    but is more intuitive for SIEM/security contexts.
+    """
+    true_positives: int      # Attack executed AND detected by rule
+    false_positives: int     # Rule triggered on historical/unrelated events
+    false_negatives: int     # Attack executed but NOT detected
+    precision: float         # TP / (TP + FP) - How accurate are the detections?
+    detection_rate: float    # TP / (TP + FN) - What % of attacks were detected? (same as recall)
+    f1_score: float          # Harmonic mean of precision and detection_rate
     
     def to_dict(self) -> Dict[str, Any]:
         return {
             'true_positives': self.true_positives,
             'false_positives': self.false_positives,
             'false_negatives': self.false_negatives,
-            'true_negatives': self.true_negatives,
             'precision': self.precision,
-            'recall': self.recall,
-            'f1_score': self.f1_score,
-            'accuracy': self.accuracy,
             'detection_rate': self.detection_rate,
-            'false_positive_rate': self.false_positive_rate
+            'f1_score': self.f1_score
         }
 
 
@@ -60,7 +62,6 @@ class SIEMMetricsCalculator:
         true_positives = 0   # Attack detected correctly
         false_positives = 0  # Rule triggered without attack (historical events)
         false_negatives = 0  # Attack not detected
-        true_negatives = 0   # No attack, no detection (baseline)
         
         for result in detection_results:
             detected = result.get('detected', False)
@@ -76,38 +77,22 @@ class SIEMMetricsCalculator:
             if historical_events > 0:
                 false_positives += historical_events
         
-        # Calculate metrics
-        total = true_positives + false_positives + false_negatives + true_negatives
-        
-        # Precision: TP / (TP + FP)
+        # Precision: TP / (TP + FP) - How accurate are detections?
         precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0.0
         
-        # Recall (Detection Rate): TP / (TP + FN)
-        recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0.0
+        # Detection Rate (same as Recall): TP / (TP + FN) - What % of attacks were detected?
+        detection_rate = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0.0
         
-        # F1 Score: 2 * (Precision * Recall) / (Precision + Recall)
-        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
-        
-        # Accuracy: (TP + TN) / (TP + TN + FP + FN)
-        accuracy = (true_positives + true_negatives) / total if total > 0 else 0.0
-        
-        # Detection Rate (same as recall)
-        detection_rate = recall
-        
-        # False Positive Rate: FP / (FP + TN)
-        false_positive_rate = false_positives / (false_positives + true_negatives) if (false_positives + true_negatives) > 0 else 0.0
+        # F1 Score: Harmonic mean of Precision and Detection Rate
+        f1_score = 2 * (precision * detection_rate) / (precision + detection_rate) if (precision + detection_rate) > 0 else 0.0
         
         return SIEMMetrics(
             true_positives=true_positives,
             false_positives=false_positives,
             false_negatives=false_negatives,
-            true_negatives=true_negatives,
             precision=precision,
-            recall=recall,
-            f1_score=f1_score,
-            accuracy=accuracy,
             detection_rate=detection_rate,
-            false_positive_rate=false_positive_rate
+            f1_score=f1_score
         )
 
 # Configure logging
@@ -348,15 +333,12 @@ class SIEMIntegrator:
         self.ssh = SSHConnector(flat_config)
         self.splunk = SplunkConnector(flat_config)
         
-        # Simulation mode fallback
-        self.simulation_mode = config.get('simulation_mode', False)
-        if not self.simulation_mode:
-            if not self.splunk.test_connection():
-                logger.warning("Could not connect to Splunk. Switching to SIMULATION MODE.")
-                self.simulation_mode = True
-            else:
-                # Verify required Splunk indexes exist
-                self._ensure_splunk_indexes()
+        # Verify Splunk connection
+        if not self.splunk.test_connection():
+            raise ConnectionError("Could not connect to Splunk. Please verify SPLUNK_HOST, SPLUNK_PORT, and credentials in .env")
+        
+        # Verify required Splunk indexes exist
+        self._ensure_splunk_indexes()
 
     def _ensure_splunk_indexes(self):
         """
@@ -387,9 +369,6 @@ class SIEMIntegrator:
         """
         Convert Sigma rule to SPL and validate it against Splunk
         """
-        if self.simulation_mode:
-            return {'valid': True, 'message': 'Simulation mode (validation skipped)'}
-            
         try:
             spl_query = self._extract_query(rule)
             validation = self.splunk.validate_query(spl_query)
@@ -410,9 +389,6 @@ class SIEMIntegrator:
         3. Query Splunk
         4. Check historical data (FPR)
         """
-        if self.simulation_mode:
-            return self._simulate_verification(rule, attack)
-            
         # 0. Pre-Validation of Query
         # We validate the query BEFORE executing the attack to avoid unnecessary attack execution
         query = self._extract_query(rule)
@@ -896,25 +872,3 @@ class SIEMIntegrator:
             q = self._process_selection(value, logsource)
             if q: queries.append(f"({q})")
         return ' AND '.join(queries)
-
-    def _simulate_verification(self, rule: Dict[str, Any], attack: Dict[str, Any]) -> DetectionResult:
-        """Simulate verification for testing"""
-        import random
-        
-        # Deterministic simulation based on rule content
-        rule_str = json.dumps(rule).lower()
-        is_good_rule = "powershell" in rule_str or "cmd" in rule_str
-        
-        detected = is_good_rule and random.random() > 0.1  # 90% chance if good rule
-        events = random.randint(1, 5) if detected else 0
-        historical = random.randint(0, 2) if random.random() > 0.7 else 0
-        
-        return DetectionResult(
-            detected=detected,
-            events_found=events,
-            query_time_ms=random.uniform(100, 500),
-            historical_events=historical,
-            status="simulated",
-            message="Simulated verification",
-            raw_events=[{"simulated": "event"}] if detected else []
-        )
