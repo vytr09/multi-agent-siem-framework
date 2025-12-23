@@ -401,6 +401,10 @@ class SIEMIntegrator:
         # Use epoch time for Splunk 'earliest'
         start_time = time.time() - 300  # 5 minutes buffer
             
+        # 0. Clear Event Logs
+        logger.info("Clearing Windows Event Logs to ensure clean state...")
+        self.ssh.execute_command('powershell -Command "wevtutil cl Security; wevtutil cl System; wevtutil cl Application"')
+
         # 1. Execute Attack
         logger.info(f"Executing attack: {attack.get('command')}")
         exec_result = self.ssh.execute_command(attack.get('command', 'echo "No command"'))
