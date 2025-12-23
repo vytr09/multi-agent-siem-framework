@@ -266,7 +266,7 @@ class LangChainOrchestrator:
         attack_results = []
         
         if self.attackgen:
-            for rule in rules:
+            async def generate_attack_for_rule(rule):
                 # Extract TTP/technique from rule
                 ttp_data = {
                     'technique_id': rule.get('ttp_id', 'T1059'),
@@ -275,8 +275,20 @@ class LangChainOrchestrator:
                     'description': rule.get('description', ''),
                     'platform': rule.get('logsource', {}).get('product', 'windows')
                 }
-                
-                attack_res = await self.attackgen.execute({'ttps': [ttp_data]})
+                return await self.attackgen.execute({'ttps': [ttp_data]})
+
+            # Parallel execution
+            tasks = [generate_attack_for_rule(rule) for rule in rules]
+            # Use Semaphore inside agent if needed, but here we just blast it 
+            # (Orchestrator level concurrency)
+            # Actually, let's limit it slightly here too if rules > 5 to be safe?
+            # Or trust the agent's internal handling. 
+            # Let's trust the agent or adding a simple semaphore here too is safer.
+            
+            # Simple parallel execution for now
+            results = await asyncio.gather(*tasks)
+            
+            for attack_res in results:
                 if attack_res['status'] == 'success':
                     attack_results.extend(attack_res.get('attack_commands', []))
         

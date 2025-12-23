@@ -53,20 +53,20 @@ class LLMJudge:
     async def test_connection(self) -> bool:
         """Test LLM connection with a simple query"""
         try:
-            print("[LLM Judge] Testing connection to LLM Provider...")
+            # print("[LLM Judge] Testing connection to LLM Provider...")
             llm = await self._get_llm()
             test_prompt = "Respond with only the JSON: {\"status\": \"ok\", \"message\": \"connection successful\"}"
             response = await llm.ainvoke([HumanMessage(content=test_prompt)])
             
             if response and response.content:
-                print(f"[LLM Judge] Connection successful (Provider: {type(llm).__name__})")
+                # print(f"[LLM Judge] Connection successful (Provider: {type(llm).__name__})")
                 return True
             else:
-                print("[LLM Judge] Empty response from API")
+                # print("[LLM Judge] Empty response from API")
                 return False
                 
         except Exception as e:
-            print(f"[LLM Judge] Connection failed: {e}")
+            # print(f"[LLM Judge] Connection failed: {e}")
             return False
     
     async def evaluate(
@@ -85,7 +85,7 @@ class LLMJudge:
             return await self._evaluate_batch(item, criteria, context)
         
         # Otherwise, split into batches
-        print(f"[LLM Judge] Splitting {len(criteria)} criteria into batches of {batch_size}")
+        # print(f"[LLM Judge] Splitting {len(criteria)} criteria into batches of {batch_size}")
         
         all_evaluations = []
         total_batches = (len(criteria) + batch_size - 1) // batch_size
@@ -94,7 +94,7 @@ class LLMJudge:
             batch = criteria[i:i+batch_size]
             batch_num = i // batch_size + 1
             
-            print(f"[LLM Judge] Evaluating batch {batch_num}/{total_batches} ({len(batch)} criteria)...")
+            # print(f"[LLM Judge] Evaluating batch {batch_num}/{total_batches} ({len(batch)} criteria)...")
             
             try:
                 result = await self._evaluate_batch(item, batch, context)
@@ -103,7 +103,7 @@ class LLMJudge:
                 
                 # Delay between batches to avoid rate limiting
                 if i + batch_size < len(criteria):
-                    print(f"[LLM Judge] Sleeping 10s between batches...")
+                    # print(f"[LLM Judge] Sleeping 10s between batches...")
                     await asyncio.sleep(10)
                     
             except Exception as e:

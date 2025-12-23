@@ -353,8 +353,35 @@ class SIEMIntegrator:
         if not self.simulation_mode:
             if not self.splunk.test_connection():
                 logger.warning("Could not connect to Splunk. Switching to SIMULATION MODE.")
-                logger.warning("Could not connect to Splunk. Switching to SIMULATION MODE.")
                 self.simulation_mode = True
+            else:
+                # Verify required Splunk indexes exist
+                self._ensure_splunk_indexes()
+
+    def _ensure_splunk_indexes(self):
+        """
+        Verify that required Splunk indexes exist and create them if missing.
+        The Splunk_TA_windows add-on sends Security events to 'windows' index by default.
+        """
+        required_indexes = ['windows']
+        
+        for index_name in required_indexes:
+            # Check if index exists using Splunk CLI via SSH
+            check_cmd = f'"C:\\Program Files\\Splunk\\bin\\splunk.exe" list index -auth admin:password 2>&1 | findstr /I "^{index_name}$"'
+            result = self.ssh.execute_command(check_cmd)
+            
+            if result.get('status') == 'success' and index_name.lower() in result.get('output', '').lower():
+                logger.info(f"Splunk index '{index_name}' exists.")
+            else:
+                # Index doesn't exist, create it
+                logger.warning(f"Splunk index '{index_name}' not found. Creating it...")
+                create_cmd = f'"C:\\Program Files\\Splunk\\bin\\splunk.exe" add index {index_name} -auth admin:password 2>&1'
+                create_result = self.ssh.execute_command(create_cmd)
+                
+                if 'added' in create_result.get('output', '').lower():
+                    logger.info(f"Successfully created Splunk index '{index_name}'.")
+                else:
+                    logger.error(f"Failed to create index '{index_name}': {create_result.get('output', create_result.get('error'))}")
 
     def validate_sigma_rule(self, rule: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -397,13 +424,30 @@ class SIEMIntegrator:
                 status="error", message=f"Invalid SPL: {validation.get('error')}", raw_events=[]
             )
             
-        # Capture start time (minus buffer for clock skew)
-        # Use epoch time for Splunk 'earliest'
-        start_time = time.time() - 300  # 5 minutes buffer
-            
-        # 0. Clear Event Logs
+        # 0. Clear Event Logs AND Reset Splunk Checkpoints
+        # This ensures Splunk will re-read from the beginning after clearing
         logger.info("Clearing Windows Event Logs to ensure clean state...")
         self.ssh.execute_command('powershell -Command "wevtutil cl Security; wevtutil cl System; wevtutil cl Application"')
+        
+        # Reset Splunk checkpoint files so it re-reads from RecordId 1
+        # Without this, Splunk's checkpoint still points to old RecordIds and misses new events
+        logger.info("Resetting Splunk WinEventLog checkpoints...")
+        # Delete checkpoint files for Splunk Enterprise
+        self.ssh.execute_command(r'del /q "C:\Program Files\Splunk\var\lib\splunk\modinputs\WinEventLog\Security" 2>nul')
+        self.ssh.execute_command(r'del /q "C:\Program Files\Splunk\var\lib\splunk\modinputs\WinEventLog\System" 2>nul')
+        self.ssh.execute_command(r'del /q "C:\Program Files\Splunk\var\lib\splunk\modinputs\WinEventLog\Application" 2>nul')
+        # Delete checkpoint files for Universal Forwarder (if present)
+        self.ssh.execute_command(r'del /q "C:\Program Files\SplunkUniversalForwarder\var\lib\splunk\modinputs\WinEventLog\Security" 2>nul')
+        self.ssh.execute_command(r'del /q "C:\Program Files\SplunkUniversalForwarder\var\lib\splunk\modinputs\WinEventLog\System" 2>nul')
+        self.ssh.execute_command(r'del /q "C:\Program Files\SplunkUniversalForwarder\var\lib\splunk\modinputs\WinEventLog\Application" 2>nul')
+        
+        # Brief wait for Splunk to detect checkpoint removal and reinitialize
+        logger.info("Waiting 5s for Splunk to reinitialize WinEventLog inputs...")
+        time.sleep(5)
+        
+        # Capture start time AFTER checkpoint reset, just before attack
+        # Use 30s buffer for clock skew (not 5 minutes - that caused duplicate events)
+        start_time = time.time() - 30
 
         # 1. Execute Attack
         logger.info(f"Executing attack: {attack.get('command')}")
@@ -444,11 +488,19 @@ class SIEMIntegrator:
             if keywords:
                 logger.info(f"Standard detection failed. Attempting keyword fallback with: {keywords}")
                 # Construct keyword query: index=* "keyword1" OR "keyword2"
-                # Ensure we don't accidentally match too broad (e.g. "Windows")
-                # Filter keywords to be at least 4 chars and distinct
-                valid_keywords = [k for k in keywords if len(k) >= 4]
-                if valid_keywords:
-                    quoted_keywords = [f'"{k}"' for k in valid_keywords]
+                # Strip path separators for broader matching in _raw
+                clean_keywords = []
+                for k in keywords:
+                    # Strip leading/trailing slashes and split by them to get basenames
+                    # e.g. \whoami.exe -> whoami.exe
+                    k_clean = k.replace('\\', ' ').replace('/', ' ').strip()
+                    parts = k_clean.split()
+                    for p in parts:
+                        if len(p) >= 4 and p not in clean_keywords:
+                            clean_keywords.append(p)
+                
+                if clean_keywords:
+                    quoted_keywords = [f'"{k}"' for k in clean_keywords]
                     keyword_query = f"search index=* {' OR '.join(quoted_keywords)}"
                     logger.info(f"Fallback Query: {keyword_query}")
                     
@@ -541,9 +593,16 @@ class SIEMIntegrator:
             tmp_path = tmp.name
             
         try:
+            # Determine sigma executable path (in same dir as python.exe in venv)
+            import sys
+            sigma_exe = os.path.join(os.path.dirname(sys.executable), "sigma.exe")
+            if not os.path.exists(sigma_exe):
+                # Fallback to PATH or 'sigma' if on linux/other
+                sigma_exe = "sigma"
+                
             # Run sigma-cli
             # Assuming 'splunk' backend and 'sysmon' pipeline as standard
-            cmd = ["sigma", "convert", "-t", "splunk", "-p", "sysmon", tmp_path]
+            cmd = [sigma_exe, "convert", "-t", "splunk", "-p", "sysmon", tmp_path]
             
             # Check if sysmon pipeline is available (fallback to no pipeline if fails?)
             # Based on testing, sysmon pipeline works.
@@ -574,9 +633,13 @@ class SIEMIntegrator:
             # We need to map these to EventCode=4688 and NewProcessName for Windows Security logs.
             import re
             
-            # 1. Expand EventID=1 to (EventID=1 OR EventCode=4688)
-            # This regex looks for 'EventID=1' and replaces it
-            query = re.sub(r'EventID\s*=\s*1\b', '(EventID=1 OR EventCode=4688)', query)
+            # 1. Expand EventID=X to (EventID=X OR EventCode=4688)
+            # Map ALL EventIDs to include EventCode=4688 (Windows Security Process Creation)
+            # This covers Sysmon (1) and potentially others falling back to generic process tracking
+            def replace_eventid(match):
+                val = match.group(1)
+                return f'(EventID={val} OR EventCode=4688)'
+            query = re.sub(r'\bEventID\s*=\s*(\d+)\b', replace_eventid, query)
             
             # 2. Map Image to (Image OR NewProcessName) - Use \b to avoid matching ParentImage
             # Regex to capture Image="value" or Image=value
@@ -789,7 +852,9 @@ class SIEMIntegrator:
                 parts = field_with_modifier.split('|')
                 base_field = parts[0]
                 modifiers = parts[1:]
-                main_modifier = next((m for m in modifiers if m in ['contains', 'endswith', 'startswith', 're', 'all']), None)
+                main_modifier = next((m for m in modifiers if m in ['contains', 'endswith', 'startswith', 're', 'all', 'equals']), None)
+                if main_modifier == 'equals':
+                    main_modifier = None # exact match is default
                 conditions.append(self._process_modifier(base_field, main_modifier, value, logsource))
             else:
                 splunk_field = self._convert_field_name(field_with_modifier, logsource)

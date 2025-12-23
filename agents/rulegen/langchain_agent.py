@@ -68,7 +68,7 @@ class LangChainRuleGenAgent(BaseAgent):
                 # Initialize LangChain components
                 self.llm_wrapper = create_langchain_llm(self.llm_config)
                 self.sigma_chain = create_sigma_rule_chain(self.llm_wrapper)
-                print(f"DEBUG: RuleGen Chain Created: {self.sigma_chain}")
+                # print(f"DEBUG: RuleGen Chain Created: {self.sigma_chain}")
                 
                 self.logger.info("LangChain RuleGen Agent started with LangChain integration")
             else:
@@ -222,7 +222,7 @@ class LangChainRuleGenAgent(BaseAgent):
                         detection = ex.get('detection', 'Unknown')
                         # Format as compact YAML-ish for the prompt
                         examples_text += f"Rule: {title}\nDetection: {detection}\n\n"
-                    print(f"DEBUG: Found {len(examples)} examples from KB for {ttp_id}")
+                    # print(f"DEBUG: Found {len(examples)} examples from KB for {ttp_id}")
             except Exception as e:
                 self.logger.warning(f"KB Query Failed: {e}")
         
@@ -232,7 +232,7 @@ class LangChainRuleGenAgent(BaseAgent):
             max_retries = 3
             for attempt in range(max_retries):
                 try:
-                    print(f"DEBUG: Generating rule for {ttp_id} using LangChain")
+                    # print(f"DEBUG: Generating rule for {ttp_id} using LangChain")
                     sigma_output = await self.sigma_chain.generate(ttp, feedback_text, examples=examples_text)
                     
                     # Convert to rule format
@@ -275,7 +275,7 @@ class LangChainRuleGenAgent(BaseAgent):
                             self.logger.error(f"Rotation failed: {rot_e}")
                     
                     if attempt == max_retries - 1:
-                        print(f"DEBUG: RuleGen LangChain Exception: {e}")
+                        # print(f"DEBUG: RuleGen LangChain Exception: {e}")
                         self.logger.warning(f"LangChain generation failed for {ttp_id}: {e}, using fallback")
                         return await self._fallback_rule_generation(ttp)
         else:

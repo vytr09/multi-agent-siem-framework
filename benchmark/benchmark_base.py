@@ -132,7 +132,7 @@ class BaseBenchmark(ABC):
     
     async def evaluate_batch(self, items: List[Dict[str, Any]]) -> List[BenchmarkResult]:
         """
-        Evaluate multiple items.
+        Evaluate multiple items in parallel.
         
         Args:
             items: List of items to evaluate
@@ -140,9 +140,24 @@ class BaseBenchmark(ABC):
         Returns:
             List of BenchmarkResults
         """
+        import asyncio
         results = []
-        for item in items:
-            result = await self.evaluate_item(item)
+        
+        # Concurrency limit to avoid hitting rate limits too hard
+        sem = asyncio.Semaphore(5)
+        
+        async def _evaluate_safe(item):
+            async with sem:
+                return await self.evaluate_item(item)
+        
+        # Create tasks
+        tasks = [_evaluate_safe(item) for item in items]
+        
+        # Run concurrently
+        batch_results = await asyncio.gather(*tasks)
+        
+        # Collect results
+        for result in batch_results:
             results.append(result)
             self.results.append(result)
         

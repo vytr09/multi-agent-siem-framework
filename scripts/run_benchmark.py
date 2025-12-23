@@ -19,12 +19,25 @@ import statistics
 
 # Disable ChromaDB/PostHog Telemetry locally
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
+os.environ["CHROMA_BOARD_DISABLED"] = "1"
+os.environ["CHROMA_TELEMETRY_IMPL"] = "chromadb.telemetry.noop.NoOpTelemetry"
+
+# Monkeypatch Posthog to silence "capture() takes 1 positional argument but 3 were given"
+try:
+    import chromadb.telemetry.product.posthog
+    class MockPosthog:
+        def __init__(self, *args, **kwargs):
+            pass
+        def capture(self, *args, **kwargs):
+            pass
+    chromadb.telemetry.product.posthog.Posthog = MockPosthog
+except ImportError:
+    pass
 
 
 # Add project root to sys.path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from core.logging import get_agent_logger
 from core.logging import get_agent_logger
 from core.langchain_orchestrator import LangChainOrchestrator
 from agents.collector.normalizers.pdf_normalizer import PDFDatasetNormalizer
@@ -76,8 +89,19 @@ async def run_benchmark(limit: int = None, delay: int = 60, force: bool = False,
         logger.info(f"\n[{i+1}/{len(files)}] Processing: {file_path.name}")
         result_file = OUTPUT_DIR / f"result_{file_path.stem}.json"
         if not force and result_file.exists():
-            logger.info(f"Skipping {file_path.name} (Result exists: {result_file})")
-            continue
+            try:
+                with open(result_file, 'r') as f:
+                    existing_data = json.load(f)
+                
+                # Check if previous run was empty/failed (no TTPs)
+                if existing_data.get('status') == 'no_data':
+                    logger.info(f"Retrying {file_path.name} (Previous run had no data)")
+                else:
+                    logger.info(f"Skipping {file_path.name} (Result exists: {result_file})")
+                    continue
+            except Exception:
+                # If file is corrupt, re-run
+                logger.warning(f"Result file corrupt, reprocessing: {result_file}")
 
         start_time = time.time()
         

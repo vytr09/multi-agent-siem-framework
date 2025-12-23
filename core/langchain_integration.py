@@ -5,6 +5,8 @@ Provides LangChain wrappers for the Multi-Agent SIEM Framework
 """
 
 from typing import Dict, Any, List, Optional
+import os
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
 try:
     from langchain_google_genai import ChatGoogleGenerativeAI
 except ImportError:
@@ -302,8 +304,8 @@ class LangChainLLMWrapper:
                 'model': config.get('model', 'gpt-4'),
                 'temperature': config.get('temperature', 0.3),
                 'api_key': api_key,
-                'max_retries': 0,
-                'timeout': 60.0, # Increased timeout for slower providers
+                'max_retries': 1, # Allow 1 internal retry before failing
+                'timeout': 30.0, # Reduced timeout to fail faster
             }
             
             # Handle max_tokens vs max_completion_tokens for Mistral/Others
@@ -331,7 +333,7 @@ class LangChainLLMWrapper:
                 google_api_key=api_key
             )
             
-        print(f"[LLM] Initialized {config.get('model')} via {provider}")
+        # print(f"[LLM] Initialized {config.get('model')} via {provider}")
 
     def rotate_provider(self):
         """Manually trigger rotation (to be called by agents on error)"""
@@ -471,7 +473,7 @@ Return a structured list of extracted TTPs. Ensure the output matches the TTPLis
         # Create chain (LCEL style)
         self.chain = self.prompt | self.llm
         
-        print("[OK] TTP Extraction Chain created")
+        # print("[OK] TTP Extraction Chain created")
     
     async def extract(self, text: str, context: Optional[str] = None) -> TTPListOutput:
         """Extract TTPs from text"""
@@ -552,7 +554,7 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
         # Create chain (LCEL style)
         self.chain = self.prompt | self.llm
         
-        print("[OK] Sigma Rule Chain created")
+        # print("[OK] Sigma Rule Chain created")
     
     async def generate(self, ttp_data: Dict[str, Any], feedback: Optional[str] = None, examples: Optional[str] = None) -> SigmaRuleOutput:
         """Generate Sigma rule"""
@@ -585,7 +587,7 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
                             detection_str = detection_str[4:]
                     detection_str = detection_str.strip()
                     
-                    print(f"[DEBUG] Raw detection string: {detection_str}")
+                    # print(f"[DEBUG] Raw detection string: {detection_str}")
                     try:
                         parsed_detection = json.loads(detection_str)
                     except json.JSONDecodeError:
@@ -599,7 +601,7 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
                     result.detection = json.dumps(parsed_detection)
                     
             except (json.JSONDecodeError, ValueError, SyntaxError) as e:
-                print(f"[ERROR] JSON/AST Decode Error: {e}")
+                # print(f"[ERROR] JSON/AST Decode Error: {e}")
                 # Fallback if JSON is invalid
                 result.detection = json.dumps({"selection": {"CommandLine|contains": "suspicious"}, "condition": "selection"})
         
@@ -664,10 +666,14 @@ Generate 2-3 realistic attack commands that demonstrate this technique on {platf
 
 - All commands are for TESTING ONLY in isolated environments
 
-**PowerShell Specifics:**
-- If the technique involves EncodedCommand (T1059.001), you MUST ensure the Base64 string is generated from **UTF-16LE** bytes.
-- Example: "Write-Host 'Test'" -> UTF-16LE bytes -> Base64
+**PowerShell Specifics (CRITICAL Constraints):**
+- **NO .NET Reflection:** Do NOT use `[System.Diagnostics.Process]::Start` or other .NET classes directly. Use standard Cmdlets like `Start-Process` or `Invoke-Item`.
+- **Path Safety:** Do NOT assume directories exist (like `C:\ProgramData\_Startup`). Use `$env:TEMP`, `$env:APPDATA`, or create the directory first: `mkdir "C:\Path" -ErrorAction SilentlyContinue; ...`.
+- **Encoding:** If using `EncodedCommand`, ensure Base64 is from UTF-16LE.
 - If you cannot guarantee UTF-16LE, provide the plain text command instead.
+
+**Common Fixes:**
+- Instead of `[System.Diagnostics.Process]::Start('cmd', '/c ...')`, use `cmd.exe /c ...` or `Start-Process cmd -ArgumentList '/c ...'`.
 
 Return a list of attack commands with metadata."""
         )
@@ -675,7 +681,7 @@ Return a list of attack commands with metadata."""
         # Create chain (LCEL style)
         self.chain = self.prompt | self.llm
         
-        print("[OK] Attack Command Generation Chain created")
+        # print("[OK] Attack Command Generation Chain created")
     
     async def generate(self, ttp_data: Dict[str, Any], examples: Optional[str] = None) -> AttackCommandListOutput:
         """Generate attack commands for a TTP"""
@@ -744,7 +750,7 @@ Provide:
         # Create chain (LCEL style)
         self.chain = self.prompt | self.llm
         
-        print("[OK] Rule Evaluation Chain created")
+        # print("[OK] Rule Evaluation Chain created")
     
     async def evaluate(self, rule: Dict[str, Any], ttp: Dict[str, Any]) -> Dict[str, Any]:
         """Evaluate rule quality"""
