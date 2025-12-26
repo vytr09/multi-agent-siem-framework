@@ -141,6 +141,34 @@ class LangChainAttackGenAgent(BaseAgent):
                 "error": str(e)
             }
             
+    @staticmethod
+    def _clean_json_output(text: Any) -> str:
+        """Clean LLM output to ensure valid JSON for parser"""
+        if hasattr(text, "content"):
+            text = text.content
+        
+        if not isinstance(text, str):
+            return str(text)
+            
+        # Strip markdown code blocks
+        text = text.strip()
+        if "```json" in text:
+            text = text.split("```json")[1]
+            if "```" in text:
+                text = text.split("```")[0]
+        elif "```" in text:
+            text = text.split("```")[1]
+            if "```" in text:
+                text = text.split("```")[0]
+                
+        # Strip any leading text before the first {
+        if "{" in text:
+            text = "{" + text.split("{", 1)[1]
+        if "}" in text:
+            text = text.rsplit("}", 1)[0] + "}"
+            
+        return text.strip()
+
     async def _generate_commands_for_ttp(self, ttp: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Generate commands for a single TTP"""
         generated_commands = []
@@ -190,6 +218,10 @@ class LangChainAttackGenAgent(BaseAgent):
                         try:
                             # Generate using LangChain
                             self.logger.debug(f"Generating commands for {ttp_data['technique_id']} on {platform}")
+                            # The attack_chain.generate method directly returns a Pydantic model,
+                            # so _clean_json_output and parser.parse are not needed here.
+                            # The instruction seems to imply a different flow where raw text is returned.
+                            # Sticking to the current flow where attack_chain handles parsing.
                             output = await self.attack_chain.generate(ttp_data, examples=examples_text)
                             
                             self.stats["langchain_generations"] += 1

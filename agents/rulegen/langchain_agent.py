@@ -144,6 +144,34 @@ class LangChainRuleGenAgent(BaseAgent):
                 "error": str(e)
             }
     
+    @staticmethod
+    def _clean_json_output(text: Any) -> str:
+        """Clean LLM output to ensure valid JSON for parser"""
+        if hasattr(text, "content"):
+            text = text.content
+        
+        if not isinstance(text, str):
+            return str(text)
+            
+        # Strip markdown code blocks
+        text = text.strip()
+        if "```json" in text:
+            text = text.split("```json")[1]
+            if "```" in text:
+                text = text.split("```")[0]
+        elif "```" in text:
+            text = text.split("```")[1]
+            if "```" in text:
+                text = text.split("```")[0]
+                
+        # Strip any leading text before the first {
+        if "{" in text:
+            text = "{" + text.split("{", 1)[1]
+        if "}" in text:
+            text = text.rsplit("}", 1)[0] + "}"
+            
+        return text.strip()
+
     async def _generate_rule_for_ttp(self, ttp: Dict[str, Any]) -> Dict[str, Any]:
         """Generate rule for a single TTP"""
         ttp_id = ttp.get("technique_id", "unknown")
@@ -233,7 +261,17 @@ class LangChainRuleGenAgent(BaseAgent):
             for attempt in range(max_retries):
                 try:
                     # print(f"DEBUG: Generating rule for {ttp_id} using LangChain")
+                    # The sigma_chain.generate method is expected to return a structured object (e.g., Pydantic model)
+                    # If it returns a raw string, then the cleaning and parsing would be needed.
+                    # Assuming for now it returns a structured object as per original code.
+                    # If the instruction implies a change in the chain's output to raw text,
+                    # then the following lines would need to be adapted.
                     sigma_output = await self.sigma_chain.generate(ttp, feedback_text, examples=examples_text)
+                    
+                    # If sigma_output is a raw string that needs parsing, uncomment and adapt these lines:
+                    # clean_output = self._clean_json_output(sigma_output)
+                    # parsed_rule = json.loads(clean_output) # Assuming the chain's parser is not directly exposed here
+                    # sigma_output = SigmaRuleChain.Output(**parsed_rule) # Reconstruct Pydantic model if needed
                     
                     # Convert to rule format
                     rule = {

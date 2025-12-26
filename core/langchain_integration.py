@@ -17,7 +17,7 @@ try:
 except ImportError:
     ChatOpenAI = None
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
-from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.output_parsers import PydanticOutputParser, JsonOutputParser
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.language_models import BaseChatModel
 from pydantic import BaseModel, Field
@@ -45,11 +45,13 @@ class TTPOutput(BaseModel):
     confidence: float = Field(description="Confidence score between 0 and 1")
     indicators: List[str] = Field(default_factory=list, description="List of detection indicators")
     tools: List[str] = Field(default_factory=list, description="Tools/malware associated")
+    reasoning: str = Field(description="Reasoning for why this TTP was selected")
 
 
 class TTPListOutput(BaseModel):
     """List of extracted TTPs"""
     ttps: List[TTPOutput] = Field(description="List of extracted TTPs")
+    model_config = {'extra': 'ignore'}
 
 
 class LogSourceOutput(BaseModel):
@@ -61,6 +63,7 @@ class LogSourceOutput(BaseModel):
 
 class SigmaRuleOutput(BaseModel):
     """Structured output for Sigma rule"""
+    reasoning: str = Field(description="Chain-of-thought reasoning: Explain the detection logic, why specific fields were selected, and how false positives are handled.")
     title: str = Field(description="Rule title")
     description: str = Field(description="Rule description")
     logsource: LogSourceOutput = Field(description="Log source specification")
@@ -83,12 +86,14 @@ class AttackCommandOutput(BaseModel):
 
 class AttackCommandListOutput(BaseModel):
     """List of attack commands"""
+    reasoning: str = Field(description="Chain-of-thought reasoning: Explain how the commands demonstrate the technique and ensure safety.")
     commands: List[AttackCommandOutput] = Field(description="List of generated attack commands")
     # Removed metadata Dict[str, Any] to avoid schema issues
 
 
 class RuleEvaluationOutput(BaseModel):
     """Structured output for rule evaluation"""
+    reasoning: str = Field(description="Chain-of-thought reasoning: Detailed analysis of the rule's strengths, weaknesses, and verification results.")
     detection_coverage: float = Field(description="Detection coverage score (0-10)")
     false_positive_rate: float = Field(description="False positive rate score (0-10)")
     performance: float = Field(description="Performance score (0-10)")
@@ -424,9 +429,38 @@ class LangChainLLMWrapper:
 class TTPExtractionChain:
     """Chain for extracting TTPs from text"""
     
+    @staticmethod
+    def _clean_json_output(text: Any) -> str:
+        """Clean LLM output to ensure valid JSON for parser"""
+        if hasattr(text, "content"):
+            text = text.content
+        
+        if not isinstance(text, str):
+            return str(text)
+            
+        # Strip markdown code blocks
+        text = text.strip()
+        if "```json" in text:
+            text = text.split("```json")[1]
+            if "```" in text:
+                text = text.split("```")[0]
+        elif "```" in text:
+            text = text.split("```")[1]
+            if "```" in text:
+                text = text.split("```")[0]
+                
+        # Strip any leading text before the first {
+        if "{" in text:
+            text = "{" + text.split("{", 1)[1]
+        if "}" in text:
+            text = text.rsplit("}", 1)[0] + "}"
+            
+        return text.strip()
+    
     def __init__(self, llm_wrapper: LangChainLLMWrapper):
-        # Use structured output with Gemini
-        self.llm = llm_wrapper.llm.with_structured_output(TTPListOutput)
+        # Use RAW LLM for robustness
+        self.llm = llm_wrapper.llm
+        self.parser = JsonOutputParser(pydantic_object=TTPListOutput)
         
         # Create prompt template (no format_instructions needed)
         self.prompt = PromptTemplate(
@@ -446,32 +480,42 @@ For each TTP, identify:
 
 Text: {text}
 
+INSTRUCTIONS:
+1. Identify potential malicious behaviors.
+2. For EACH behavior, explicitly explain the REASONING inside the `reasoning` field of the TTP object.
+3. Extract the structured TTP details.
+
 IMPORTANT: Even if the text is short, you MUST extract at least one TTP if any attack behavior is described.
 If a technique ID is mentioned (e.g., T1059.001), use it.
 If keywords like "PowerShell", "cmd", "malware" are present, infer the corresponding technique.
 **CRITICAL:**
-- Extract specific file paths (e.g. %ALLUSERSPROFILE%\Start Menu) instead of generic ones.
+- Extract specific file paths (e.g. %ALLUSERSPROFILE%\\Start Menu) instead of generic ones.
 - Identify Parent-Child process relationships (e.g. "Word initiated command prompt") and list them in the description or indicators.
 - Do not ignore IP addresses or Domains if they appear in the text.
 
 EXAMPLES:
 Input: "The attacker used PowerShell to execute a base64 encoded command."
-Output: [{{
-    "technique_id": "T1059.001",
-    "technique_name": "PowerShell",
-    "tactic": "Execution",
-    "description": "Attacker used PowerShell with base64 encoding",
-    "confidence": 0.9,
-    "indicators": ["powershell.exe", "-enc"],
-    "tools": ["PowerShell"]
-}}]
+Output: {{
+    "ttps": [{{
+        "technique_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "tactic": "Execution",
+        "description": "Attacker used PowerShell with base64 encoding",
+        "confidence": 0.9,
+        "indicators": ["powershell.exe", "-enc"],
+        "tools": ["PowerShell"],
+        "reasoning": "The text explicitly mentions 'PowerShell' and typical command line arguments like 'encoded command'. This maps directly to T1059.001."
+    }}]
+}}
 
-Return a structured list of extracted TTPs. Ensure the output matches the TTPListOutput schema.""",
-            input_variables=["text", "context"]
+Return ONLY the JSON object. Do not add markdown backticks.
+{format_instructions}""",
+            input_variables=["text", "context"],
+            partial_variables={"format_instructions": self.parser.get_format_instructions()}
         )
         
-        # Create chain (LCEL style)
-        self.chain = self.prompt | self.llm
+        # Create chain (LCEL style) with cleaning
+        self.chain = self.prompt | self.llm | self._clean_json_output | self.parser
         
         # print("[OK] TTP Extraction Chain created")
     
@@ -481,6 +525,10 @@ Return a structured list of extracted TTPs. Ensure the output matches the TTPLis
             # Provide default empty context if None
             ctx = context if context else "No additional context."
             result = await self.chain.ainvoke({"text": text, "context": ctx})
+            
+            # Convert Dict to Pydantic Model
+            if isinstance(result, dict):
+                return TTPListOutput(**result)
             return result
         except Exception as e:
             print(f"Extraction error: {e}")
@@ -495,12 +543,10 @@ class SigmaRuleChain:
     """Chain for generating Sigma rules"""
     
     def __init__(self, llm_wrapper: LangChainLLMWrapper):
-        # Use structured output with Gemini
-        self.llm = llm_wrapper.llm.with_structured_output(SigmaRuleOutput)
-        
-        # Create prompt template (no format_instructions needed)
+        self.llm = llm_wrapper.llm
+        self.parser = JsonOutputParser(pydantic_object=SigmaRuleOutput)
         self.prompt = PromptTemplate(
-            input_variables=["ttp_name", "ttp_id", "tactic", "description", "indicators", "feedback"],
+            input_variables=["ttp_name", "ttp_id", "tactic", "description", "indicators", "feedback", "examples"],
             template="""You are a SIEM detection engineer creating Sigma rules.
 
 **MITRE ATT&CK Technique:**
@@ -532,6 +578,7 @@ Create a comprehensive Sigma rule with:
    - Add multiple selection criteria for accuracy
    - Use 'contains', 'endswith', 'startswith' operators
    - Example: {{"selection": {{"Image|endswith": "\\\\powershell.exe", "CommandLine|contains": "Invoke-WebRequest"}}, "condition": "selection"}}
+   - **IMPORTANT:** The `detection` field must be a VALID JSON STRING representing the dictionary. Escape quotes properly.
 
 **3. CRITICAL RULES (Strict Enforcement):**
    - **NO PIPES in condition:** Do NOT use pipes in 'condition' (e.g. `selection | count()`). This is deprecated. Use simple boolean logic (and/or/not).
@@ -548,11 +595,20 @@ Create a comprehensive Sigma rule with:
 
 **6. Tags:** Include attack.{ttp_id} tag
 
-Generate a complete, valid Sigma rule that will actually detect this technique."""
+INSTRUCTIONS:
+1. Plan the rule logic step-by-step (analyze TTP, choose log source, construct logic, consider FPs).
+2. Write this plan in the `reasoning` field.
+3. Then generate the complete Sigma rule.
+
+Generate a complete, valid Sigma rule that will actually detect this technique.
+
+Return ONLY the JSON object. Do not add markdown backticks.
+{format_instructions}""",
+            partial_variables={"format_instructions": self.parser.get_format_instructions()}
         )
         
-        # Create chain (LCEL style)
-        self.chain = self.prompt | self.llm
+        # Create chain (LCEL style) with cleaning
+        self.chain = self.prompt | self.llm | TTPExtractionChain._clean_json_output | self.parser
         
         # print("[OK] Sigma Rule Chain created")
     
@@ -572,10 +628,25 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
             "examples": examples_text
         })
         
-        # Post-process: Parse detection JSON string to dict
-        # This is necessary because we changed the model to use str for detection
+        if isinstance(result, dict):
+            # Already a dict from JsonOutputParser
+            # Convert to SigmaRuleOutput just to validation
+            sigma_output = SigmaRuleOutput(**result)
+            # Then dump back to dict for processing
+            result_dict = sigma_output.model_dump()
+            
+            # Since detection is already a string in Pydantic model, it might come as string or dict from LLM depending on how it followed instructions.
+            # JsonOutputParser usually parses nested JSON if the prompt asked for it, BUT our schema defines it as str.
+            # If the LLM returned an object for "detection", we need to json.dumps it.
+            if isinstance(result.get('detection'), dict):
+                result_dict['detection'] = json.dumps(result['detection'])
+            
+            # Return dict directly as the agent expects it or re-wrap in SigmaRuleOutput
+            # The agent expects a SigmaRuleOutput OBJECT (pydantic model) based on previous code: `sigma_output.title`
+            return sigma_output
+
+        # Legacy handling (should not be reached with new chain instructions, but keeping for safety)
         if isinstance(result, SigmaRuleOutput):
-            # Create a new object or modify the existing one (Pydantic models are immutable by default but we can dump to dict)
             result_dict = result.model_dump()
             try:
                 if isinstance(result.detection, str):
@@ -584,7 +655,7 @@ Generate a complete, valid Sigma rule that will actually detect this technique."
                     if detection_str.startswith("```"):
                         detection_str = detection_str.split("```")[1]
                         if detection_str.startswith("json"):
-                            detection_str = detection_str[4:]
+                             detection_str = detection_str[4:]
                     detection_str = detection_str.strip()
                     
                     # print(f"[DEBUG] Raw detection string: {detection_str}")
@@ -617,12 +688,10 @@ class AttackCommandGenerationChain:
     
     def __init__(self, llm_wrapper: LangChainLLMWrapper):
         """Initialize attack command generation chain"""
-        # Use structured output with Gemini
-        self.llm = llm_wrapper.llm.with_structured_output(AttackCommandListOutput)
-        
-        # Create prompt template (no format_instructions needed)
+        self.llm = llm_wrapper.llm
+        self.parser = JsonOutputParser(pydantic_object=AttackCommandListOutput)
         self.prompt = PromptTemplate(
-            input_variables=["technique_name", "technique_id", "tactic", "platform", "description"],
+            input_variables=["technique_name", "technique_id", "tactic", "platform", "description", "examples"],
             template="""You are a red team operator creating attack commands for testing detection rules.
 
 **MITRE ATT&CK Technique:**
@@ -672,14 +741,23 @@ Generate 2-3 realistic attack commands that demonstrate this technique on {platf
 - **Encoding:** If using `EncodedCommand`, ensure Base64 is from UTF-16LE.
 - If you cannot guarantee UTF-16LE, provide the plain text command instead.
 
-**Common Fixes:**
-- Instead of `[System.Diagnostics.Process]::Start('cmd', '/c ...')`, use `cmd.exe /c ...` or `Start-Process cmd -ArgumentList '/c ...'`.
-
-Return a list of attack commands with metadata."""
+    **Common Fixes:**
+    - Instead of `[System.Diagnostics.Process]::Start('cmd', '/c ...')`, use `cmd.exe /c ...` or `Start-Process cmd -ArgumentList '/c ...'`.
+    
+    INSTRUCTIONS:
+    1. Think step-by-step (analyze platform, safety, and validity).
+    2. Write this thinking in the `reasoning` field.
+    3. Generate the list of attack commands.
+    
+    Return a list of attack commands with metadata.
+    
+    Return ONLY the JSON object. Do not add markdown backticks.
+    {format_instructions}""",
+            partial_variables={"format_instructions": self.parser.get_format_instructions()}
         )
         
-        # Create chain (LCEL style)
-        self.chain = self.prompt | self.llm
+        # Create chain (LCEL style) with cleaning
+        self.chain = self.prompt | self.llm | TTPExtractionChain._clean_json_output | self.parser
         
         # print("[OK] Attack Command Generation Chain created")
     
@@ -697,6 +775,8 @@ Return a list of attack commands with metadata."""
             "examples": examples_text
         })
         
+        if isinstance(result, dict):
+             return AttackCommandListOutput(**result)
         return result
 
 
@@ -743,8 +823,13 @@ Provide:
 - Scores for each criterion (0-10)
 - Overall score (average of all criteria)
 - List of strengths
-- List of weaknesses  
-- List of improvement suggestions"""
+    - List of weaknesses  
+    - List of improvement suggestions
+    
+    INSTRUCTIONS:
+    1. Analyze the rule step-by-step against the criteria.
+    2. Write this analysis in the `reasoning` field.
+    3. Assign scores based on your analysis."""
         )
         
         # Create chain (LCEL style)

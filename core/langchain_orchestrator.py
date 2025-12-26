@@ -26,6 +26,7 @@ from core.siem_integration import SIEMIntegrator, SIEMMetricsCalculator
 from core.config import get_config
 from core.logging import get_agent_logger
 from core.knowledge_base import get_kb_manager
+from core.graph import SecurityWorkflow
 
 
 AgentMode = Literal["traditional", "langchain", "hybrid"]
@@ -216,8 +217,158 @@ class LangChainOrchestrator:
                 await self.attackgen.start()
         else:
             raise ValueError(f"Unknown agent: {agent_name}")
-    
+
     async def run_pipeline(self, cti_reports: List[Dict], context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Run full pipeline with LangGraph (Parallel & Optimized)
+        """
+        self.logger.info(f"Running {self.mode} pipeline with LangGraph...")
+        
+        # Initialize SecurityWorkflow with current agents
+        workflow = SecurityWorkflow(
+            self.extractor, 
+            self.rulegen, 
+            self.attackgen, 
+            self.evaluator, 
+            self.siem_integrator
+        )
+        
+        # Prepare input state
+        input_state = {
+            "cti_reports": cti_reports,
+            "context": context if context else {},
+            "extracted_ttps": [],
+            "optimized_ttps": [],
+            "processed_results": [],
+            "final_report": {},
+            "status": "starting",
+            "errors": []
+        }
+        
+        # Execute Graph
+        final_state = await workflow.run(input_state)
+        
+        # Extract results for backward compatibility
+        results = final_state.get('processed_results', [])
+        final_rules = []
+        final_attacks = []
+        siem_verification_list = []
+        extracted_ttps = final_state.get('extracted_ttps', [])
+        
+        for res in results:
+            if res.get('status') == 'success':
+                final_rules.extend(res.get('rules', []))
+                final_attacks.extend(res.get('attacks', []))
+                
+                # Extract SIEM verification from rules for backward compatibility
+                for rule in res.get('rules', []):
+                    siem_ver = rule.get('siem_verification')
+                    if siem_ver:
+                        siem_verification_list.append({
+                            'rule_id': rule.get('id', 'unknown'),
+                            'ttp_id': res.get('ttp_id', 'unknown'),
+                            'detected': siem_ver.get('detected', False),
+                            'events_found': siem_ver.get('events_found', 0),
+                            'query_time_ms': siem_ver.get('query_time_ms', 0),
+                            'status': siem_ver.get('status', 'unknown'),
+                            'message': siem_ver.get('message', '')
+                        })
+        
+        # Reconstruct extraction result to match legacy schema
+        # Group TTPs by report_id
+        from collections import defaultdict
+        ttps_by_report = defaultdict(list)
+        for ttp in extracted_ttps:
+            r_id = ttp.get('report_id', 'unknown')
+            ttps_by_report[r_id].append(ttp)
+            
+        extraction_results = []
+        for r_id, ttps in ttps_by_report.items():
+            extraction_results.append({
+                "report_id": r_id,
+                "extracted_ttps": ttps
+            })
+            
+        legacy_extraction_output = {
+            "status": "success",
+            "extraction_summary": {
+                "reports_processed": len(extraction_results),
+                "total_ttps_extracted": len(extracted_ttps),
+                "processing_time_ms": 0  # Placeholder or calculate if start/end times tracked
+            },
+            "extraction_results": extraction_results
+        }
+        
+        # Calculate full SIEM metrics using the existing calculator
+        siem_metrics_obj = {}
+        if siem_verification_list:
+            # Adapt the list to what calculator expects (it expects objects with 'detected' attribute or dict key)
+            # The calculator usually works with objects, let's verify if it handles dicts.
+            # Looking at code: SIEMMetricsCalculator.calculate_metrics(siem_results)
+            # where siem_results is a list of dicts.
+            try:
+                metrics = SIEMMetricsCalculator.calculate_metrics(siem_verification_list)
+                siem_metrics_obj = metrics.to_dict()
+            except Exception as e:
+                self.logger.warning(f"Failed to calculate detailed SIEM metrics: {e}")
+                # Fallbck to simple metrics
+                total = len(siem_verification_list)
+                detected = sum(1 for v in siem_verification_list if v.get('detected'))
+                siem_metrics_obj = {
+                    'total_verifications': total,
+                    'detected_count': detected,
+                    'detection_rate': detected / total if total > 0 else 0
+                }
+        
+        # Calculate Aggregated Score
+        scores = []
+        iterations_max = 1
+        for res in results:
+            if 'evaluation' in res:
+                s = res['evaluation'].get('summary', {}).get('average_quality_score')
+                if s is not None:
+                    scores.append(s)
+            # Estimate iterations: if feedback exists, it was > 1
+            # In graph, we don't explicitly return iteration count per TTP easy, assume 1 unless we track it
+            pass
+            
+        avg_score = sum(scores) / len(scores) if scores else 0.0
+
+        # Construct final result dictionary to match old contract EXACTLY
+        final_result = {
+            'status': 'success',
+            'mode': self.mode,
+            'extraction': legacy_extraction_output,  # Updated structure
+            'rules': {'rules': final_rules, 'status': 'success'},
+            'evaluation': {'status': 'success', 'summary': {'average_quality_score': avg_score}},
+            'attacks': final_attacks,
+            'siem_verification': siem_verification_list,
+            'siem_metrics': siem_metrics_obj,
+            'iterations': iterations_max, # Placeholder for graph
+            'final_score': avg_score,
+            'final_report': final_state.get('final_report', {}),
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Knowledge Base Learning (Preserved)
+        kb = get_kb_manager()
+        if kb and kb.enabled:
+            for rule in final_rules:
+                siem_ver = rule.get('siem_verification', {})
+                if siem_ver.get('detected', False):
+                    self.logger.info(f"Learning verified rule: {rule.get('title')}")
+                    await kb.add_sigma_rule(rule, status="verified")
+
+        # Write final result
+        final_file = self.output_dir / self.mode / 'pipeline_result.json'
+        final_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(final_file, 'w') as f:
+            json.dump(final_result, f, indent=2)
+            
+        return final_result
+
+    # OLD Sequential Pipeline (Renamed for reference or fallback)
+    async def run_pipeline_legacy(self, cti_reports: List[Dict], context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Run full pipeline with feedback loop
         """

@@ -78,34 +78,40 @@ class KBManager:
         """
         if not self.enabled: return
         
-        vector_store = self._get_vector_store(self.COLLECTION_RULES)
-        
-        # Create text representation for embedding
-        # We index the "Meaning" of the rule
-        text_content = f"""
-        Title: {rule.get('title')}
-        Description: {rule.get('description')}
-        Technique: {rule.get('tags', [])}
-        Log Source: {rule.get('logsource', {})}
-        """
-        
-        metadata = {
-            "rule_id": str(rule.get("id", "")),
-            "title": rule.get("title", "Unknown"),
-            "status": status,
-            "timestamp": datetime.utcnow().isoformat(),
-            "full_json": json.dumps(rule) # Store full rule in metadata for easy retrieval
-        }
-        
-        # Upsert
-        id_hash = self._generate_id(text_content)
-        
-        await vector_store.aadd_texts(
-            texts=[text_content],
-            metadatas=[metadata],
-            ids=[id_hash]
-        )
-        self.logger.info(f"Added Sigma rule to KB: {rule.get('title')}")
+        try:
+            vector_store = self._get_vector_store(self.COLLECTION_RULES)
+            
+            # Create text representation for embedding
+            # We index the "Meaning" of the rule
+            text_content = f"""
+            Title: {rule.get('title')}
+            Description: {rule.get('description')}
+            Technique: {rule.get('tags', [])}
+            Log Source: {rule.get('logsource', {})}
+            """
+            
+            metadata = {
+                "rule_id": str(rule.get("id", "")),
+                "title": rule.get("title", "Unknown"),
+                "status": status,
+                "timestamp": datetime.utcnow().isoformat(),
+                "full_json": json.dumps(rule) # Store full rule in metadata for easy retrieval
+            }
+            
+            # Upsert
+            id_hash = self._generate_id(text_content)
+            
+            await vector_store.aadd_texts(
+                texts=[text_content],
+                metadatas=[metadata],
+                ids=[id_hash]
+            )
+            self.logger.info(f"Added Sigma rule to KB: {rule.get('title')}")
+        except Exception as e:
+            if "Component not running" in str(e):
+                self.logger.warning(f"ChromaDB Component not running during add_sigma_rule. Skipping. Error: {e}")
+                return
+            self.logger.error(f"Failed to add Sigma rule to KB: {e}")
 
     async def query_similar_rules(self, query: str, n_results: int = 3) -> List[Dict[str, Any]]:
         """
@@ -115,18 +121,26 @@ class KBManager:
         
         vector_store = self._get_vector_store(self.COLLECTION_RULES)
         
-        results = await vector_store.asimilarity_search(query, k=n_results)
-        
-        rules = []
-        for doc in results:
-            try:
-                # Parse the full JSON stored in metadata
-                rule_json = json.loads(doc.metadata.get("full_json", "{}"))
-                rules.append(rule_json)
-            except Exception:
-                continue
-                
-        return rules
+        try:
+            results = await vector_store.asimilarity_search(query, k=n_results)
+            
+            rules = []
+            for doc in results:
+                try:
+                    # Parse the full JSON stored in metadata
+                    rule_json = json.loads(doc.metadata.get("full_json", "{}"))
+                    rules.append(rule_json)
+                except Exception:
+                    continue
+                    
+            return rules
+        except Exception as e:
+            if "Component not running" in str(e):
+                self.logger.warning(f"ChromaDB Component not running. Returning empty results. Error: {e}")
+                # Optional: Attempt simpler recovery or just fail open
+                return []
+            self.logger.error(f"KB Query Failed: {e}")
+            return []
 
     async def add_ttp(self, ttp: Dict[str, Any], report_id: str):
         """
@@ -135,28 +149,34 @@ class KBManager:
         """
         if not self.enabled: return
         
-        vector_store = self._get_vector_store(self.COLLECTION_TTPS)
-        
-        text_content = f"""
-        Technique: {ttp.get('technique_name')} ({ttp.get('attack_id')})
-        Description: {ttp.get('description')}
-        Indicators: {', '.join(ttp.get('indicators', []))}
-        """
-        
-        metadata = {
-            "attack_id": ttp.get("attack_id"),
-            "report_id": report_id,
-            "timestamp": datetime.utcnow().isoformat(),
-            "full_json": json.dumps(ttp)
-        }
-        
-        id_hash = self._generate_id(text_content + report_id)
-        
-        await vector_store.aadd_texts(
-            texts=[text_content],
-            metadatas=[metadata],
-            ids=[id_hash]
-        )
+        try:
+            vector_store = self._get_vector_store(self.COLLECTION_TTPS)
+            
+            text_content = f"""
+            Technique: {ttp.get('technique_name')} ({ttp.get('attack_id')})
+            Description: {ttp.get('description')}
+            Indicators: {', '.join(ttp.get('indicators', []))}
+            """
+            
+            metadata = {
+                "attack_id": ttp.get("attack_id"),
+                "report_id": report_id,
+                "timestamp": datetime.utcnow().isoformat(),
+                "full_json": json.dumps(ttp)
+            }
+            
+            id_hash = self._generate_id(text_content + report_id)
+            
+            await vector_store.aadd_texts(
+                texts=[text_content],
+                metadatas=[metadata],
+                ids=[id_hash]
+            )
+        except Exception as e:
+            if "Component not running" in str(e):
+                self.logger.warning(f"ChromaDB Component not running during add_ttp. Skipping. Error: {e}")
+                return
+            self.logger.error(f"Failed to add TTP to KB: {e}")
 
     async def check_duplicate_report(self, content: str) -> bool:
         """
@@ -175,7 +195,10 @@ class KBManager:
             existing = col.get(ids=[content_hash])
             if existing and existing['ids']:
                 return True
-        except Exception:
+        except Exception as e:
+            if "Component not running" in str(e):
+                self.logger.warning(f"ChromaDB Component not running during check. Assuming no duplicate. Error: {e}")
+                return False
             pass
             
         return False
@@ -184,18 +207,24 @@ class KBManager:
         """Register a processed report to prevent re-processing"""
         if not self.enabled: return
         
-        vector_store = self._get_vector_store(self.COLLECTION_REPORTS)
-        
-        content_hash = self._generate_id(content)
-        
-        # We index the Summary or Title for vector search, but use Hash for ID
-        text_content = f"Processed Report: {report_metadata.get('title', 'Unknown')}\nSummary: {content[:500]}"
-        
-        await vector_store.aadd_texts(
-            texts=[text_content],
-            metadatas=[report_metadata],
-            ids=[content_hash]
-        )
+        try:
+            vector_store = self._get_vector_store(self.COLLECTION_REPORTS)
+            
+            content_hash = self._generate_id(content)
+            
+            # We index the Summary or Title for vector search, but use Hash for ID
+            text_content = f"Processed Report: {report_metadata.get('title', 'Unknown')}\nSummary: {content[:500]}"
+            
+            await vector_store.aadd_texts(
+                texts=[text_content],
+                metadatas=[report_metadata],
+                ids=[content_hash]
+            )
+        except Exception as e:
+            if "Component not running" in str(e):
+                self.logger.warning(f"ChromaDB Component not running during register. Skipping. Error: {e}")
+                return
+            self.logger.error(f"KB Register Failed: {e}")
 
     def _generate_id(self, content: str) -> str:
         """Generate SHA256 hash for ID"""
