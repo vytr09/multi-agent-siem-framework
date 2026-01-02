@@ -28,12 +28,13 @@ class SecurityWorkflow:
     """
     Manages the LangGraph workflow for the SIEM agents.
     """
-    def __init__(self, extractor, rulegen, attackgen, evaluator, siem_integrator):
+    def __init__(self, extractor, rulegen, attackgen, evaluator, siem_integrator, status_callback=None):
         self.extractor = extractor
         self.rulegen = rulegen
         self.attackgen = attackgen
         self.evaluator = evaluator
         self.siem_integrator = siem_integrator
+        self.status_callback = status_callback
         
         self.logger = get_agent_logger("security_graph")
         self.graph = self._build_graph()
@@ -60,6 +61,13 @@ class SecurityWorkflow:
     async def extractor_node(self, state: GraphState) -> Dict:
         """Node 1: Extract TTPs from CTI Reports"""
         self.logger.info("--- NODE: EXTRACTOR ---")
+        if self.status_callback:
+            await self.status_callback({
+                "stage": "extraction", 
+                "status": "running", 
+                "message": "Extracting TTPs from CTI reports..."
+            })
+
         try:
             reports = state.get("cti_reports", [])
             context = state.get("context", {})
@@ -82,6 +90,13 @@ class SecurityWorkflow:
     async def optimizer_node(self, state: GraphState) -> Dict:
         """Node 2: Deduplicate and Filter TTPs"""
         self.logger.info("--- NODE: OPTIMIZER ---")
+        if self.status_callback:
+            await self.status_callback({
+                "stage": "optimization", 
+                "status": "running", 
+                "message": "Optimizing and deduplicating extracted TTPs..."
+            })
+
         ttps = state.get("extracted_ttps", [])
         
         # 1. Deduplication by ID
@@ -110,6 +125,13 @@ class SecurityWorkflow:
     async def parallel_processor_node(self, state: GraphState) -> Dict:
         """Node 3: Process TTPs in Parallel (Map Step)"""
         self.logger.info("--- NODE: PARALLEL PROCESSOR ---")
+        if self.status_callback:
+            await self.status_callback({
+                "stage": "processing", 
+                "status": "running", 
+                "message": "Generating rules and attacks for TTPs..."
+            })
+
         ttps = state.get("optimized_ttps", [])
         
         if not ttps:
@@ -226,6 +248,13 @@ class SecurityWorkflow:
     async def aggregator_node(self, state: GraphState) -> Dict:
         """Node 4: Aggregate Results"""
         self.logger.info("--- NODE: AGGREGATOR ---")
+        if self.status_callback:
+            await self.status_callback({
+                "stage": "aggregation", 
+                "status": "running", 
+                "message": "Aggregating final results and metrics..."
+            })
+
         results = state.get("processed_results", [])
         
         final_rules = []

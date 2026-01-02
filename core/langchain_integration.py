@@ -20,7 +20,7 @@ from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser, JsonOutputParser
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.language_models import BaseChatModel
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 import os
 import json
 import ast
@@ -52,6 +52,21 @@ class TTPListOutput(BaseModel):
     """List of extracted TTPs"""
     ttps: List[TTPOutput] = Field(description="List of extracted TTPs")
     model_config = {'extra': 'ignore'}
+
+    @model_validator(mode='before')
+    @classmethod
+    def validate_single_dict_to_list(cls, data: Any) -> Any:
+        # Handle case where LLM returns a single TTP dict instead of a list wrapped in 'ttps'
+        if isinstance(data, dict):
+            # If the dict is already in correct format (has 'ttps' key which is a list)
+            if 'ttps' in data and isinstance(data['ttps'], list):
+                return data
+            
+            # If the dict looks like a single TTP object (has 'technique_name' etc)
+            if 'technique_name' in data or 'technique_id' in data:
+                return {'ttps': [data]}
+                
+        return data
 
 
 class LogSourceOutput(BaseModel):
@@ -111,26 +126,179 @@ class RuleEvaluationOutput(BaseModel):
 class MetricsCallback(BaseCallbackHandler):
     """Callback to track LLM metrics"""
     
+    # Pricing per 1M tokens (as of Jan 2025)
+    # Source: https://ai.google.dev/pricing, https://openai.com/pricing
+    PRICING = {
+        # Gemini models
+        "gemini-3-flash-preview": {"input": 0.50, "output": 3.00},
+        "gemini-2.5-flash": {"input": 0.15, "output": 0.60},
+        "gemini-2.5-pro": {"input": 1.25, "output": 10.00},
+        "gemini-2.0-flash": {"input": 0.10, "output": 0.40},
+        "gemini-2.0-flash-lite": {"input": 0.075, "output": 0.30},
+        "gemini-1.5-flash": {"input": 0.075, "output": 0.30},
+        "gemini-1.5-pro": {"input": 1.25, "output": 5.00},
+        # OpenAI models  
+        "gpt-4o-mini": {"input": 0.15, "output": 0.60},
+        "gpt-4o": {"input": 2.50, "output": 10.00},
+        "gpt-4-turbo": {"input": 10.00, "output": 30.00},
+        # Default fallback
+        "default": {"input": 0.15, "output": 0.60},
+    }
+    
     def __init__(self):
         self.api_calls = 0
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
         self.total_tokens = 0
         self.errors = 0
+        self._start_time = None
+        self.total_query_time = 0.0
+        self.model_name = "unknown"
         
     def on_llm_start(self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> None:
-        """Track LLM start"""
+        """Track LLM start and begin timing"""
+        import time
         self.api_calls += 1
+        self._start_time = time.time()
+        # Try to get model name from serialized data
+        if serialized:
+            self.model_name = serialized.get("kwargs", {}).get("model", 
+                             serialized.get("name", self.model_name))
+        
+        # Fallback tracking for prompts (estimate if needed later)
+        self._temp_prompt_chars = sum(len(p) for p in prompts)
+    
+    def on_llm_end(self, response: Any, **kwargs: Any) -> None:
+        """Track token usage and query time from response"""
+        import time
+        # Track query time
+        if self._start_time:
+            self.total_query_time += time.time() - self._start_time
+            self._start_time = None
+        
+        # Track token usage from LangChain response
+        found_tokens = False
+        try:
+            # Sum extracted tokens for this response
+            extracted_prompt = 0
+            extracted_completion = 0
+            extracted_total = 0
+            
+            # Try to get from llm_output (OpenAI style)
+            if hasattr(response, 'llm_output') and response.llm_output:
+                usage = response.llm_output.get('token_usage', {}) or response.llm_output.get('usage', {})
+                if usage:
+                    extracted_prompt += usage.get('prompt_tokens', 0) or usage.get('input_tokens', 0)
+                    extracted_completion += usage.get('completion_tokens', 0) or usage.get('output_tokens', 0)
+                    extracted_total += usage.get('total_tokens', 0)
+            
+            # Try to get from generations (Gemini style)
+            if extracted_total == 0 and hasattr(response, 'generations') and response.generations:
+                for gen_list in response.generations:
+                    for gen in gen_list:
+                        # Method 1: generation_info
+                        if hasattr(gen, 'generation_info') and gen.generation_info:
+                            usage = gen.generation_info.get('usage_metadata', {})
+                            if usage:
+                                extracted_prompt += usage.get('prompt_token_count', 0)
+                                extracted_completion += usage.get('candidates_token_count', 0)
+                                extracted_total += usage.get('total_token_count', 0)
+                        
+                        # Method 2: response_metadata on message
+                        if hasattr(gen, 'message') and hasattr(gen.message, 'response_metadata'):
+                            meta = gen.message.response_metadata
+                            if 'token_count' in meta:
+                                extracted_prompt += meta.get('token_count', {}).get('prompt_tokens', 0)
+                                extracted_completion += meta.get('token_count', {}).get('completion_tokens', 0)
+                                extracted_total = extracted_prompt + extracted_completion
+                            elif 'usage_metadata' in meta:
+                                usage = meta['usage_metadata']
+                                extracted_prompt += usage.get('prompt_token_count', 0)
+                                extracted_completion += usage.get('candidates_token_count', 0)
+                                extracted_total += usage.get('total_token_count', 0)
+
+            # Add extracted tokens if valid
+            if extracted_total > 0:
+                self.prompt_tokens += extracted_prompt
+                self.completion_tokens += extracted_completion
+                self.total_tokens += extracted_total
+                found_tokens = True
+
+            # FALLBACK: Estimation if no tokens found or total is 0
+            if not found_tokens or extracted_total == 0:
+                # Estimate output chars
+                output_chars = 0
+                if hasattr(response, 'generations'):
+                    for gen_list in response.generations:
+                        for gen in gen_list:
+                            if hasattr(gen, 'text'):
+                                output_chars += len(gen.text)
+                            elif hasattr(gen, 'message') and hasattr(gen.message, 'content'):
+                                output_chars += len(gen.message.content)
+                
+                # Estimate prompt chars (from temporary storage)
+                prompt_chars = getattr(self, '_temp_prompt_chars', 0)
+                
+                est_prompt = prompt_chars // 4
+                est_completion = output_chars // 4
+                
+                self.prompt_tokens += est_prompt
+                self.completion_tokens += est_completion
+                self.total_tokens += (est_prompt + est_completion)
+                
+        except Exception as e:
+            # Fallback to simple increment to avoid 0
+            self.prompt_tokens += 100
+            self.completion_tokens += 100
+            print(f"Error tracking tokens: {e}")
+
+
     
     def on_llm_error(self, error: Exception, **kwargs: Any) -> None:
-        """Track errors"""
+        """Track errors and stop timing"""
+        import time
         self.errors += 1
+        if self._start_time:
+            self.total_query_time += time.time() - self._start_time
+            self._start_time = None
+    
+    def calculate_cost(self) -> float:
+        """Calculate cost based on token usage and model pricing"""
+        # Find matching pricing (handle model name variations)
+        pricing = self.PRICING.get("default")
+        model_lower = self.model_name.lower() if self.model_name else ""
+        
+        for model_key, price in self.PRICING.items():
+            if model_key in model_lower or model_lower in model_key:
+                pricing = price
+                break
+        
+        input_cost = (self.prompt_tokens / 1_000_000) * pricing["input"]
+        output_cost = (self.completion_tokens / 1_000_000) * pricing["output"]
+        return input_cost + output_cost
     
     def get_metrics(self) -> Dict[str, Any]:
-        """Get metrics summary"""
+        """Get metrics summary (IntelEx Table V style)"""
         return {
             "api_calls": self.api_calls,
-            "total_tokens": self.total_tokens,
+            "prompt_tokens": self.prompt_tokens,
+            "completion_tokens": self.completion_tokens,
+            "total_tokens": self.total_tokens if self.total_tokens > 0 else self.prompt_tokens + self.completion_tokens,
+            "query_time_seconds": round(self.total_query_time, 2),
+            "cost_usd": round(self.calculate_cost(), 6),
+            "model": self.model_name,
             "errors": self.errors
         }
+    
+    def reset(self):
+        """Reset all metrics for a new run"""
+        self.api_calls = 0
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.total_tokens = 0
+        self.errors = 0
+        self._start_time = None
+        self.total_query_time = 0.0
 
 
 # ============================================================================
@@ -328,14 +496,17 @@ class LangChainLLMWrapper:
                 # Standard behavior (OpenAI, Cerebras seems fine with it)
                 llm_kwargs['max_tokens'] = max_tokens
                 
-            self.llm = ChatOpenAI(**llm_kwargs)
+            self.llm = ChatOpenAI(**llm_kwargs, callbacks=[self.callback])
             
         else: # Gemini
+            if ChatGoogleGenerativeAI is None:
+                raise ImportError("langchain-google-genai not installed. Run: pip install langchain-google-genai")
             self.llm = ChatGoogleGenerativeAI(
                 model=config.get('model', 'gemini-2.5-flash-lite'),
                 temperature=config.get('temperature', 0.3),
                 max_tokens=config.get('max_output_tokens', 8000),
-                google_api_key=api_key
+                google_api_key=api_key,
+                callbacks=[self.callback]
             )
             
         # print(f"[LLM] Initialized {config.get('model')} via {provider}")
@@ -389,8 +560,9 @@ class LangChainLLMWrapper:
                 'model': config.get('model', 'gpt-4'),
                 'temperature': config.get('temperature', 0.3),
                 'api_key': api_key,
-                'max_retries': 0,
-                'timeout': 60.0,
+                'api_key': api_key,
+                'max_retries': 2, # Increased retries for stability
+                'timeout': 90.0, # Increased timeout for slow providers (Cerebras/Nvidia)
             }
             base_url = config.get('base_url', '')
             max_tokens = config.get('max_tokens', 8000)
@@ -406,7 +578,7 @@ class LangChainLLMWrapper:
             else:
                 llm_kwargs['max_tokens'] = max_tokens
                 
-            return ChatOpenAI(**llm_kwargs)
+            return ChatOpenAI(**llm_kwargs, callbacks=[self.callback])
             
         else: # Gemini
             return ChatGoogleGenerativeAI(
@@ -414,7 +586,8 @@ class LangChainLLMWrapper:
                 temperature=config.get('temperature', 0.3),
                 max_tokens=config.get('max_output_tokens', 8000),
                 google_api_key=api_key,
-                max_retries=0
+                max_retries=0,
+                callbacks=[self.callback]
             )
 
     def get_metrics(self) -> Dict[str, Any]:
@@ -458,36 +631,76 @@ class TTPExtractionChain:
         return text.strip()
     
     def __init__(self, llm_wrapper: LangChainLLMWrapper):
-        # Use RAW LLM for robustness
-        self.llm = llm_wrapper.llm
+        # Use Higher Temperature for Aggressive Extraction (Recall Focus)
+        self.llm = llm_wrapper.get_llm(temperature=0.7)
         self.parser = JsonOutputParser(pydantic_object=TTPListOutput)
         
         # Create prompt template (no format_instructions needed)
+        # Create prompt template (no format_instructions needed)
+        # Create prompt template (no format_instructions needed)
         self.prompt = PromptTemplate(
-            template="""You are a cybersecurity expert analyzing threat intelligence reports.
+            template="""You are a cybersecurity expert analyzing threat intelligence reports to extract TTPs (Tactics, Techniques, and Procedures).
 
-Extract all TTPs (Tactics, Techniques, and Procedures) from the following text.
-
+SECTION 1: REFERENCE KNOWLEDGE (MITRE ATT&CK Context)
+Use this section ONLY to look up correct Technique IDs and Names. Do NOT extract findings from here.
 {context}
 
-For each TTP, identify:
-- MITRE ATT&CK technique ID (e.g., T1059.001)
-- Technique name
-- Brief description
-- Confidence score (0.0 to 1.0)
-- List of indicators (file names, hashes, IPs, domains, commands)
-- List of tools/malware used
+SECTION 2: FEW-SHOT EXAMPLES (Follow this extraction style)
 
-Text: {text}
+Example 1:
+Text: "The attacker executed a base64 encoded command using PowerShell."
+Output:
+{{
+    "ttps": [
+        {{
+            "technique_id": "T1059.001",
+            "technique_name": "PowerShell",
+            "tactic": "Execution",
+            "description": "Attacker used PowerShell to execute a base64 encoded command.",
+            "reasoning": "The text explicitly mentions 'PowerShell' and 'base64 encoded command', which maps directly to T1059.001.",
+            "indicators": ["PowerShell", "base64"],
+            "confidence": 1.0,
+            "tools": ["PowerShell"]
+        }}
+    ]
+}}
+
+Example 2:
+Text: "The system downloaded 'malware.exe' from 'http://evil.com'."
+Output:
+{{
+    "ttps": [
+        {{
+            "technique_id": "T1105",
+            "technique_name": "Ingress Tool Transfer",
+            "tactic": "Command and Control",
+            "description": "File 'malware.exe' was downloaded from a remote URL.",
+            "reasoning": "Downloading a file from a remote source corresponds to Ingress Tool Transfer (T1105).",
+            "indicators": ["http://evil.com", "malware.exe"],
+            "confidence": 0.9,
+            "tools": []
+        }}
+    ]
+}}
+
+SECTION 3: REPORT TEXT (Source of Truth)
+Extract TTPs found strictly within this text.
+{text}
+
+SECTION 4: TASK
+Extract every single potential TTP supported by evidence in the REPORT TEXT.
+**CRITICAL: Prioritize RECALL. Extract at least 5-10 distinct TTPs if the text allows.**
+**List ALL potential techniques. Don't worry about False Positives (they will be filtered).**
 
 INSTRUCTIONS:
-1. Identify potential malicious behaviors.
-2. For EACH behavior, explicitly explain the REASONING inside the `reasoning` field of the TTP object.
-3. Extract the structured TTP details.
+1. Identify ALL malicious behaviors in the 'REPORT TEXT'.
+2. Map behaviors to MITRE ATT&CK IDs (use REFERENCE KNOWLEDGE for lookup).
+3. First, GENERATE REASONING for each potential TTP.
+4. JSON Output must include the reasoning field.
+5. Even if confidence is low, EXTRACT IT. Let the verifier filter it later.
+6. Extract specific indicators (IPs, Domains, File paths).
 
-IMPORTANT: Even if the text is short, you MUST extract at least one TTP if any attack behavior is described.
-If a technique ID is mentioned (e.g., T1059.001), use it.
-If keywords like "PowerShell", "cmd", "malware" are present, infer the corresponding technique.
+OUTPUT FORMAT: JSON ONLY (No markdown formatting)
 **CRITICAL:**
 - Extract specific file paths (e.g. %ALLUSERSPROFILE%\\Start Menu) instead of generic ones.
 - Identify Parent-Child process relationships (e.g. "Word initiated command prompt") and list them in the description or indicators.
@@ -730,7 +943,9 @@ Generate 2-3 realistic attack commands that demonstrate this technique on {platf
 **Safety Guidelines:**
 - Use test/benign strings where possible
 - Avoid actual malicious payloads
-- **FORBIDDEN COMMANDS:** Do NOT generate commands that recursively list the entire file system (e.g. `Get-ChildItem -Path C:\ -Recurse` or `dir C:\ /s`). These cause system freezes.
+- **FORBIDDEN COMMANDS:** 
+    - Do NOT generate commands that recursively list the entire file system (e.g. `Get-ChildItem -Path C:\ -Recurse` or `dir C:\ /s`). These cause system freezes.
+    - Do NOT use `bash`, `sh`, `awk`, `sed`, `grep` on **Windows** unless executed inside WSL (which is rarely the case for standard tests). Assume standard CMD/PowerShell.
 - Mark destructive commands as high safety risk
 
 - All commands are for TESTING ONLY in isolated environments
@@ -895,6 +1110,110 @@ def create_attack_gen_chain(llm_wrapper: LangChainLLMWrapper) -> AttackCommandGe
 # All-in-One Manager
 # ============================================================================
 
+# ============================================================================
+# Verification Chain (IntelEx-Style)
+# ============================================================================
+
+class VerifierOutput(BaseModel):
+    """Structured output for TTP verification"""
+    is_valid: bool = Field(description="Is this TTP supported by the text?")
+    confidence: float = Field(description="Confidence score (0.0 - 1.0)")
+    reasoning: str = Field(description="Reasoning for validity check. Quote evidence if valid.")
+
+
+class TTPVerifierChain:
+    """Chain for verifying extracted TTPs (LLM-as-a-Judge)"""
+    def __init__(self, llm_wrapper: LangChainLLMWrapper):
+        self.llm = llm_wrapper.llm
+        self.parser = JsonOutputParser(pydantic_object=VerifierOutput)
+        self.prompt = PromptTemplate(
+            template="""You are a strict QA auditor verifying Threat Intelligence extraction results.
+
+Your goal is to determine if a Candidate TTP is truly supported by the provided Report Text.
+
+REPORT TEXT:
+{text}
+
+CANDIDATE TTP:
+- ID: {technique_id}
+- Name: {technique_name}
+- Description: {description}
+- Indicators: {indicators}
+
+TASK:
+Verify if the Candidate TTP is explicitly supported by the Report Text.
+- It is VALID only if there is clear evidence in the text matching the definition of the technique.
+- It is INVALID if the technique is hallucinated, inferred without evidence, or mentioned only in a non-malicious context.
+
+**CRITICAL RULES:**
+1. **ALLOW LOGICAL INFERENCE:** If the text mentions specific indicators (e.g. "http://..." URL), accept the corresponding technique (e.g. T1071.001 Web Protocols) even if the exact words are missing.
+2. **REJECT INCORRECT MAPPING:** If the behavior describes T1552 (File Theft) but the candidate is T1003 (OS Credential Dumping), mark INVALID. Precision matters.
+3. **CONTEXTUAL FLEXIBILITY:** Browsing to a URL can be C2 (T1071) or Initial Access (T1189) depending on intent. If the action initiates the attack loop or exploits a browser, ALLOW IT. Do not be overly strict about "existing backdoor" if the behavior aligns with the technique definition.
+4. **STRICT EVIDENCE CHECK:** Reject TTPs based purely on generic terms like "escalated privileges", "recon data", or "system shutdown" UNLESS specific tools (e.g. Mimikatz, exploit names) or technical artifacts are mentioned.
+5. **PRESERVE STRONG MATCHES:** If a specific tool (e.g. "Copykatz", "PowerShell") is mentioned, PRESERVE the mapping even if implied.
+
+OUTPUT FORMAT: JSON
+{{
+    "is_valid": boolean,
+    "confidence": float (0.0 to 1.0),
+    "reasoning": "Explain why based on the text..."
+}}
+{format_instructions}""",
+            input_variables=["text", "technique_id", "technique_name", "description", "indicators"],
+            partial_variables={"format_instructions": self.parser.get_format_instructions()}
+        )
+
+        self.chain = self.prompt | self.llm | self._clean_json_output | self.parser
+        
+    @staticmethod
+    def _clean_json_output(text: Any) -> str:
+        """Clean LLM output to ensure valid JSON for parser"""
+        if hasattr(text, "content"):
+            text = text.content
+        
+        if not isinstance(text, str):
+            return str(text)
+            
+        # Strip markdown
+        text = text.strip()
+        if "```json" in text:
+            text = text.split("```json")[1]
+            if "```" in text:
+                text = text.split("```")[0]
+        elif "```" in text:
+            text = text.split("```")[1]
+            if "```" in text:
+                text = text.split("```")[0]
+        
+        # Remove trailing commas (common JSON error)
+        import re
+        text = re.sub(r',\s*}', '}', text)
+        text = re.sub(r',\s*]', ']', text)
+        
+        return text.strip()
+        
+    async def verify(self, text: str, ttp: Dict[str, Any]) -> Dict[str, Any]:
+        """Verify TTP against text"""
+        try:
+            return await self.chain.ainvoke({
+                "text": text,
+                "technique_id": ttp.get("technique_id"),
+                "technique_name": ttp.get("technique_name"),
+                "description": ttp.get("description"),
+                "indicators": str(ttp.get("indicators"))
+            })
+        except Exception as e:
+            return {"is_valid": False, "confidence": 0.0, "reasoning": f"Verification failed: {e}"}
+
+def create_verifier_chain(llm_wrapper: LangChainLLMWrapper) -> TTPVerifierChain:
+    """Create TTP verification chain"""
+    return TTPVerifierChain(llm_wrapper)
+
+
+# ============================================================================
+# All-in-One Manager
+# ============================================================================
+
 class LangChainManager:
     """Manages all LangChain chains for the framework"""
     
@@ -912,6 +1231,7 @@ class LangChainManager:
         self.sigma_chain = create_sigma_rule_chain(self.llm_wrapper)
         self.attack_chain = create_attack_gen_chain(self.llm_wrapper)
         self.evaluation_chain = create_evaluation_chain(self.llm_wrapper)
+        self.verifier_chain = create_verifier_chain(self.llm_wrapper)
         
         print("\n[OK] LangChain Integration Ready")
         print("="*80 + "\n")

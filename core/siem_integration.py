@@ -334,11 +334,18 @@ class SIEMIntegrator:
         self.splunk = SplunkConnector(flat_config)
         
         # Verify Splunk connection
-        if not self.splunk.test_connection():
-            raise ConnectionError("Could not connect to Splunk. Please verify SPLUNK_HOST, SPLUNK_PORT, and credentials in .env")
-        
-        # Verify required Splunk indexes exist
-        self._ensure_splunk_indexes()
+        self.splunk_connected = False
+        if self.splunk.test_connection():
+            self.splunk_connected = True
+            # Verify required Splunk indexes exist
+            try:
+                self._ensure_splunk_indexes()
+            except Exception as e:
+                logger.warning(f"Failed to ensure Splunk indexes: {e}")
+        else:
+            logger.warning("Could not connect to Splunk. SIEM integration will be disabled (mock mode/skipped).")
+            # Don't raise, just disable verification features
+            # raise ConnectionError("Could not connect to Splunk...")
 
     def _ensure_splunk_indexes(self):
         """
@@ -389,6 +396,12 @@ class SIEMIntegrator:
         3. Query Splunk
         4. Check historical data (FPR)
         """
+        if not self.splunk_connected:
+            return DetectionResult(
+                detected=False, events_found=0, query_time_ms=0, historical_events=0,
+                status="skipped", message="SIEM integration disabled (connection failed)", raw_events=[]
+            )
+
         # 0. Pre-Validation of Query
         # We validate the query BEFORE executing the attack to avoid unnecessary attack execution
         query = self._extract_query(rule)

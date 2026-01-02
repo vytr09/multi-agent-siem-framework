@@ -23,10 +23,30 @@ from core.langchain_orchestrator import LangChainOrchestrator
 from agents.collector.normalizers.pdf_normalizer import PDFDatasetNormalizer
 from benchmark.rulegen_benchmark import RuleGenBenchmark
 from benchmark.attackgen_benchmark import AttackGenBenchmark
+# Monkeypatch Posthog to silence "capture() takes 1 positional argument but 3 were given"
+try:
+    import chromadb.telemetry.product.posthog
+    class MockPosthog:
+        def __init__(self, *args, **kwargs):
+            pass
+        def capture(self, *args, **kwargs):
+            pass
+    chromadb.telemetry.product.posthog.Posthog = MockPosthog
+except ImportError:
+    pass
+
 from pypdf import PdfReader
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("benchmark_run.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 logger = get_agent_logger("benchmark_runner")
 
 OUTPUT_DIR = Path("data/benchmark_results")
@@ -167,6 +187,7 @@ async def process_single_file(orchestrator, file_path: Path):
         json.dump(result_entry, f, indent=2, default=str)
     
     # Return Summary Data
+    siem_metrics = result_entry.get("siem_metrics", {})
     return {
         "file": file_path.name,
         "status": "success",
@@ -175,6 +196,7 @@ async def process_single_file(orchestrator, file_path: Path):
         "rules_generated": len(rules),
         "attacks_generated": len(attacks),
         "siem_detections": len([x for x in siem_verification if x.get('detected')]),
+        "detection_rate": siem_metrics.get("detection_rate", 0),
         "quality_score": quality_score_avg
     }
 
@@ -234,13 +256,26 @@ async def main():
                     if data.get('status') == 'success':
                          metrics = data.get('benchmark_metrics', {})
                          final_report = data.get('final_report', {})
+                         extraction = data.get('extraction', {})
+                         extraction_summary = extraction.get('extraction_summary', {})
+                         rulegen = data.get('rulegen', {})
+                         rulegen_summ = rulegen.get('summary', {})
+                         attackgen = data.get('attackgen', {})
+                         attackgen_summ = attackgen.get('summary', {})
                          
+                         siem_metrics = data.get('siem_metrics', {})
+                         final_score = data.get('final_score', 0)
+
                          summary_results.append({
                             "file": file_path.name,
                             "status": "skipped (success)",
                             "duration_s": metrics.get('duration_s', 0),
-                            "ttps_found": final_report.get('total_ttps', 0),
-                            "quality_score": metrics.get('quality_score', 0)
+                            "ttps_found": extraction_summary.get("total_ttps_extracted", 0), # Best effort
+                            "rules_generated": rulegen_summ.get("total_rules_generated", 0),
+                            "attacks_generated": attackgen_summ.get("total_attacks_generated", 0),
+                            "siem_detections": siem_metrics.get("true_positives", 0),
+                            "detection_rate": siem_metrics.get("detection_rate", 0),
+                            "quality_score": final_score
                          })
                          continue
                 except Exception:

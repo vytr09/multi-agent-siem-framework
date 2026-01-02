@@ -218,7 +218,7 @@ class LangChainOrchestrator:
         else:
             raise ValueError(f"Unknown agent: {agent_name}")
 
-    async def run_pipeline(self, cti_reports: List[Dict], context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def run_pipeline(self, cti_reports: List[Dict], context: Optional[Dict[str, Any]] = None, status_callback: Optional[callable] = None) -> Dict[str, Any]:
         """
         Run full pipeline with LangGraph (Parallel & Optimized)
         """
@@ -230,7 +230,8 @@ class LangChainOrchestrator:
             self.rulegen, 
             self.attackgen, 
             self.evaluator, 
-            self.siem_integrator
+            self.siem_integrator,
+            status_callback=status_callback
         )
         
         # Prepare input state
@@ -245,6 +246,21 @@ class LangChainOrchestrator:
             "errors": []
         }
         
+        # Report SIEM status
+        if status_callback:
+            if self.siem_integrator and not self.siem_integrator.splunk_connected:
+                await status_callback({
+                    "step": "init", 
+                    "status": "warning", 
+                    "message": "SIEM Integration Disabled: Splunk connection failed. Verification will be skipped."
+                })
+            elif not self.siem_integrator:
+                await status_callback({
+                    "step": "init", 
+                    "status": "warning", 
+                    "message": "SIEM Integration Disabled: Not initialized."
+                })
+
         # Execute Graph
         final_state = await workflow.run(input_state)
         

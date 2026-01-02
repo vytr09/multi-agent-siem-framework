@@ -24,7 +24,8 @@ from core.logging import get_agent_logger
 from core.langchain_integration import (
     create_langchain_llm,
     create_ttp_extraction_chain,
-    TTPExtractionChain
+    TTPExtractionChain,
+    get_llm_manager
 )
 from core.knowledge_base import get_kb_manager
 
@@ -253,6 +254,13 @@ class LangChainExtractorAgent(BaseAgent):
                 self.logger.info(f"Starting LLM Extraction. Chain exists: {bool(self.ttp_chain)}")
                 context_str = self._build_context_string(report, nlp_results)
                 
+                # RAG: Retrieve MITRE Context
+                if kb and kb.enabled:
+                    mitre_context = await kb.query_mitre_context(report_text, n_results=5)
+                    if mitre_context:
+                        context_str += f"\n\n{mitre_context}"
+                        self.logger.info(f"Added RAG context: retrieved {len(mitre_context)} chars")
+                
                 # Check for IntelEx chunks
                 chunks = report.get("chunks", [])
                 
@@ -306,14 +314,26 @@ class LangChainExtractorAgent(BaseAgent):
                         for ttp in ttp_output.ttps
                     ]
                 self.stats["langchain_extractions"] += 1
+                # DEBUG: Log LLM output
+                print(f"DEBUG: LLM extracted {len(llm_ttps)} TTPs")
+                if llm_ttps:
+                    print(f"DEBUG: First LLM TTP: {llm_ttps[0]}")
                 
             except Exception as e:
                 print(f"DEBUG: Extractor LangChain Exception: {e}")
+                import traceback
+                traceback.print_exc()
                 self.logger.warning(f"LangChain extraction failed: {e}")
                 llm_ttps = []
         
         llm_time = (datetime.utcnow() - llm_start).total_seconds() * 1000
         self.stats["llm_processing_time_ms"] += llm_time
+        
+        # Step 3.5: IntelEx-Style Verification (LLM-as-a-Judge)
+        if self.langchain_enabled and llm_ttps:
+            llm_ttps = await self._verify_extracted_ttps(llm_ttps, report_text)
+            self.logger.info(f"Post-verification TTP count: {len(llm_ttps)}")
+
         
         # Step 4: NLP TTPs
         nlp_ttps = self._create_ttps_from_nlp_indicators(nlp_ttp_indicators)
@@ -608,6 +628,43 @@ class LangChainExtractorAgent(BaseAgent):
         self._is_paused = False
         self._can_execute = True
         self.set_status(AgentStatus.IDLE, "Agent resumed")
+
+    async def _verify_extracted_ttps(self, raw_ttps: List[Dict], report_text: str) -> List[Dict]:
+        """Verify TTPs using LLM-as-a-Judge (IntelEx Methodology)"""
+        lm = get_llm_manager(self.llm_config)
+        verified_ttps = []
+        
+        if not hasattr(lm, "verifier_chain") or not lm.verifier_chain:
+            # Fallback if uninitialized
+            self.logger.warning("Verifier chain not available. Skipping verification.")
+            return raw_ttps
+
+        self.logger.info(f"Verifying {len(raw_ttps)} TTPs...")
+        
+        for ttp in raw_ttps:
+            try:
+                # Add slight delay to avoid rate limits
+                await asyncio.sleep(0.5)
+                
+                res = await lm.verifier_chain.verify(report_text, ttp)
+                
+                if res.get("is_valid", False):
+                    # Update confidence with verification score
+                    # Blend: 70% Original, 30% Verification for safety
+                    verify_conf = res.get("confidence", 0.8)
+                    orig_conf = ttp.get("confidence", 0.5)
+                    ttp["confidence"] = (orig_conf * 0.7) + (verify_conf * 0.3)
+                    
+                    ttp["verification_reasoning"] = res.get("reasoning")
+                    verified_ttps.append(ttp)
+                else:
+                    self.logger.info(f"Dropped TTP {ttp.get('technique_id')} ({ttp.get('technique_id')}): {res.get('reasoning')}")
+            except Exception as e:
+                self.logger.error(f"Verification error for TTP: {e}")
+                verified_ttps.append(ttp) # Keep on error (fail open) to avoid dropping valid TTPs due to API issues
+        
+        return verified_ttps
+
 
     async def _extract_with_retry(self, text: str, context: str) -> Any:
         """Execute extraction chain with retry on rate limit"""

@@ -25,6 +25,15 @@ except ImportError:
 
 from core.logging import get_agent_logger
 
+# Suppress annoying ChromaDB telemetry errors
+class TelemetryFilter(logging.Filter):
+    def filter(self, record):
+        return "telemetry event" not in record.getMessage()
+
+logging.getLogger().addFilter(TelemetryFilter())
+logging.getLogger("chromadb").addFilter(TelemetryFilter())
+logging.getLogger("posthog").addFilter(TelemetryFilter())
+
 class KBManager:
     """
     Manages the Knowledge Base for the framework.
@@ -34,6 +43,7 @@ class KBManager:
     COLLECTION_RULES = "sigma_rules"
     COLLECTION_TTPS = "historical_ttps"
     COLLECTION_REPORTS = "investigations"
+    COLLECTION_MITRE = "mitre_attack"
     
     def __init__(self, persist_dir: str = "data/chroma_db", embedding_model: str = "BAAI/bge-small-en-v1.5"):
         self.logger = get_agent_logger("kb_manager")
@@ -58,12 +68,112 @@ class KBManager:
         # Initialize Client (Persistent)
         settings = Settings(anonymized_telemetry=False)
         self.client = chromadb.PersistentClient(path=str(self.persist_dir), settings=settings)
+        self.lock = asyncio.Lock()
         
         self.logger.info("Knowledge Base initialized successfully")
+
+    # ... (skipping unchanged methods)
+
+    async def add_mitre_technique(self, technique: Dict[str, Any]):
+        """
+        Add a MITRE ATT&CK technique to the KB.
+        """
+        if not self.enabled: return
+        
+        try:
+            async with self.lock:
+                for attempt in range(2):
+                    try:
+                        vector_store = self._get_vector_store(self.COLLECTION_MITRE)
+                        
+                        text_content = f"""
+                        Technique: {technique.get('name')} ({technique.get('external_id')})
+                        Description: {technique.get('description')}
+                        Detection: {technique.get('detection', 'N/A')}
+                        Platforms: {', '.join(technique.get('platforms', []))}
+                        """
+                        
+                        metadata = {
+                            "attack_id": technique.get("external_id"),
+                            "name": technique.get("name"),
+                            "url": technique.get("url", ""),
+                            "full_json": json.dumps(technique)
+                        }
+                        
+                        id_hash = technique.get("external_id") # Use Attack ID as unique ID
+                        
+                        await vector_store.aadd_texts(
+                            texts=[text_content],
+                            metadatas=[metadata],
+                            ids=[id_hash]
+                        )
+                        break
+                    except Exception as e:
+                        if "Component not running" in str(e) and attempt == 0:
+                            self._reset_client()
+                            continue
+                        # Ignore ID verification errors (duplicates)
+                        if "ID" in str(e) and "already exists" in str(e):
+                            break
+                        raise e
+        except Exception as e:
+            self.logger.error(f"Failed to add MITRE technique to KB: {e}")
+
+    async def query_mitre_context(self, query: str, n_results: int = 3) -> str:
+        """
+        Retrieve relevant MITRE context for a query (report text).
+        Returns a formatted string of potential techniques.
+        """
+        if not self.enabled: return ""
+        
+        try:
+            async with self.lock:
+                # Using simple similarity search
+                vector_store = self._get_vector_store(self.COLLECTION_MITRE)
+                results = await vector_store.asimilarity_search(query, k=n_results)
+                
+                context_parts = []
+                for doc in results:
+                    tech_id = doc.metadata.get("attack_id")
+                    name = doc.metadata.get("name")
+                    content = doc.page_content
+                    # Limit content length to save tokens
+                    if "Description:" in content: 
+                        desc = content.split("Description:")[1].split("Detection:")[0].strip()[:300] + "..."
+                    else:
+                        desc = content[:300]
+                    
+                    context_parts.append(f"- {name} ({tech_id}): {desc}")
+                
+                if not context_parts:
+                    return ""
+                    
+                return "Potential MITRE Techniques found in Knowledge Base:\n" + "\n".join(context_parts)
+                
+        except Exception as e:
+            self.logger.error(f"KB Retrieval Failed: {e}")
+            return ""
+
+    def _generate_id(self, content: str) -> str:
+        """Generate SHA256 hash for ID"""
+        return hashlib.sha256(content.encode()).hexdigest()
+
+    def _reset_client(self):
+        """Re-initialize the client after a crash"""
+        try:
+            self.logger.warning("Resetting ChromaDB client...")
+            settings = Settings(anonymized_telemetry=False)
+            self.client = chromadb.PersistentClient(path=str(self.persist_dir), settings=settings)
+            self.logger.info("ChromaDB client reset successfully.")
+        except Exception as e:
+            self.logger.error(f"Failed to reset ChromaDB: {e}")
 
     def _get_vector_store(self, collection_name: str) -> 'Chroma':
         """Get LangChain vector store interface for a collection"""
         if not self.enabled: return None
+        
+        # No proactive check - rely on reactive recovery
+        # self._check_client()
         
         return Chroma(
             client=self.client,
@@ -79,38 +189,45 @@ class KBManager:
         if not self.enabled: return
         
         try:
-            vector_store = self._get_vector_store(self.COLLECTION_RULES)
-            
-            # Create text representation for embedding
-            # We index the "Meaning" of the rule
-            text_content = f"""
-            Title: {rule.get('title')}
-            Description: {rule.get('description')}
-            Technique: {rule.get('tags', [])}
-            Log Source: {rule.get('logsource', {})}
-            """
-            
-            metadata = {
-                "rule_id": str(rule.get("id", "")),
-                "title": rule.get("title", "Unknown"),
-                "status": status,
-                "timestamp": datetime.utcnow().isoformat(),
-                "full_json": json.dumps(rule) # Store full rule in metadata for easy retrieval
-            }
-            
-            # Upsert
-            id_hash = self._generate_id(text_content)
-            
-            await vector_store.aadd_texts(
-                texts=[text_content],
-                metadatas=[metadata],
-                ids=[id_hash]
-            )
-            self.logger.info(f"Added Sigma rule to KB: {rule.get('title')}")
+            async with self.lock:
+                # Retry logic
+                for attempt in range(2):
+                    try:
+                        vector_store = self._get_vector_store(self.COLLECTION_RULES)
+                        
+                        # Create text representation for embedding
+                        text_content = f"""
+                        Title: {rule.get('title')}
+                        Description: {rule.get('description')}
+                        Technique: {rule.get('tags', [])}
+                        Log Source: {rule.get('logsource', {})}
+                        """
+                        
+                        metadata = {
+                            "rule_id": str(rule.get("id", "")),
+                            "title": rule.get("title", "Unknown"),
+                            "status": status,
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "full_json": json.dumps(rule)
+                        }
+                        
+                        id_hash = self._generate_id(text_content)
+                        
+                        await vector_store.aadd_texts(
+                            texts=[text_content],
+                            metadatas=[metadata],
+                            ids=[id_hash]
+                        )
+                        self.logger.info(f"Added Sigma rule to KB: {rule.get('title')}")
+                        break # Success
+                    except Exception as e:
+                        if "Component not running" in str(e) and attempt == 0:
+                            self.logger.warning(f"ChromaDB crashed (attempt {attempt}). Resetting and retrying...")
+                            self._reset_client()
+                            continue
+                        raise e
+
         except Exception as e:
-            if "Component not running" in str(e):
-                self.logger.warning(f"ChromaDB Component not running during add_sigma_rule. Skipping. Error: {e}")
-                return
             self.logger.error(f"Failed to add Sigma rule to KB: {e}")
 
     async def query_similar_rules(self, query: str, n_results: int = 3) -> List[Dict[str, Any]]:
@@ -119,26 +236,31 @@ class KBManager:
         """
         if not self.enabled: return []
         
-        vector_store = self._get_vector_store(self.COLLECTION_RULES)
-        
         try:
-            results = await vector_store.asimilarity_search(query, k=n_results)
-            
-            rules = []
-            for doc in results:
-                try:
-                    # Parse the full JSON stored in metadata
-                    rule_json = json.loads(doc.metadata.get("full_json", "{}"))
-                    rules.append(rule_json)
-                except Exception:
-                    continue
-                    
-            return rules
+            async with self.lock:
+                for attempt in range(2):
+                    try:
+                        vector_store = self._get_vector_store(self.COLLECTION_RULES)
+                        results = await vector_store.asimilarity_search(query, k=n_results)
+                        
+                        rules = []
+                        for doc in results:
+                            try:
+                                rule_json = json.loads(doc.metadata.get("full_json", "{}"))
+                                rules.append(rule_json)
+                            except Exception:
+                                continue
+                        return rules
+                    except Exception as e:
+                        if "Component not running" in str(e) and attempt == 0:
+                            self.logger.warning(f"ChromaDB crashed (attempt {attempt}). Resetting...")
+                            self._reset_client()
+                            continue
+                        # If simple unrelated error, return empty logic handled by outer except? 
+                        # Actually previous code caught exception and returned [].
+                        raise e
+                        
         except Exception as e:
-            if "Component not running" in str(e):
-                self.logger.warning(f"ChromaDB Component not running. Returning empty results. Error: {e}")
-                # Optional: Attempt simpler recovery or just fail open
-                return []
             self.logger.error(f"KB Query Failed: {e}")
             return []
 
@@ -150,32 +272,39 @@ class KBManager:
         if not self.enabled: return
         
         try:
-            vector_store = self._get_vector_store(self.COLLECTION_TTPS)
-            
-            text_content = f"""
-            Technique: {ttp.get('technique_name')} ({ttp.get('attack_id')})
-            Description: {ttp.get('description')}
-            Indicators: {', '.join(ttp.get('indicators', []))}
-            """
-            
-            metadata = {
-                "attack_id": ttp.get("attack_id"),
-                "report_id": report_id,
-                "timestamp": datetime.utcnow().isoformat(),
-                "full_json": json.dumps(ttp)
-            }
-            
-            id_hash = self._generate_id(text_content + report_id)
-            
-            await vector_store.aadd_texts(
-                texts=[text_content],
-                metadatas=[metadata],
-                ids=[id_hash]
-            )
+            async with self.lock:
+                for attempt in range(2):
+                    try:
+                        vector_store = self._get_vector_store(self.COLLECTION_TTPS)
+                        
+                        text_content = f"""
+                        Technique: {ttp.get('technique_name')} ({ttp.get('attack_id')})
+                        Description: {ttp.get('description')}
+                        Indicators: {', '.join(ttp.get('indicators', []))}
+                        """
+                        
+                        metadata = {
+                            "attack_id": ttp.get("attack_id"),
+                            "report_id": report_id,
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "full_json": json.dumps(ttp)
+                        }
+                        
+                        id_hash = self._generate_id(text_content + report_id)
+                        
+                        await vector_store.aadd_texts(
+                            texts=[text_content],
+                            metadatas=[metadata],
+                            ids=[id_hash]
+                        )
+                        break
+                    except Exception as e:
+                        if "Component not running" in str(e) and attempt == 0:
+                            self.logger.warning("ChromaDB crashed. Resetting...")
+                            self._reset_client()
+                            continue
+                        raise e
         except Exception as e:
-            if "Component not running" in str(e):
-                self.logger.warning(f"ChromaDB Component not running during add_ttp. Skipping. Error: {e}")
-                return
             self.logger.error(f"Failed to add TTP to KB: {e}")
 
     async def check_duplicate_report(self, content: str) -> bool:
@@ -191,15 +320,23 @@ class KBManager:
         
         # Check if ID exists (try to get it)
         try:
-            col = self.client.get_collection(self.COLLECTION_REPORTS)
-            existing = col.get(ids=[content_hash])
-            if existing and existing['ids']:
-                return True
-        except Exception as e:
-            if "Component not running" in str(e):
-                self.logger.warning(f"ChromaDB Component not running during check. Assuming no duplicate. Error: {e}")
-                return False
-            pass
+            async with self.lock:
+                for attempt in range(2):
+                    try:
+                        # self._check_client() # No longer exists
+                        col = self.client.get_collection(self.COLLECTION_REPORTS)
+                        existing = col.get(ids=[content_hash])
+                        if existing and existing['ids']:
+                            return True
+                        # If successful check, break/return
+                        return False
+                    except Exception as e:
+                        if "Component not running" in str(e) and attempt == 0:
+                            self._reset_client()
+                            continue
+                        raise e
+        except Exception:
+            return False
             
         return False
         
@@ -208,22 +345,28 @@ class KBManager:
         if not self.enabled: return
         
         try:
-            vector_store = self._get_vector_store(self.COLLECTION_REPORTS)
-            
-            content_hash = self._generate_id(content)
-            
-            # We index the Summary or Title for vector search, but use Hash for ID
-            text_content = f"Processed Report: {report_metadata.get('title', 'Unknown')}\nSummary: {content[:500]}"
-            
-            await vector_store.aadd_texts(
-                texts=[text_content],
-                metadatas=[report_metadata],
-                ids=[content_hash]
-            )
+            async with self.lock:
+                for attempt in range(2):
+                    try:
+                        vector_store = self._get_vector_store(self.COLLECTION_REPORTS)
+                        
+                        content_hash = self._generate_id(content)
+                        
+                        # We index the Summary or Title for vector search, but use Hash for ID
+                        text_content = f"Processed Report: {report_metadata.get('title', 'Unknown')}\nSummary: {content[:500]}"
+                        
+                        await vector_store.aadd_texts(
+                            texts=[text_content],
+                            metadatas=[report_metadata],
+                            ids=[content_hash]
+                        )
+                        break
+                    except Exception as e:
+                        if "Component not running" in str(e) and attempt == 0:
+                            self._reset_client()
+                            continue
+                        raise e
         except Exception as e:
-            if "Component not running" in str(e):
-                self.logger.warning(f"ChromaDB Component not running during register. Skipping. Error: {e}")
-                return
             self.logger.error(f"KB Register Failed: {e}")
 
     def _generate_id(self, content: str) -> str:
