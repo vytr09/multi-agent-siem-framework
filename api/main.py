@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routers import agents, metrics, rules, logs, attacks, settings
+from api.routers import agents, rules, attacks, logs, metrics, settings, providers, files, knowledge
 import logging
 import os
 
@@ -43,6 +43,18 @@ app.include_router(rules.router, prefix="/rules", tags=["Rules"])
 app.include_router(attacks.router, prefix="/attacks", tags=["Attacks"])
 app.include_router(logs.router, prefix="/logs", tags=["Logs"])
 app.include_router(settings.router, prefix="/settings", tags=["Settings"])
+app.include_router(files.router, prefix="/files", tags=["Files"])
+from api.routers import providers
+app.include_router(providers.router, prefix="/providers", tags=["Providers"])
+from fastapi.staticfiles import StaticFiles
+
+# ... (Include Routers)
+app.include_router(knowledge.router, prefix="/knowledge", tags=["Knowledge Base"])
+from api.routers import pipeline
+app.include_router(pipeline.router, prefix="/pipeline", tags=["Pipeline"])
+
+# Mount uploads directory
+app.mount("/uploads", StaticFiles(directory="data/uploads"), name="uploads")
 
 @app.get("/health")
 async def health_check():

@@ -74,3 +74,52 @@ async def stop_agents():
     """Stop all agents"""
     await agent_manager.stop_all()
     return {"status": "stopped"}
+
+@router.post("/run_file")
+async def run_pipeline_from_file(
+    filename: str = Body(..., embed=True), 
+    force: bool = Body(False, embed=True),
+    background_tasks: BackgroundTasks = None
+):
+    """Run the pipeline using a specific uploaded file."""
+    try:
+        from api.routers.files import UPLOAD_DIR, parse_file
+        import os
+        
+        file_path = UPLOAD_DIR / filename # Use Path object directly
+        if not file_path.exists():
+             raise HTTPException(status_code=404, detail=f"File not found: {filename}")
+             
+        # Parse file content
+        content = parse_file(file_path)
+        
+        # Prepare Input
+        cti_report = {
+            "id": filename,
+            "content": content,
+            "source": filename,
+            "timestamp": "now"
+        }
+        
+        # Context to pass down (including force flag)
+        context = {
+            "ignore_duplicates": force
+        }
+        
+        # Run Pipeline in Background
+        # We define a wrapper to run the async pipeline in the background
+        async def run_pipeline_task():
+            try:
+                # Pass context to run_pipeline
+                await agent_manager.run_pipeline({"cti_reports": [cti_report], "context": context})
+            except Exception as e:
+                print(f"Error in background pipeline: {e}")
+
+        background_tasks.add_task(run_pipeline_task)
+        
+        return {"status": "started", "message": f"Pipeline started in background (Force: {force})"}
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))

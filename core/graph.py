@@ -28,12 +28,13 @@ class SecurityWorkflow:
     """
     Manages the LangGraph workflow for the SIEM agents.
     """
-    def __init__(self, extractor, rulegen, attackgen, evaluator, siem_integrator, status_callback=None):
+    def __init__(self, extractor, rulegen, attackgen, evaluator, siem_integrator, config=None, status_callback=None):
         self.extractor = extractor
         self.rulegen = rulegen
         self.attackgen = attackgen
         self.evaluator = evaluator
         self.siem_integrator = siem_integrator
+        self.config = config or {}
         self.status_callback = status_callback
         
         self.logger = get_agent_logger("security_graph")
@@ -200,37 +201,55 @@ class SecurityWorkflow:
             eval_result = await self.evaluator.execute({'rules': [rule]})
             score = eval_result.get('summary', {}).get('average_quality_score', 0)
             
-            # Step 4: Feedback Loop (Simple Implementation)
-            # If score low or not detected, retry ONCE
-            detected = rule.get('siem_verification', {}).get('detected', False)
-            if (score < 0.7 or (attack and not detected)) and self.rulegen:
-                 self.logger.info(f"[{ttp_id}] Low score/detection (Score: {score}, Detected: {detected}). Retrying...")
-                 
-                 feedback = {
-                     'evaluation': eval_result,
-                     'verification_results': [{'ttp_id': ttp_id, 'verification': rule.get('siem_verification')}]
-                 }
-                 
-                 # Retry RuleGen with feedback
-                 retry_res = await self.rulegen.execute({
-                     'ttps': [ttp],
-                     'feedback': feedback
-                 })
-                 
-                 # Use new rule if available
-                 new_rules = retry_res.get('rules', [])
-                 if new_rules:
-                     rule = new_rules[0]
-                     # Re-verify if possible (reuse attack)
-                     if attack and self.siem_integrator:
-                         v_res = self.siem_integrator.verify_rule(rule, attack)
-                         rule['siem_verification'] = {
-                             'detected': v_res.detected,
-                             'status': v_res.status,
-                             'message': v_res.message,
-                             'events_found': getattr(v_res, 'events_found', 1 if v_res.detected else 0),
-                             'query_time_ms': getattr(v_res, 'query_time_ms', 0)
-                         }
+            # Step 4: Feedback Loop (Iterative Refinement)
+            iteration = 0
+            # Get config from instance or default
+            feedback_config = self.config.get('feedback', {}) if self.config else {}
+            max_iterations = feedback_config.get('max_iterations', 3)
+            min_score_threshold = feedback_config.get('minimum_score', 0.8)
+            
+            while iteration < max_iterations:
+                detected = rule.get('siem_verification', {}).get('detected', False)
+                score = eval_result.get('summary', {}).get('average_quality_score', 0)
+                
+                # Exit condition: High score OR Detected (Functional success > Style)
+                if score >= min_score_threshold or detected:
+                    self.logger.info(f"[{ttp_id}] Success criteria met (Score: {score}, Detected: {detected}). Stopping iterations.")
+                    break
+                
+                self.logger.info(f"[{ttp_id}] Iteration {iteration+1}/{max_iterations}: Score {score}, Detected {detected}. Refining...")
+                
+                feedback = {
+                    'evaluation': eval_result,
+                    'verification_results': [{'ttp_id': ttp_id, 'verification': rule.get('siem_verification')}]
+                }
+                
+                # Retry RuleGen with feedback
+                retry_res = await self.rulegen.execute({
+                    'ttps': [ttp],
+                    'feedback': feedback
+                })
+                
+                # Use new rule if available
+                new_rules = retry_res.get('rules', [])
+                if new_rules:
+                    rule = new_rules[0]
+                    # Re-verify if possible (reuse attack)
+                    if attack and self.siem_integrator:
+                        v_res = self.siem_integrator.verify_rule(rule, attack)
+                        rule['siem_verification'] = {
+                            'detected': v_res.detected,
+                            'status': v_res.status,
+                            'message': v_res.message,
+                            'events_found': getattr(v_res, 'events_found', 1 if v_res.detected else 0),
+                            'query_time_ms': getattr(v_res, 'query_time_ms', 0)
+                        }
+                    
+                    # Re-evaluate
+                    eval_result = await self.evaluator.execute({'rules': [rule]})
+                
+                iteration += 1
+
             
             return {
                 "ttp_id": ttp_id,

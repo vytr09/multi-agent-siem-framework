@@ -8,6 +8,7 @@ import { Activity, Shield, Zap, Target, Play, StopCircle, RefreshCw, Power } fro
 import { api, API_BASE_URL, type AgentStatus, type AgentDetail } from "@/lib/api"
 import { useToast } from "@/components/ui/toast-notification"
 
+
 export default function AgentsPage() {
     const [agentData, setAgentData] = useState<{ status: AgentStatus, details: Record<string, AgentDetail> } | null>(null)
     const [loading, setLoading] = useState(true)
@@ -124,8 +125,8 @@ export default function AgentsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold font-heading text-neutral-100">Agents</h1>
-                    <p className="text-neutral-400 mt-1">Manage and monitor individual AI agents.</p>
+                    <h1 className="text-3xl font-bold font-heading text-foreground">Agents</h1>
+                    <p className="text-muted-foreground mt-1">Manage and monitor individual AI agents.</p>
                 </div>
                 <div className="flex gap-3">
                     <Button variant="outline" onClick={fetchData}>
@@ -151,8 +152,8 @@ export default function AgentsPage() {
                             </div>
                             <CardHeader>
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 rounded-lg bg-neutral-800 border border-neutral-700">
-                                        <Icon className="h-6 w-6 text-yellow-500" />
+                                    <div className="p-3 rounded-lg bg-muted border border-border">
+                                        <Icon className="h-6 w-6 text-primary" />
                                     </div>
                                     <div>
                                         <CardTitle>{detail.name}</CardTitle>
@@ -163,16 +164,16 @@ export default function AgentsPage() {
                             <CardContent>
                                 <div className="space-y-4">
                                     <div>
-                                        <h4 className="text-sm font-medium text-neutral-300 mb-2">Model Configuration</h4>
-                                        <div className="bg-neutral-900 rounded-md p-3 border border-neutral-800">
-                                            <code className="text-xs text-yellow-500">{detail.model}</code>
+                                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Model Configuration</h4>
+                                        <div className="bg-muted rounded-md p-3 border border-border">
+                                            <code className="text-xs text-primary">{detail.model}</code>
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-medium text-neutral-300 mb-2">Capabilities</h4>
+                                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Capabilities</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {detail.capabilities.map((cap) => (
-                                                <Badge key={cap} variant="outline" className="bg-neutral-900">
+                                                <Badge key={cap} variant="outline" className="bg-muted">
                                                     {cap}
                                                 </Badge>
                                             ))}
@@ -194,11 +195,12 @@ export default function AgentsPage() {
                     )
                 })}
                 {!agentData && !loading && (
-                    <div className="col-span-2 text-center text-neutral-500 py-12">
+                    <div className="col-span-2 text-center text-muted-foreground py-12">
                         Failed to load agent configuration.
                     </div>
                 )}
             </div>
+
         </div>
     )
 }

@@ -356,10 +356,15 @@ class LangChainExtractorAgent(BaseAgent):
         scored_ttps = self._score_ttps(enriched_ttps, report)
         
         # Step 9: Filter
-        filtered_ttps = [
-            ttp for ttp in scored_ttps
-            if ttp.get("confidence_score", 0) >= self.min_confidence_threshold
-        ]
+        filtered_ttps = []
+        for ttp in scored_ttps:
+            score = ttp.get("confidence_score", 0)
+            if score >= self.min_confidence_threshold:
+                filtered_ttps.append(ttp)
+            else:
+                self.logger.info(f"Dropped TTP {ttp.get('technique_id')} ({ttp.get('technique_name')}) due to low confidence: {score} < {self.min_confidence_threshold}")
+                # DEBUG: Print reason
+                print(f"DEBUG: Dropped TTP low confidence: {score}")
         
         # Step 10: Format
         formatted_ttps = [
@@ -538,9 +543,20 @@ class LangChainExtractorAgent(BaseAgent):
         for ttp in ttps:
             try:
                 res = self.enhanced_scorer.calculate_score(ttp, report, text, {})
-                ttp["confidence_score"] = res["score"]
-                ttp["confidence_level"] = res["level"]
+                enhanced_score = res["score"]
+                original_confidence = ttp.get("confidence", 0.5)
+                
+                # Trust the higher score - if LLM/Verification says 0.8, keep it.
+                # If NLP heuristics say 0.9, upgrade it.
+                final_score = max(enhanced_score, original_confidence)
+                
+                ttp["confidence_score"] = final_score
+                ttp["confidence_level"] = res["level"] # This might mismatch score now, but acceptable
                 ttp["confidence_breakdown"] = res["breakdown"]
+                
+                # Log adjustment if significant
+                if abs(final_score - enhanced_score) > 0.1:
+                    self.logger.info(f"Adjusted score for {ttp.get('technique_id')}: Enhanced={enhanced_score}, Original={original_confidence} -> Final={final_score}")
                 scored.append(ttp)
             except Exception as e:
                 # Fallback

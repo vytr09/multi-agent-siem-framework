@@ -231,6 +231,7 @@ class LangChainOrchestrator:
             self.attackgen, 
             self.evaluator, 
             self.siem_integrator,
+            config=self.config,
             status_callback=status_callback
         )
         

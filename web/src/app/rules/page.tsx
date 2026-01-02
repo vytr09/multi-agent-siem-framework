@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Shield, FileText, RefreshCw, Download, Copy, Search, Filter } from "lucide-react"
 import { api } from "@/lib/api"
 import yaml from "js-yaml"
+import { RuleEditor } from "@/components/dashboard/rule-editor"
 
 interface Rule {
     title: string;
@@ -82,8 +83,8 @@ export default function RulesPage() {
         <div className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold font-heading text-neutral-100">Detection Rules</h1>
-                    <p className="text-neutral-400 mt-1">Generated Sigma rules for threat detection.</p>
+                    <h1 className="text-3xl font-bold font-heading text-foreground">Detection Rules</h1>
+                    <p className="text-muted-foreground mt-1">Generated Sigma rules for threat detection.</p>
                 </div>
                 <div className="flex gap-3">
                     <Button variant="outline" onClick={fetchRules}>
@@ -98,21 +99,21 @@ export default function RulesPage() {
             </div>
 
             {/* Search and Filter Bar */}
-            <div className="flex flex-col md:flex-row gap-4 bg-neutral-900/50 p-4 rounded-lg border border-neutral-800">
+            <div className="flex flex-col md:flex-row gap-4 bg-muted/50 p-4 rounded-lg border border-border">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
                         placeholder="Search rules by title, ID, or description..."
-                        className="w-full bg-neutral-950 border border-neutral-800 rounded-md pl-9 pr-4 py-2 text-sm text-neutral-100 focus:outline-none focus:border-yellow-500/50 transition-colors"
+                        className="w-full bg-background border border-input rounded-md pl-9 pr-4 py-2 text-sm text-foreground focus:outline-none focus:border-ring transition-colors"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
                 <div className="relative w-full md:w-48">
-                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <select
-                        className="w-full bg-neutral-950 border border-neutral-800 rounded-md pl-9 pr-4 py-2 text-sm text-neutral-100 focus:outline-none focus:border-yellow-500/50 transition-colors appearance-none"
+                        className="w-full bg-background border border-input rounded-md pl-9 pr-4 py-2 text-sm text-foreground focus:outline-none focus:border-ring transition-colors appearance-none"
                         value={severityFilter}
                         onChange={(e) => setSeverityFilter(e.target.value)}
                     >
@@ -127,75 +128,22 @@ export default function RulesPage() {
 
             <div className="grid gap-6">
                 {filteredRules.length === 0 && !loading && (
-                    <Card className="border-dashed border-neutral-700 bg-transparent">
+                    <Card className="border-dashed border-border bg-transparent">
                         <CardContent className="flex flex-col items-center justify-center py-12">
-                            <Shield className="h-12 w-12 text-neutral-600 mb-4" />
-                            <p className="text-neutral-400">No rules found matching your criteria.</p>
+                            <Shield className="h-12 w-12 text-muted-foreground mb-4" />
+                            <p className="text-muted-foreground">No rules found matching your criteria.</p>
                             {rules.length === 0 && (
-                                <Button variant="link" className="mt-2 text-yellow-500">Run the pipeline to generate rules</Button>
+                                <Button variant="link" className="mt-2 text-primary">Run the pipeline to generate rules</Button>
                             )}
                         </CardContent>
                     </Card>
                 )}
 
-                {filteredRules.map((rule, index) => {
-                    const yamlContent = yaml.dump(rule, { indent: 2, lineWidth: -1 })
-                    return (
-                        <Card key={index} className="group transition-all hover:border-yellow-500/50">
-                            <CardHeader>
-                                <div className="flex items-start justify-between">
-                                    <div className="flex gap-4">
-                                        <div className="p-2 rounded-md bg-neutral-800 h-fit">
-                                            <FileText className="h-5 w-5 text-emerald-500" />
-                                        </div>
-                                        <div>
-                                            <CardTitle className="text-lg">{rule.title || "Untitled Rule"}</CardTitle>
-                                            <CardDescription className="mt-1 font-mono text-xs text-neutral-500">
-                                                ID: {rule.id || "N/A"}
-                                            </CardDescription>
-                                        </div>
-                                    </div>
-                                    <Badge variant={rule.level === "critical" ? "destructive" : "default"}>
-                                        {rule.level || "medium"}
-                                    </Badge>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    <p className="text-sm text-neutral-300">{rule.description}</p>
-
-                                    <div className="relative group/code">
-                                        <div className="absolute right-2 top-2 opacity-0 group-hover/code:opacity-100 transition-opacity">
-                                            <Button size="icon" variant="ghost" className="h-6 w-6 bg-neutral-800 hover:bg-neutral-700" onClick={() => copyToClipboard(yamlContent)}>
-                                                <Copy className="h-3 w-3" />
-                                            </Button>
-                                        </div>
-                                        <pre className="p-4 rounded-lg bg-neutral-950 border border-neutral-800 overflow-x-auto max-h-96">
-                                            <code className="text-xs font-mono text-neutral-300 whitespace-pre">
-                                                {yamlContent}
-                                            </code>
-                                        </pre>
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-2">
-                                        {rule.tags?.map((tag: string) => {
-                                            const isAttack = tag.startsWith("attack.")
-                                            return (
-                                                <Badge
-                                                    key={tag}
-                                                    variant="outline"
-                                                    className={`text-xs ${isAttack ? 'border-red-500/30 text-red-400 bg-red-500/5' : ''}`}
-                                                >
-                                                    {tag}
-                                                </Badge>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )
-                })}
+                {filteredRules.map((rule, index) => (
+                    <div key={index} className="h-full">
+                        <RuleEditor rule={rule} />
+                    </div>
+                ))}
             </div>
         </div>
     )

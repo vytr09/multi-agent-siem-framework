@@ -4,32 +4,37 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Activity, Shield, Zap, Target, Play, AlertTriangle, CheckCircle, RefreshCw } from "lucide-react"
+import { Activity, Shield, Zap, Target, Play, AlertTriangle, CheckCircle, RefreshCw, FileText, Clock, Search, Eye } from "lucide-react"
 import { api, type AgentStatus, type SystemMetrics } from "@/lib/api"
 import { useToast } from "@/components/ui/toast-notification"
+import { FileUpload } from "@/components/dashboard/file-upload"
+import { PipelineVisualizer } from "@/components/dashboard/pipeline-visualizer"
+import { Checkbox } from "@/components/ui/checkbox"
+import { formatDistanceToNow } from "date-fns"
+import { FileViewerModal } from "@/components/dashboard/file-viewer-modal"
+import { PipelineSummary } from "@/components/dashboard/pipeline-summary"
+import { PipelineResultsModal } from "@/components/dashboard/pipeline-results-modal"
+import { useNotifications } from "@/contexts/notification-context"
 
-export default function Dashboard() {
+export default function Workbench() {
   const { showToast } = useToast()
-  const [agents, setAgents] = useState<AgentStatus | null>(null)
-  const [metrics, setMetrics] = useState<SystemMetrics | null>(null)
-  const [activity, setActivity] = useState<any[]>([])
-  const [latestAttack, setLatestAttack] = useState<any>(null)
+  const [activeCases, setActiveCases] = useState<any[]>([])
+  const [pipelineState, setPipelineState] = useState(0) // 0=Idle, 1=Ingest, 2=Extract, 3=RuleGen, 4=Verify
   const [loading, setLoading] = useState(true)
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null)
+
+  const [viewingFile, setViewingFile] = useState<string | null>(null)
+  const [forceAnalyze, setForceAnalyze] = useState(false)
+  const [pipelineResult, setPipelineResult] = useState<any>(null)
+  const [showResultsModal, setShowResultsModal] = useState(false)
+
+  const { addNotification } = useNotifications()
 
   const fetchData = async () => {
     try {
-      const [agentData, metricsData, activityData, attackData] = await Promise.all([
-        api.getAgents(),
-        api.getMetrics(),
-        api.getActivity(),
-        api.getLatestAttack()
-      ])
-      setAgents(agentData.status)
-      setMetrics(metricsData)
-      setActivity(Array.isArray(activityData) ? activityData : [])
-      setLatestAttack(attackData)
-      setLastUpdated(new Date())
+      setLoading(true)
+      const files = await api.getFiles()
+      setActiveCases(files)
     } catch (error) {
       console.error("Failed to fetch data:", error)
     } finally {
@@ -37,223 +42,220 @@ export default function Dashboard() {
     }
   }
 
-  const handleRunPipeline = async () => {
-    try {
-      showToast("Starting pipeline simulation...", "info")
-      // Sample CTI report for demonstration
-      const sampleReport = {
-        id: "demo_report_" + Date.now(),
-        content: "The attacker used PowerShell to execute a base64 encoded command. The command was 'powershell.exe -enc JABzACAAPQAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABJAE8ALgBNAGUAbQBvAHIAeQBTAHQAcgBlAGEAbQAoAFsAQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAIgBIADQAcwBJAEE'. This indicates a potential fileless malware attack using T1059.001.",
-        source: "Dashboard Simulation"
-      }
-
-      // Trigger pipeline with sample data
-      await api.startPipeline({ cti_reports: [sampleReport] })
-
-      showToast("Pipeline started successfully", "success")
-
-      // Force refresh after a short delay
-      setTimeout(fetchData, 2000)
-    } catch (error) {
-      console.error("Failed to run pipeline:", error)
-      showToast("Failed to start pipeline", "error")
-    }
-  }
-
   useEffect(() => {
-    setLastUpdated(new Date()) // Set initial time on client
     fetchData()
-    const interval = setInterval(fetchData, 5000) // Poll every 5 seconds
-    return () => clearInterval(interval)
-  }, [])
+  }, [pipelineState]) // Refresh when pipeline state changes
 
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case "running": return "success"
-      case "stopped": return "secondary"
-      case "error": return "destructive"
-      default: return "outline"
+  const handleUploadComplete = () => {
+    showToast("File uploaded successfully. New Case created.", "success")
+    fetchData()
+  }
+  const handleRunPipeline = async (caseId: string) => {
+    setSelectedCaseId(caseId)
+    setPipelineState(1)
+    showToast(`Starting investigation for Case ${caseId.substring(0, 8)}...`, "info")
+    addNotification("Investigation Started", `Analysis started for case ${caseId.substring(0, 8)}...`, "info")
+
+    try {
+      // Start the pipeline
+      await api.runPipelineFromFile(caseId, forceAnalyze);
+      setPipelineState(2) // Move to extraction/running visual state
+
+      // Poll for completion
+      const interval = setInterval(async () => {
+        try {
+          const agents = await api.getAgents();
+          const status = agents.status.pipeline;
+
+          console.log("Pipeline Status:", status);
+
+          if (status === 'completed') {
+            clearInterval(interval);
+            setPipelineState(4);
+            showToast("Investigation completed successfully.", "success");
+            addNotification("Investigation Complete", `Analysis for case ${caseId.substring(0, 8)} finished successfully.`, "success")
+
+            // Fetch the pipeline result
+            try {
+              const result = await api.getPipelineResult();
+              setPipelineResult(result);
+            } catch (e) {
+              console.error("Failed to fetch pipeline result:", e);
+            }
+          } else if (status === 'error') {
+            clearInterval(interval);
+            setPipelineState(0);
+            showToast("Investigation failed. Check backend logs.", "error");
+            addNotification("Investigation Failed", `Analysis for case ${caseId.substring(0, 8)} failed.`, "error")
+          } else if (status === 'running') {
+            // Keep spinning
+            setPipelineState((prev) => prev === 2 ? 3 : 2);
+          }
+        } catch (e) {
+          console.error("Polling error:", e);
+        }
+      }, 1000);
+
+    } catch (error) {
+      console.error("Pipeline failed to start:", error);
+      setPipelineState(0); // Reset or Error state
+      showToast("Failed to start investigation.", "error");
+      addNotification("Launch Failed", "Could not start the investigation pipeline.", "error")
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-7xl mx-auto">
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold font-heading text-neutral-100">Mission Control</h1>
-          <p className="text-neutral-400 mt-1">
-            Real-time overview of SIEM agents and threat detection.
-            <span className="text-xs ml-2 opacity-50">Updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Syncing...'}</span>
+          <h1 className="text-3xl font-bold font-heading text-foreground">Analyst Workbench</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage CTI reports, investigate threats, and orchestrate agent pipelines.
           </p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" onClick={fetchData}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-          <Button className="gap-2" onClick={handleRunPipeline}>
-            <Play className="h-4 w-4" />
-            Run Pipeline
+            Refresh Cases
           </Button>
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-400">Active Agents</CardTitle>
-            <Activity className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-neutral-100">
-              {agents ? Object.values(agents).filter(s => s === 'running').length : 0}/4
-            </div>
-            <p className="text-xs text-neutral-500 mt-1">All systems operational</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-400">Rules Generated</CardTitle>
-            <Shield className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-neutral-100">{metrics?.rules_generated || 0}</div>
-            <p className="text-xs text-neutral-500 mt-1">Total rules in database</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-400">Detection Rate</CardTitle>
-            <Target className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-neutral-100">{metrics?.detection_rate || 0}%</div>
-            <p className="text-xs text-neutral-500 mt-1">Based on feedback loops</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-400">Attacks Launched</CardTitle>
-            <Zap className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-neutral-100">{metrics?.attacks_launched || 0}</div>
-            <p className="text-xs text-neutral-500 mt-1">Total simulations run</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-
-        {/* Latest Threat Detection */}
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Latest Threat Detection</CardTitle>
-            <CardDescription>Most recent attack simulation result.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px] w-full rounded-lg bg-neutral-900 border border-neutral-800 flex flex-col items-center justify-center relative overflow-hidden p-6">
-              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
-
-              {latestAttack && latestAttack.technique !== "None" ? (
-                <div className="z-10 text-center space-y-6">
-                  <div className="flex justify-center">
-                    <div className={`h-24 w-24 rounded-full flex items-center justify-center border-4 ${latestAttack.status === 'Detected' ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-red-500/50 bg-red-500/10'}`}>
-                      {latestAttack.status === 'Detected' ? (
-                        <Shield className="h-10 w-10 text-emerald-500" />
-                      ) : (
-                        <AlertTriangle className="h-10 w-10 text-red-500" />
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-neutral-100">{latestAttack.technique}</h3>
-                    <p className="text-sm text-neutral-400 mt-1 max-w-[250px] mx-auto truncate" title={latestAttack.details}>
-                      {latestAttack.details}
-                    </p>
-                    <p className={`text-lg font-medium mt-2 ${latestAttack.status === 'Detected' ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {latestAttack.status.toUpperCase()}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-neutral-500 flex flex-col items-center z-10">
-                  <Activity className="h-12 w-12 mb-4 animate-pulse text-yellow-500/50" />
-                  <span>Waiting for active pipeline...</span>
-                  <Button variant="link" className="mt-2 text-yellow-500" onClick={handleRunPipeline}>
-                    Start Simulation
-                  </Button>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Agent Status */}
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Agent Status</CardTitle>
-            <CardDescription>Health and activity monitoring.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { name: "Extractor Agent", key: "extractor", type: "NLP + Gemini", icon: Activity },
-                { name: "RuleGen Agent", key: "rulegen", type: "Cerebras Llama-3", icon: Shield },
-                { name: "AttackGen Agent", key: "attackgen", type: "LangChain", icon: Zap },
-                { name: "Evaluator Agent", key: "evaluator", type: "Gemini Judge", icon: Target },
-              ].map((agent, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-neutral-900 border border-neutral-800">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-md bg-neutral-800">
-                      <agent.icon className="h-4 w-4 text-neutral-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-neutral-200">{agent.name}</p>
-                      <p className="text-xs text-neutral-500">{agent.type}</p>
-                    </div>
-                  </div>
-                  <Badge variant={getStatusVariant(agents?.[agent.key as keyof AgentStatus] || 'stopped')}>
-                    {agents?.[agent.key as keyof AgentStatus] || 'Unknown'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity */}
-      <Card>
+      {/* Pipeline Status */}
+      <Card className="border-primary/20 bg-primary/5">
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Latest system events and logs.</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5 text-primary" />
+            Active Investigation Pipeline
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {activity.length === 0 && (
-              <p className="text-sm text-neutral-500 italic">No recent activity logged.</p>
-            )}
-            {Array.isArray(activity) && activity.map((log, i) => (
-              <div key={i} className="flex items-start gap-4 pb-4 border-b border-neutral-800 last:border-0 last:pb-0">
-                <span className="text-xs font-mono text-neutral-500 mt-1">{log.time}</span>
-                <div>
-                  <p className="text-sm text-neutral-300">{log.event}</p>
-                </div>
-                <div className="ml-auto">
-                  {log.type === "error" && <AlertTriangle className="h-4 w-4 text-red-500" />}
-                  {log.type === "success" && <CheckCircle className="h-4 w-4 text-emerald-500" />}
-                  {log.type === "warning" && <AlertTriangle className="h-4 w-4 text-amber-500" />}
-                  {log.type === "info" && <Activity className="h-4 w-4 text-blue-500" />}
-                </div>
+          {selectedCaseId ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">Case ID: <span className="font-mono text-muted-foreground">{selectedCaseId}</span></span>
+                <Badge variant={pipelineState === 4 ? "default" : "secondary"}>
+                  {pipelineState === 0 ? "Idle" : pipelineState === 4 ? "Completed" : "Processing..."}
+                </Badge>
               </div>
-            ))}
-          </div>
+              <PipelineVisualizer currentStage={pipelineState} />
+
+              {/* Show summary when completed */}
+              {pipelineState === 4 && (
+                <PipelineSummary
+                  result={pipelineResult}
+                  onViewDetails={() => setShowResultsModal(true)}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No active investigation. Select a case or upload a report to start.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Upload & New Case */}
+        <div className="lg:col-span-1 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>New Investigation</CardTitle>
+              <CardDescription>Upload a CTI report (PDF/TXT) to start.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FileUpload onUploadComplete={handleUploadComplete} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column: Case Management */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Case Files</span>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="force-analyze"
+                      checked={forceAnalyze}
+                      onCheckedChange={(checked) => setForceAnalyze(checked as boolean)}
+                    />
+                    <label
+                      htmlFor="force-analyze"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground"
+                    >
+                      Force Re-analyze
+                    </label>
+                  </div>
+                  <div className="relative w-64">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Search cases..."
+                      className="w-full rounded-md border border-input bg-background pl-8 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    />
+                  </div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-1">
+                {activeCases.length === 0 ? (
+                  <div className="text-center py-10 text-muted-foreground">
+                    <FileText className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                    <p>No cases found.</p>
+                  </div>
+                ) : (
+                  activeCases.map((file) => (
+                    <div key={file.filename} className="group flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-md bg-muted text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-colors">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground truncate max-w-[300px]" title={file.filename}>
+                            {file.filename.replace(/^\d{8}_\d{6}_/, '')}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <Clock className="h-3 w-3" />
+                            <span>{new Date(file.modified).toLocaleDateString()}</span>
+                            <span>•</span>
+                            <span>{(file.size / 1024).toFixed(1)} KB</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setViewingFile(file.filename)}>
+                          <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        </Button>
+                        <Button size="sm" variant="secondary" onClick={() => handleRunPipeline(file.filename)}>
+                          <Play className="h-3 w-3 mr-1" /> Analyze
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <FileViewerModal
+        isOpen={!!viewingFile}
+        filename={viewingFile}
+        onClose={() => setViewingFile(null)}
+      />
+
+      <PipelineResultsModal
+        isOpen={showResultsModal}
+        onClose={() => setShowResultsModal(false)}
+        result={pipelineResult}
+      />
     </div>
   )
 }

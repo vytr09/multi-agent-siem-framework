@@ -20,6 +20,8 @@ class AgentManager:
             cls._instance.orchestrator = None
             cls._instance.is_initialized = False
             cls._instance.config = {}
+            cls._instance.pipeline_status = "idle"
+            cls._instance.pipeline_result = None
         return cls._instance
 
     def _load_config(self) -> Dict[str, Any]:
@@ -62,6 +64,7 @@ class AgentManager:
             await self.orchestrator.initialize()
             self.config = self.orchestrator.config # Sync config
             self.is_initialized = True
+            self.pipeline_status = "idle"
             logger.info("AgentManager initialized successfully")
 
     def get_agent_status(self) -> Dict[str, str]:
@@ -80,6 +83,7 @@ class AgentManager:
             "rulegen": "running" if self.orchestrator.rulegen else "stopped",
             "evaluator": "running" if self.orchestrator.evaluator else "stopped",
             "attackgen": "running" if self.orchestrator.attackgen else "stopped",
+            "pipeline": self.pipeline_status
         }
         return status
 
@@ -144,10 +148,31 @@ class AgentManager:
         await self.start_all()
             
         # Determine input type and run appropriate pipeline
+        # Determine input type and run appropriate pipeline
         if "cti_reports" in input_data:
-            return await self.orchestrator.run_pipeline(input_data["cti_reports"])
+            self.pipeline_status = "running"
+            try:
+                # Pass context if available
+                context = input_data.get("context", None)
+                result = await self.orchestrator.run_pipeline(input_data["cti_reports"], context=context)
+                self.pipeline_result = result
+                self.pipeline_status = "completed"
+                return result
+            except Exception as e:
+                self.pipeline_status = "error"
+                logger.error(f"Pipeline failed: {e}")
+                raise e
         elif "extracted_ttps" in input_data:
-            return await self.orchestrator.run_test_pipeline(input_data)
+            self.pipeline_status = "running"
+            try:
+                result = await self.orchestrator.run_test_pipeline(input_data)
+                self.pipeline_result = result
+                self.pipeline_status = "completed"
+                return result
+            except Exception as e:
+                self.pipeline_status = "error"
+                logger.error(f"Test Pipeline failed: {e}")
+                raise e
         else:
             raise ValueError("Invalid input data format")
 
