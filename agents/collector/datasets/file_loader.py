@@ -33,3 +33,49 @@ class FileDatasetLoader:
             except Exception as e:
                 raise CollectorException(f"Failed to read {pdf_path}: {e}")
         return raw_events
+
+    def load_markdown_events(self) -> List[Dict[str, Any]]:
+        """
+        Load markdown (.md) files and wrap into raw_event format.
+        """
+        raw_events = []
+        for md_path in self.list_files("*.md"):
+            try:
+                with open(md_path, 'r', encoding='utf-8') as f:
+                    text = f.read()
+                raw_events.append({
+                    "source": md_path.stem,
+                    "content": text,
+                    "metadata": {"filename": md_path.name}
+                })
+            except Exception as e:
+                raise CollectorException(f"Failed to read {md_path}: {e}")
+        return raw_events
+
+    def load_text_events(self) -> List[Dict[str, Any]]:
+        """
+        Load text (.txt) files and wrap into raw_event format.
+        """
+        raw_events = []
+        for txt_path in self.list_files("*.txt"):
+            try:
+                with open(txt_path, 'r', encoding='utf-8') as f:
+                    text = f.read()
+                raw_events.append({
+                    "source": txt_path.stem,
+                    "content": text,
+                    "metadata": {"filename": txt_path.name}
+                })
+            except Exception as e:
+                raise CollectorException(f"Failed to read {txt_path}: {e}")
+        return raw_events
+
+    def load_all_events(self) -> List[Dict[str, Any]]:
+        """
+        Load all supported file types (PDF, TXT, MD).
+        """
+        events = []
+        events.extend(self.load_pdf_events())
+        events.extend(self.load_text_events())
+        events.extend(self.load_markdown_events())
+        return events

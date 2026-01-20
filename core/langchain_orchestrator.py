@@ -340,14 +340,21 @@ class LangChainOrchestrator:
         # Calculate Aggregated Score
         scores = []
         iterations_max = 1
+        all_rule_history = []  # NEW: Collect all rule history
+        
         for res in results:
             if 'evaluation' in res:
                 s = res['evaluation'].get('summary', {}).get('average_quality_score')
                 if s is not None:
                     scores.append(s)
-            # Estimate iterations: if feedback exists, it was > 1
-            # In graph, we don't explicitly return iteration count per TTP easy, assume 1 unless we track it
-            pass
+            
+            # NEW: Collect rule history from each TTP result
+            if 'rule_history' in res:
+                all_rule_history.extend(res.get('rule_history', []))
+            
+            # Track actual iterations used
+            if 'iterations_used' in res:
+                iterations_max = max(iterations_max, res['iterations_used'])
             
         avg_score = sum(scores) / len(scores) if scores else 0.0
 
@@ -361,9 +368,10 @@ class LangChainOrchestrator:
             'attacks': final_attacks,
             'siem_verification': siem_verification_list,
             'siem_metrics': siem_metrics_obj,
-            'iterations': iterations_max, # Placeholder for graph
+            'iterations': iterations_max,
             'final_score': avg_score,
             'final_report': final_state.get('final_report', {}),
+            'rule_history': all_rule_history,  # NEW: Include all rule versions
             'timestamp': datetime.now().isoformat()
         }
         
@@ -381,6 +389,22 @@ class LangChainOrchestrator:
         final_file.parent.mkdir(parents=True, exist_ok=True)
         with open(final_file, 'w') as f:
             json.dump(final_result, f, indent=2)
+        
+        # === HISTORY PERSISTENCE ===
+        # Save each run to history folder with timestamp
+        # (datetime already imported at top of file)
+        history_dir = self.output_dir / self.mode / 'history'
+        history_dir.mkdir(parents=True, exist_ok=True)
+        
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        # Include report source in filename for easy identification
+        report_id = cti_reports[0].get('id', 'unknown')[:30] if cti_reports else 'unknown'
+        report_id = report_id.replace('/', '_').replace('\\', '_')
+        history_file = history_dir / f'{timestamp}_{report_id}.json'
+        
+        with open(history_file, 'w') as f:
+            json.dump(final_result, f, indent=2)
+        self.logger.info(f"Pipeline result saved to history: {history_file.name}")
             
         return final_result
 

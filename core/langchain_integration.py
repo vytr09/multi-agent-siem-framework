@@ -13,9 +13,10 @@ except ImportError:
     ChatGoogleGenerativeAI = None
 
 try:
-    from langchain_openai import ChatOpenAI
+    from langchain_openai import ChatOpenAI, AzureChatOpenAI
 except ImportError:
     ChatOpenAI = None
+    AzureChatOpenAI = None
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser, JsonOutputParser
 from langchain_core.callbacks import BaseCallbackHandler
@@ -46,6 +47,7 @@ class TTPOutput(BaseModel):
     indicators: List[str] = Field(default_factory=list, description="List of detection indicators")
     tools: List[str] = Field(default_factory=list, description="Tools/malware associated")
     reasoning: str = Field(description="Reasoning for why this TTP was selected")
+    quote: str = Field(description="Exact quote from the report text that evidences this TTP")
 
 
 class TTPListOutput(BaseModel):
@@ -312,11 +314,12 @@ class MetricsCallback(BaseCallbackHandler):
 @dataclass
 class LLMProvider:
     name: str
-    type: str  # 'openai', 'gemini'
+    type: str  # 'openai', 'gemini', 'azure'
     model: str
     api_key_env: str
     priority: int = 1
     base_url: Optional[str] = None
+    api_version: Optional[str] = None  # Required for Azure OpenAI
     
     def get_api_key(self) -> Optional[str]:
         return os.getenv(self.api_key_env)
@@ -351,7 +354,8 @@ class ProviderRotationManager:
                     model=p['model'],
                     api_key_env=p['api_key_env'],
                     priority=p.get('priority', 99),
-                    base_url=p.get('base_url')
+                    base_url=p.get('base_url'),
+                    api_version=p.get('api_version')  # Azure support
                 ))
             
             # Sort by priority
@@ -377,7 +381,7 @@ class ProviderRotationManager:
             LLMProvider(
                 name="gemini",
                 type="gemini",
-                model="gemini-2.0-flash-lite",
+                model="gemini-2.5-flash-lite",
                 api_key_env="GEMINI_API_KEY",
                 priority=2
             ),
@@ -444,7 +448,7 @@ class LangChainLLMWrapper:
             'model': provider.model,
             'api_key': provider.get_api_key(),
             'base_url': provider.base_url,
-            'temperature': self.config.get('temperature', 0.3),
+            'api_version': provider.api_version,  # Azure support
             'temperature': self.config.get('temperature', 0.3),
             'max_tokens': self.config.get('max_tokens', 8000)
         }
@@ -469,7 +473,24 @@ class LangChainLLMWrapper:
 
         provider = config.get('provider', 'gemini').lower()
         
-        if provider == 'openai':
+        if provider == 'azure':
+            # Azure OpenAI handling
+            if AzureChatOpenAI is None:
+                raise ImportError("langchain-openai not installed. Run: pip install langchain-openai")
+            
+            self.llm = AzureChatOpenAI(
+                azure_deployment=config.get('model'),  # Deployment name (e.g., Phi-4)
+                azure_endpoint=config.get('base_url'),  # Azure endpoint URL
+                api_key=api_key,
+                api_version=config.get('api_version', '2024-05-01-preview'),
+                temperature=config.get('temperature', 0.3),
+                max_tokens=config.get('max_tokens', 8000),
+                max_retries=2,
+                timeout=60.0,
+                callbacks=[self.callback]
+            )
+            
+        elif provider == 'openai':
             if ChatOpenAI is None:
                 raise ImportError("langchain-openai not installed")
                 
@@ -552,14 +573,30 @@ class LangChainLLMWrapper:
         api_key = config.get('api_key')
         provider = config.get('provider', 'gemini').lower()
         
-        if provider == 'openai':
+        if provider == 'azure':
+            # Azure OpenAI handling
+            if AzureChatOpenAI is None:
+                raise ImportError("langchain-openai not installed")
+            
+            return AzureChatOpenAI(
+                azure_deployment=config.get('model'),
+                azure_endpoint=config.get('base_url'),
+                api_key=api_key,
+                api_version=config.get('api_version', '2024-05-01-preview'),
+                temperature=config.get('temperature', 0.3),
+                max_tokens=config.get('max_tokens', 8000),
+                max_retries=2,
+                timeout=60.0,
+                callbacks=[self.callback]
+            )
+        
+        elif provider == 'openai':
             if ChatOpenAI is None:
                 raise ImportError("langchain-openai not installed")
             
             llm_kwargs = {
                 'model': config.get('model', 'gpt-4'),
                 'temperature': config.get('temperature', 0.3),
-                'api_key': api_key,
                 'api_key': api_key,
                 'max_retries': 2, # Increased retries for stability
                 'timeout': 90.0, # Increased timeout for slow providers (Cerebras/Nvidia)
@@ -658,6 +695,7 @@ Output:
             "tactic": "Execution",
             "description": "Attacker used PowerShell to execute a base64 encoded command.",
             "reasoning": "The text explicitly mentions 'PowerShell' and 'base64 encoded command', which maps directly to T1059.001.",
+            "quote": "The attacker executed a base64 encoded command using PowerShell.",
             "indicators": ["PowerShell", "base64"],
             "confidence": 1.0,
             "tools": ["PowerShell"]
@@ -676,6 +714,7 @@ Output:
             "tactic": "Command and Control",
             "description": "File 'malware.exe' was downloaded from a remote URL.",
             "reasoning": "Downloading a file from a remote source corresponds to Ingress Tool Transfer (T1105).",
+            "quote": "The system downloaded 'malware.exe' from 'http://evil.com'.",
             "indicators": ["http://evil.com", "malware.exe"],
             "confidence": 0.9,
             "tools": []
@@ -699,6 +738,7 @@ INSTRUCTIONS:
 4. JSON Output must include the reasoning field.
 5. Even if confidence is low, EXTRACT IT. Let the verifier filter it later.
 6. Extract specific indicators (IPs, Domains, File paths).
+7. **MANDATORY**: Copy the exact **quote** from the text that proves this TTP.
 
 OUTPUT FORMAT: JSON ONLY (No markdown formatting)
 **CRITICAL:**
@@ -717,7 +757,8 @@ Output: {{
         "confidence": 0.9,
         "indicators": ["powershell.exe", "-enc"],
         "tools": ["PowerShell"],
-        "reasoning": "The text explicitly mentions 'PowerShell' and typical command line arguments like 'encoded command'. This maps directly to T1059.001."
+        "reasoning": "The text explicitly mentions 'PowerShell' and typical command line arguments like 'encoded command'. This maps directly to T1059.001.",
+        "quote": "The attacker used PowerShell to execute a base64 encoded command."
     }}]
 }}
 

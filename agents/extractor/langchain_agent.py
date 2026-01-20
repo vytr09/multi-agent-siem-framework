@@ -285,6 +285,8 @@ class LangChainExtractorAgent(BaseAgent):
                                     "confidence": ttp.confidence,
                                     "indicators": ttp.indicators,
                                     "tools": ttp.tools,
+                                    "reasoning": ttp.reasoning,
+                                    "quote": getattr(ttp, "quote", ""),
                                     "extraction_method": "langchain_llm",
                                     "source": "langchain",
                                     "chunk_index": i # Track origin
@@ -308,6 +310,8 @@ class LangChainExtractorAgent(BaseAgent):
                             "confidence": ttp.confidence,
                             "indicators": ttp.indicators,
                             "tools": ttp.tools,
+                            "reasoning": ttp.reasoning,
+                            "quote": getattr(ttp, "quote", ""),
                             "extraction_method": "langchain_llm",
                             "source": "langchain"
                         }
@@ -583,9 +587,10 @@ class LangChainExtractorAgent(BaseAgent):
             "confidence_breakdown": ttp.get("confidence_breakdown"),
             "indicators": ttp.get("indicators", []),
             "tools": ttp.get("tools", []),
-            "extraction_method": ttp.get("extraction_method", "unknown")
+            "extraction_method": ttp.get("extraction_method", "unknown"),
+            "reasoning": ttp.get("reasoning"),
+            "quote": ttp.get("quote"),
         }
-
     async def _traditional_extraction(self, text: str) -> List[Dict]:
         """Fallback extraction"""
         self.stats["traditional_extractions"] += 1

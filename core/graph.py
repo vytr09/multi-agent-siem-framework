@@ -201,6 +201,18 @@ class SecurityWorkflow:
             eval_result = await self.evaluator.execute({'rules': [rule]})
             score = eval_result.get('summary', {}).get('average_quality_score', 0)
             
+            # === RULE HISTORY TRACKING ===
+            # Track each version of the rule for before/after comparison
+            import copy
+            rule_history = []
+            
+            # Save initial rule (iteration 0)
+            initial_rule_snapshot = copy.deepcopy(rule)
+            initial_rule_snapshot['_iteration'] = 0
+            initial_rule_snapshot['_score'] = score
+            initial_rule_snapshot['_is_initial'] = True
+            rule_history.append(initial_rule_snapshot)
+            
             # Step 4: Feedback Loop (Iterative Refinement)
             iteration = 0
             # Get config from instance or default
@@ -247,17 +259,49 @@ class SecurityWorkflow:
                     
                     # Re-evaluate
                     eval_result = await self.evaluator.execute({'rules': [rule]})
+                    new_score = eval_result.get('summary', {}).get('average_quality_score', 0)
+                    
+                    # Save this iteration's rule snapshot
+                    rule_snapshot = copy.deepcopy(rule)
+                    rule_snapshot['_iteration'] = iteration + 1
+                    rule_snapshot['_score'] = new_score
+                    rule_snapshot['_is_initial'] = False
+                    rule_history.append(rule_snapshot)
                 
                 iteration += 1
 
+            # === SELECT BEST RULE ===
+            # Choose rule with highest score OR detected=True (detection takes priority)
+            best_rule = rule  # Default to last
+            best_score = 0
+            
+            for hist_rule in rule_history:
+                hist_score = hist_rule.get('_score', 0)
+                hist_detected = hist_rule.get('siem_verification', {}).get('detected', False)
+                
+                # Prefer detected rules, then highest score
+                if hist_detected:
+                    best_rule = hist_rule
+                    best_score = hist_score
+                    break  # Detected is highest priority
+                elif hist_score > best_score:
+                    best_rule = hist_rule
+                    best_score = hist_score
+            
+            # Clean up internal fields before returning
+            final_rule = {k: v for k, v in best_rule.items() if not k.startswith('_')}
             
             return {
                 "ttp_id": ttp_id,
                 "status": "success",
-                "rules": [rule],
+                "rules": [final_rule],
                 "attacks": attacks,
-                "verification": rule.get('siem_verification'),
-                "evaluation": eval_result
+                "verification": final_rule.get('siem_verification'),
+                "evaluation": eval_result,
+                "rule_history": rule_history,
+                "iterations_used": len(rule_history),
+                "best_iteration": best_rule.get('_iteration', 0),
+                "best_score": best_score
             }
             
         except Exception as e:
