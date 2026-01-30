@@ -1,11 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { X, FileText, Shield, Zap, BarChart3, CheckCircle, XCircle, Info, AlertTriangle } from "lucide-react"
+import { X, FileText, Shield, Zap, BarChart3, CheckCircle, XCircle, Info, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, Code } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import { FeedbackLoopPanel } from "./feedback-loop-panel"
+import { DemoMetricsHeader } from "./demo-metrics-header"
+import yaml from "js-yaml"
 
 interface PipelineResult {
     status: string
@@ -18,6 +21,10 @@ interface PipelineResult {
                 tactic: string
                 confidence_score: number
                 extraction_method: string
+                indicators?: string[]
+                tools?: string[]
+                reasoning?: string
+                quote?: string
             }>
         }>
     }
@@ -28,10 +35,19 @@ interface PipelineResult {
             description: string
             level: string
             technique_name: string
+            logsource?: {
+                category?: string
+                product?: string
+                service?: string
+            }
+            detection?: Record<string, unknown>
+            tags?: string[]
+            falsepositives?: string[]
             siem_verification?: {
                 detected: boolean
                 events_found: number
                 message: string
+                status?: string
             }
         }>
     }
@@ -58,6 +74,7 @@ interface PipelineResult {
     }
     iterations?: number
     final_score?: number
+    rule_history?: Array<any>
 }
 
 interface PipelineResultsModalProps {
@@ -67,14 +84,86 @@ interface PipelineResultsModalProps {
 }
 
 const tabs = [
+    { id: "overview", label: "Overview", icon: BarChart3 },
     { id: "ttps", label: "TTPs", icon: FileText },
     { id: "rules", label: "Rules", icon: Shield },
     { id: "attacks", label: "Attacks", icon: Zap },
-    { id: "metrics", label: "Metrics", icon: BarChart3 },
+    { id: "feedback", label: "Feedback Loop", icon: RefreshCw },
 ]
 
+// Helper to convert rule object to YAML string
+const ruleToYaml = (rule: any) => {
+    try {
+        // Strip internal fields starting with _ or extra UI fields
+        const cleanRule = { ...rule }
+        // Remove verification result from the YAML view as it's not part of Sigma
+        const keysToRemove = ['id', 'technique_name', 'siem_verification', '_score', '_iteration', '_is_initial']
+
+        Object.keys(cleanRule).forEach(key => {
+            if (key.startsWith('_') || keysToRemove.includes(key)) delete cleanRule[key]
+        })
+        return yaml.dump(cleanRule)
+    } catch (e) {
+        return JSON.stringify(rule, null, 2)
+    }
+}
+
+// Sub-component for individual Rule Item
+function RuleItem({ rule }: { rule: any }) {
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    return (
+        <div className="rounded-lg border bg-card overflow-hidden">
+            <div className="p-4 flex items-start justify-between">
+                <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium text-foreground">{rule.title}</h3>
+                        <div className="flex items-center gap-2">
+                            {rule.siem_verification?.detected ? (
+                                <Badge className="bg-green-500 hover:bg-green-600 text-white gap-1">
+                                    <CheckCircle className="h-3 w-3" />
+                                    Verified ({rule.siem_verification.events_found})
+                                </Badge>
+                            ) : (
+                                <Badge variant="outline" className="text-muted-foreground gap-1">
+                                    <XCircle className="h-3 w-3" />
+                                    Not Detected
+                                </Badge>
+                            )}
+                        </div>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{rule.description}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                        <Badge variant="outline">{rule.level}</Badge>
+                        <span className="text-xs text-muted-foreground">{rule.technique_name}</span>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 text-xs ml-auto gap-1 text-primary hover:text-primary/80"
+                            onClick={() => setIsExpanded(!isExpanded)}
+                        >
+                            <Code className="h-3 w-3" />
+                            {isExpanded ? "Hide Source" : "View YAML"}
+                            {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            {isExpanded && (
+                <div className="bg-zinc-950 p-4 border-t border-border animate-in slide-in-from-top-2">
+                    <pre className="text-xs font-mono text-zinc-300 whitespace-pre-wrap overflow-x-auto">
+                        {ruleToYaml(rule)}
+                    </pre>
+                </div>
+            )}
+        </div>
+    )
+}
+
 export function PipelineResultsModal({ isOpen, onClose, result }: PipelineResultsModalProps) {
-    const [activeTab, setActiveTab] = useState("ttps")
+    const [activeTab, setActiveTab] = useState("overview")
 
     if (!isOpen || !result) return null
 
@@ -139,6 +228,49 @@ export function PipelineResultsModal({ isOpen, onClose, result }: PipelineResult
 
                 {/* Content */}
                 <ScrollArea className="flex-1 p-6">
+                    {/* NEW: Overview Tab with DemoMetricsHeader */}
+                    {activeTab === "overview" && (
+                        <div className="space-y-6">
+                            <DemoMetricsHeader
+                                ttpsCount={ttps.length}
+                                rulesCount={rules.length}
+                                attacksCount={attacks.length}
+                                detectionRate={metrics?.detection_rate || 0}
+                                precision={metrics?.precision || 0}
+                                f1Score={metrics?.f1_score || 0}
+                                qualityScore={result.final_score || 0}
+                                iterations={result.iterations || 1}
+                            />
+
+                            {/* Quick Stats */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-4 rounded-lg border bg-card">
+                                    <h4 className="font-medium mb-2">Pipeline Status</h4>
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle className="h-5 w-5 text-green-500" />
+                                        <span className="text-sm text-muted-foreground">
+                                            Completed in {result.iterations || 1} iteration(s)
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-lg border bg-card">
+                                    <h4 className="font-medium mb-2">Final Quality</h4>
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-3xl font-bold text-primary">
+                                            {Math.round((result.final_score || 0) * 100)}%
+                                        </span>
+                                        <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-primary"
+                                                style={{ width: `${(result.final_score || 0) * 100}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {activeTab === "ttps" && (
                         <div className="space-y-3">
                             {ttps.length === 0 ? (
@@ -153,8 +285,46 @@ export function PipelineResultsModal({ isOpen, onClose, result }: PipelineResult
                                                     <span className="font-medium">{ttp.technique_name}</span>
                                                 </div>
                                                 <p className="text-sm text-muted-foreground mt-1">Tactic: {ttp.tactic}</p>
-                                                <Badge variant="outline" className="mt-2 text-xs">{ttp.extraction_method}</Badge>
-                                            </div>
+
+                                                {/* EVIDENCE/INDICATORS */}
+                                                {(ttp.indicators && ttp.indicators.length > 0 || ttp.tools && ttp.tools.length > 0) && (
+                                                    <div className="mt-3 flex flex-wrap gap-2">
+                                                        {ttp.indicators?.map((ind: string, i: number) => (
+                                                            <Badge key={`ind-${i}`} variant="secondary" className="text-[10px] bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 border-blue-200/20">
+                                                                Ind: {ind}
+                                                            </Badge>
+                                                        ))}
+                                                        {ttp.tools?.map((tool: string, i: number) => (
+                                                            <Badge key={`tool-${i}`} variant="secondary" className="text-[10px] bg-orange-500/10 text-orange-600 hover:bg-orange-500/20 border-orange-200/20">
+                                                                Tool: {tool}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* NEW: Reason & Quote (for improved evidence) */}
+                                                {(ttp.reasoning || ttp.quote) && (
+                                                    <div className="mt-4 pt-3 border-t border-border/50">
+                                                        {ttp.quote && (
+                                                            <div className="mb-2">
+                                                                <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1 mb-1">
+                                                                    <Info className="h-3 w-3" /> Source Evidence
+                                                                </span>
+                                                                <blockquote className="text-xs italic text-muted-foreground border-l-2 border-primary/50 pl-3 py-1 bg-muted/30 rounded-r">
+                                                                    "{ttp.quote}"
+                                                                </blockquote>
+                                                            </div>
+                                                        )}
+                                                        {ttp.reasoning && (
+                                                            <div>
+                                                                <span className="text-xs font-semibold text-muted-foreground">Reasoning: </span>
+                                                                <span className="text-xs text-muted-foreground">{ttp.reasoning}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                <Badge variant="outline" className="mt-2 text-xs">{ttp.extraction_method}</Badge>                                            </div>
                                             <div className="text-right">
                                                 <p className={cn("text-2xl font-bold", getConfidenceColor(ttp.confidence_score))}>
                                                     {Math.round(ttp.confidence_score * 100)}%
@@ -174,34 +344,7 @@ export function PipelineResultsModal({ isOpen, onClose, result }: PipelineResult
                                 <p className="text-muted-foreground text-center py-8">No rules generated.</p>
                             ) : (
                                 rules.map((rule, index) => (
-                                    <div key={rule.id || index} className="p-4 rounded-lg border bg-card">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <h3 className="font-medium text-foreground">{rule.title}</h3>
-                                                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{rule.description}</p>
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <Badge variant="outline">{rule.level}</Badge>
-                                                    <span className="text-xs text-muted-foreground">{rule.technique_name}</span>
-                                                </div>
-                                            </div>
-                                            <div className="ml-4">
-                                                {rule.siem_verification?.detected ? (
-                                                    <div className="flex items-center gap-2 text-green-500">
-                                                        <CheckCircle className="h-5 w-5" />
-                                                        <div className="text-right">
-                                                            <p className="text-sm font-medium">Verified</p>
-                                                            <p className="text-xs text-muted-foreground">{rule.siem_verification.events_found} events</p>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                                        <XCircle className="h-5 w-5" />
-                                                        <p className="text-sm">Not Verified</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <RuleItem key={rule.id || index} rule={rule} />
                                 ))
                             )}
                         </div>
@@ -233,64 +376,15 @@ export function PipelineResultsModal({ isOpen, onClose, result }: PipelineResult
                         </div>
                     )}
 
-                    {activeTab === "metrics" && (
-                        <div className="space-y-6">
-                            {/* Quality Score */}
-                            <div className="p-6 rounded-lg border bg-card">
-                                <h3 className="font-medium mb-4">Overall Quality</h3>
-                                <div className="flex items-center gap-4">
-                                    <div className="text-4xl font-bold text-primary">
-                                        {Math.round((result.final_score || 0) * 100)}%
-                                    </div>
-                                    <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-primary transition-all"
-                                            style={{ width: `${(result.final_score || 0) * 100}%` }}
-                                        />
-                                    </div>
-                                </div>
-                                {result.iterations && (
-                                    <p className="text-sm text-muted-foreground mt-2">
-                                        Completed in {result.iterations} iteration(s)
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* SIEM Metrics */}
-                            {metrics && (
-                                <div className="p-6 rounded-lg border bg-card">
-                                    <h3 className="font-medium mb-4">SIEM Detection Metrics</h3>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="p-4 rounded-md bg-green-500/10 text-center">
-                                            <p className="text-2xl font-bold text-green-500">{metrics.true_positives}</p>
-                                            <p className="text-xs text-muted-foreground">True Positives</p>
-                                        </div>
-                                        <div className="p-4 rounded-md bg-yellow-500/10 text-center">
-                                            <p className="text-2xl font-bold text-yellow-500">{metrics.false_positives}</p>
-                                            <p className="text-xs text-muted-foreground">False Positives</p>
-                                        </div>
-                                        <div className="p-4 rounded-md bg-red-500/10 text-center">
-                                            <p className="text-2xl font-bold text-red-500">{metrics.false_negatives}</p>
-                                            <p className="text-xs text-muted-foreground">False Negatives</p>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-4 mt-4">
-                                        <div className="text-center">
-                                            <p className="text-lg font-bold">{Math.round(metrics.precision * 100)}%</p>
-                                            <p className="text-xs text-muted-foreground">Precision</p>
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-lg font-bold">{Math.round(metrics.detection_rate * 100)}%</p>
-                                            <p className="text-xs text-muted-foreground">Detection Rate</p>
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-lg font-bold">{Math.round(metrics.f1_score * 100)}%</p>
-                                            <p className="text-xs text-muted-foreground">F1 Score</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    {activeTab === "feedback" && (
+                        <FeedbackLoopPanel
+                            iterations={result.iterations || 1}
+                            finalScore={result.final_score || 0}
+                            maxIterations={3}
+                            detected={(metrics?.detection_rate ?? 0) > 0}
+                            rules={rules}
+                            ruleHistory={result.rule_history}
+                        />
                     )}
                 </ScrollArea>
 

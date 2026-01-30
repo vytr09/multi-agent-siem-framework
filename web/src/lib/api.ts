@@ -156,6 +156,14 @@ export const api = {
         return res.json()
     },
 
+    async cancelPipeline() {
+        const res = await fetch(`${API_BASE_URL}/agents/cancel_pipeline`, {
+            method: "POST"
+        })
+        if (!res.ok) throw new Error("Failed to cancel pipeline")
+        return res.json()
+    },
+
     async getFiles() {
         const res = await fetch(`${API_BASE_URL}/files/`)
         if (!res.ok) throw new Error("Failed to fetch files")
@@ -183,6 +191,27 @@ export const api = {
     async getPipelineResult() {
         const res = await fetch(`${API_BASE_URL}/pipeline/result`)
         if (!res.ok) throw new Error("Failed to fetch pipeline result")
+        return res.json()
+    },
+
+    // History API
+    async getPipelineHistory(limit: number = 20) {
+        const res = await fetch(`${API_BASE_URL}/history/?limit=${limit}`)
+        if (!res.ok) throw new Error("Failed to fetch pipeline history")
+        return res.json()
+    },
+
+    async getPipelineRun(runId: string) {
+        const res = await fetch(`${API_BASE_URL}/history/${runId}`)
+        if (!res.ok) throw new Error("Failed to fetch pipeline run")
+        return res.json()
+    },
+
+    async deletePipelineRun(runId: string) {
+        const res = await fetch(`${API_BASE_URL}/history/${runId}`, {
+            method: "DELETE"
+        })
+        if (!res.ok) throw new Error("Failed to delete pipeline run")
         return res.json()
     }
 };

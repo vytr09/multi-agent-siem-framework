@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Activity, Shield, Zap, Target, Play, AlertTriangle, CheckCircle, RefreshCw, FileText, Clock, Search, Eye } from "lucide-react"
+import { Activity, Shield, Zap, Target, Play, AlertTriangle, CheckCircle, RefreshCw, FileText, Clock, Search, Eye, StopCircle } from "lucide-react"
 import { api, type AgentStatus, type SystemMetrics } from "@/lib/api"
 import { useToast } from "@/components/ui/toast-notification"
 import { FileUpload } from "@/components/dashboard/file-upload"
@@ -15,20 +15,25 @@ import { FileViewerModal } from "@/components/dashboard/file-viewer-modal"
 import { PipelineSummary } from "@/components/dashboard/pipeline-summary"
 import { PipelineResultsModal } from "@/components/dashboard/pipeline-results-modal"
 import { useNotifications } from "@/contexts/notification-context"
+import { usePipeline } from "@/contexts/pipeline-context"
+import { PipelineHistoryDropdown } from "@/components/dashboard/pipeline-history-dropdown"
 
 export default function Workbench() {
   const { showToast } = useToast()
-  const [activeCases, setActiveCases] = useState<any[]>([])
-  const [pipelineState, setPipelineState] = useState(0) // 0=Idle, 1=Ingest, 2=Extract, 3=RuleGen, 4=Verify
-  const [loading, setLoading] = useState(true)
-  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null)
+  const { addNotification } = useNotifications()
 
+  // Use context for pipeline state (persists across route changes)
+  const {
+    pipelineState, setPipelineState,
+    selectedCaseId, setSelectedCaseId,
+    pipelineResult, setPipelineResult
+  } = usePipeline()
+
+  const [activeCases, setActiveCases] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [viewingFile, setViewingFile] = useState<string | null>(null)
   const [forceAnalyze, setForceAnalyze] = useState(false)
-  const [pipelineResult, setPipelineResult] = useState<any>(null)
   const [showResultsModal, setShowResultsModal] = useState(false)
-
-  const { addNotification } = useNotifications()
 
   const fetchData = async () => {
     try {
@@ -89,7 +94,7 @@ export default function Workbench() {
             addNotification("Investigation Failed", `Analysis for case ${caseId.substring(0, 8)} failed.`, "error")
           } else if (status === 'running') {
             // Keep spinning
-            setPipelineState((prev) => prev === 2 ? 3 : 2);
+            setPipelineState(pipelineState === 2 ? 3 : 2);
           }
         } catch (e) {
           console.error("Polling error:", e);
@@ -115,6 +120,14 @@ export default function Workbench() {
           </p>
         </div>
         <div className="flex gap-3">
+          <PipelineHistoryDropdown
+            onSelectRun={(result) => {
+              setPipelineResult(result)
+              setPipelineState(4)
+              setSelectedCaseId(result.source_report || 'History')
+              setShowResultsModal(true)
+            }}
+          />
           <Button variant="outline" onClick={fetchData}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh Cases
@@ -135,9 +148,29 @@ export default function Workbench() {
             <div className="space-y-4">
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">Case ID: <span className="font-mono text-muted-foreground">{selectedCaseId}</span></span>
-                <Badge variant={pipelineState === 4 ? "default" : "secondary"}>
-                  {pipelineState === 0 ? "Idle" : pipelineState === 4 ? "Completed" : "Processing..."}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant={pipelineState === 4 ? "default" : "secondary"}>
+                    {pipelineState === 0 ? "Idle" : pipelineState === 4 ? "Completed" : "Processing..."}
+                  </Badge>
+                  {pipelineState > 0 && pipelineState < 4 && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await api.cancelPipeline();
+                          setPipelineState(0);
+                          showToast("Pipeline cancelled.", "info");
+                        } catch (e) {
+                          showToast("Failed to cancel pipeline.", "error");
+                        }
+                      }}
+                    >
+                      <StopCircle className="h-4 w-4 mr-1" />
+                      Stop
+                    </Button>
+                  )}
+                </div>
               </div>
               <PipelineVisualizer currentStage={pipelineState} />
 
