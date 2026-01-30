@@ -286,6 +286,7 @@ class LangChainOrchestrator:
                             'ttp_id': res.get('ttp_id', 'unknown'),
                             'detected': siem_ver.get('detected', False),
                             'events_found': siem_ver.get('events_found', 0),
+                            'historical_events': siem_ver.get('historical_events', 0),  # Added for FP calculation
                             'query_time_ms': siem_ver.get('query_time_ms', 0),
                             'status': siem_ver.get('status', 'unknown'),
                             'message': siem_ver.get('message', '')

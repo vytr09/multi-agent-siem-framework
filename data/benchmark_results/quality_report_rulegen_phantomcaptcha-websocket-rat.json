@@ -1,0 +1,3366 @@
+{
+  "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+  "timestamp": "2026-01-19T14:47:24.442169",
+  "config": {
+    "llm_judge": {
+      "enabled": true,
+      "api_key": "<REDACTED>",
+      "model": "llama-3.3-70b",
+      "temperature": 0.1,
+      "max_tokens": "<REDACTED>",
+      "timeout": 60,
+      "persona": "expert cybersecurity researcher and red team operator with deep knowledge of MITRE ATT&CK framework and detection engineering",
+      "detailed_feedback": true,
+      "confidence_scores": true,
+      "enable_comparison": true,
+      "max_requests_per_minute": 60,
+      "retry_attempts": 3,
+      "retry_delay": 2
+    },
+    "attackgen_benchmark": {
+      "enabled": true,
+      "use_llm_evaluation": true,
+      "use_rule_based_evaluation": true,
+      "min_passing_score": 0.6,
+      "high_quality_threshold": 0.85,
+      "metrics": {
+        "technical_correctness": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "attack_alignment": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "platform_compatibility": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "operational_realism": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "threat_actor_alignment": {
+          "weight": 1.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "testing_safety": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "controlled_impact": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "detection_value": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "artifact_generation": {
+          "weight": 1.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "completeness": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        },
+        "documentation_quality": {
+          "weight": 1.0,
+          "min_score": 0.0,
+          "max_score": 10.0,
+          "enabled": true
+        }
+      },
+      "top_performers_count": 10,
+      "bottom_performers_count": 5,
+      "enable_comparative_analysis": true,
+      "export_format": "json",
+      "export_detailed_results": true,
+      "export_statistics": true
+    },
+    "rulegen_benchmark": {
+      "enabled": true,
+      "use_llm_evaluation": true,
+      "use_rule_based_evaluation": true,
+      "min_passing_score": 0.6,
+      "metrics": {
+        "sigma_completeness": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "detection_logic_correctness": {
+          "weight": 3.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "platform_syntax_correctness": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "field_mapping_accuracy": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "detection_specificity": {
+          "weight": 3.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "detection_sensitivity": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "metadata_richness": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "optimization_level": {
+          "weight": 1.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "attack_coverage": {
+          "weight": 3.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "false_positive_resistance": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "contextual_awareness": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "operational_deployability": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "performance_efficiency": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "analyst_actionability": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "evasion_resistance": {
+          "weight": 2.5,
+          "min_score": 0.0,
+          "max_score": 10.0
+        },
+        "multi_stage_detection": {
+          "weight": 2.0,
+          "min_score": 0.0,
+          "max_score": 10.0
+        }
+      }
+    },
+    "general": {
+      "max_concurrent_evaluations": 3,
+      "batch_size": 5,
+      "enable_caching": true,
+      "cache_ttl": 3600,
+      "log_level": "INFO",
+      "log_file": "logs/benchmark.log",
+      "log_format": "json",
+      "output_directory": "data/benchmark_results",
+      "create_timestamp_subdirs": true,
+      "calculate_statistics": true,
+      "generate_summary_report": true,
+      "export_csv": true,
+      "generate_plots": false,
+      "plot_format": "png"
+    },
+    "comparison": {
+      "enabled": true,
+      "criteria": [
+        "overall quality",
+        "technical correctness",
+        "operational realism",
+        "testing safety"
+      ],
+      "significant_difference_threshold": 0.1
+    },
+    "regression": {
+      "enabled": false,
+      "baseline_file": "baselines/attackgen_baseline.json",
+      "alert_on_degradation": true,
+      "degradation_threshold": 0.05,
+      "track_history": true,
+      "history_file": "history/benchmark_history.json"
+    },
+    "alerting": {
+      "enabled": false,
+      "low_score_threshold": 0.5,
+      "alert_channels": [
+        "email",
+        "slack"
+      ],
+      "email": {
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "from_address": "benchmark@example.com",
+        "to_addresses": [
+          "team@example.com"
+        ]
+      },
+      "slack": {
+        "webhook_url": "${SLACK_WEBHOOK_URL}",
+        "channel": "#siem-benchmarks"
+      }
+    },
+    "advanced": {
+      "ensemble_evaluation": {
+        "enabled": false,
+        "models": [
+          "gemini-2.0-flash-lite"
+        ],
+        "aggregation_method": "weighted_average"
+      },
+      "ground_truth": {
+        "enabled": false,
+        "dataset_path": "datasets/ground_truth.json",
+        "calculate_accuracy": true
+      },
+      "custom_metrics": {
+        "enabled": false,
+        "metrics_file": "config/custom_metrics.yaml"
+      },
+      "debug": {
+        "enabled": false,
+        "save_prompts": true,
+        "save_responses": true,
+        "verbose_logging": true
+      }
+    }
+  },
+  "statistics": {
+    "total_evaluations": 12,
+    "average_score": 0.6759722222222222,
+    "category_averages": {
+      "correctness": 0.81,
+      "quality": 0.6887254901960785,
+      "effectiveness": 0.6194444444444444,
+      "realism": 0.763888888888889,
+      "detectability": 0.5092592592592592
+    },
+    "metric_averages": {
+      "sigma_completeness": 0.7999999999999999,
+      "detection_logic_correctness": 0.8166666666666668,
+      "detection_specificity": 0.6583333333333333,
+      "detection_sensitivity": 0.6666666666666666,
+      "metadata_richness": 0.6499999999999999,
+      "optimization_level": 0.8250000000000001,
+      "attack_coverage": 0.7000000000000001,
+      "false_positive_resistance": 0.525,
+      "contextual_awareness": 0.6166666666666666,
+      "operational_deployability": 0.8083333333333335,
+      "analyst_actionability": 0.7083333333333334,
+      "evasion_resistance": 0.5166666666666667,
+      "multi_stage_detection": 0.5
+    },
+    "score_distribution": {
+      "excellent (>=0.9)": 0,
+      "good (0.8-0.9)": 0,
+      "fair (0.7-0.8)": 2,
+      "poor (0.6-0.7)": 10,
+      "failing (<0.6)": 0
+    }
+  },
+  "results": [
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6666666666666665,
+      "category_scores": {
+        "correctness": 0.8600000000000001,
+        "quality": 0.6705882352941177,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.4555555555555555
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated, but some fields like 'references', 'author', and 'date' are missing. The provided fields are properly populated with meaningful content.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Properly populated fields",
+              "Meaningful content"
+            ],
+            "weaknesses": [
+              "Missing required fields",
+              "Incomplete metadata"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The detection logic accurately identifies spearphishing attempts by monitoring Word processes spawning command shells. The selection criteria and condition logic are sound and not overly complex.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria",
+              "Sound condition logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives",
+              "Limited evasion detection"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule uses exact matches and includes filters to exclude benign activity, but may not be specific enough to minimize false positives in production. Multiple conditions are combined, but more context could be added.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Exact matches used",
+              "Filters for benign activity"
+            ],
+            "weaknesses": [
+              "Potential for false positives",
+              "Limited context"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule covers some indicators of the attack technique, but may not be sensitive enough to catch variations and evasion attempts. More wildcards or regex could be used to catch variations.",
+          "confidence": 0.6,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Covers some indicators",
+              "Uses some wildcards"
+            ],
+            "weaknesses": [
+              "Limited coverage of variations",
+              "Narrow detection logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes MITRE ATT&CK tags and references to authoritative sources, but lacks detailed information about threat actors, campaigns, and tools associated with the technique. The description is clear but could be more detailed. The rule structure is well-defined, following the Sigma rule format.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags",
+              "Clear description"
+            ],
+            "weaknesses": [
+              "Lacks threat actor information",
+              "Limited references"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule uses specific and restrictive filters, avoids leading wildcards, and utilizes appropriate operators. However, the use of 'contains' for the CommandLine could potentially slow query execution. The log source is specific, and the rule structure is optimized for SIEM performance.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Specific filters",
+              "Avoids leading wildcards"
+            ],
+            "weaknesses": [
+              "Potential performance impact from 'contains' operator"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vector for Spearphishing Attachment Detection but may not include all sub-techniques or variations. It detects common variants but might not address advanced or sophisticated attacks. The rule considers multi-stage attacks to some extent but could be more comprehensive.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vector",
+              "Detects common variants"
+            ],
+            "weaknesses": [
+              "May not cover all sub-techniques",
+              "Limited coverage of advanced attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes some filters to reduce false positives, such as the specific Image and ParentImage conditions. However, it lacks comprehensive whitelisting, time-based or frequency-based logic, and does not fully consider parent-child process relationships or admin tool usage.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Specific Image and ParentImage conditions"
+            ],
+            "weaknesses": [
+              "Lacks comprehensive whitelisting",
+              "Limited consideration of process relationships"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by monitoring Word processes spawning command shells, but it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with common spearphishing attachment tactics, but it may not fully capture the complexity of real-world attack chains.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Monitors Word processes spawning command shells",
+              "Aligns with common spearphishing tactics"
+            ],
+            "weaknesses": [
+              "Lacks specific references to campaigns or APT groups",
+              "May not capture complex attack chains"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is mostly ready for deployment, with a realistic log source and tested detection logic. However, the false positive rate may be a concern, and the severity level may require adjustment based on specific SOC needs.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Realistic log source",
+              "Tested detection logic"
+            ],
+            "weaknesses": [
+              "Potential false positive rate concern",
+              "Severity level may require adjustment"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides some actionable information, such as the process and command line, but may benefit from additional context and guidance for next steps in investigation and remediation.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Provides process and command line information",
+              "Clear rule title"
+            ],
+            "weaknesses": [
+              "May lack sufficient context for investigation",
+              "Limited guidance for next steps"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule may be vulnerable to evasion techniques, such as renaming executables or files, and relies heavily on command-line arguments. Additional detection points and consideration of obfuscation attempts would improve its robustness.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns and relationships"
+            ],
+            "weaknesses": [
+              "Vulnerable to renaming executables or files",
+              "Relies heavily on command-line arguments"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule detects the initial execution of the Spearphishing Attachment technique by monitoring Word processes spawning command shells, but it does not cover persistence, lateral movement, data collection, or exfiltration stages. The detection logic is primarily focused on a single event. However, it does demonstrate an understanding of the initial attack sequence.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:32:23.154092",
+          "metadata": {
+            "strengths": [
+              "Detects initial execution of the technique",
+              "Monitors specific process behavior"
+            ],
+            "weaknesses": [
+              "Limited to single-event detection",
+              "Does not cover other stages of the attack lifecycle"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.spearphishing (Spearphishing Attachment Detection) scored 0.67/1.0 (Below Average). Best performance in correctness (0.86). Needs improvement in detectability (0.46). Issues found in: false_positive_resistance, evasion_resistance, multi_stage_detection",
+      "timestamp": "2026-01-19T14:32:23.154092",
+      "metadata": {
+        "attack_id": "attack.spearphishing",
+        "technique_name": "Spearphishing Attachment Detection",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.7066666666666667,
+      "category_scores": {
+        "correctness": 0.8600000000000001,
+        "quality": 0.7823529411764706,
+        "effectiveness": 0.64,
+        "realism": 0.7555555555555555,
+        "detectability": 0.4555555555555555
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated, but some fields like 'references', 'author', and 'date' are missing. The provided fields have meaningful content, indicating a well-structured rule. However, the absence of certain fields deducts from the completeness.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Well-structured detection logic",
+              "Properly populated fields"
+            ],
+            "weaknesses": [
+              "Missing required fields",
+              "Lack of author and date information"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The detection logic accurately identifies the attack technique by focusing on Microsoft Word spawning command shells, which is a strong indicator of malicious document execution. The condition logic is sound and not overly complex, making it effective for triggering on actual attacks.",
+          "confidence": 0.95,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria",
+              "Sound condition logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives if not properly filtered"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule is somewhat specific but could be improved with more filters to exclude benign activity. It uses exact matches and considers the parent process, which helps in minimizing false positives. However, more conditions or filters could enhance its specificity.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Uses exact matches",
+              "Considers parent process"
+            ],
+            "weaknesses": [
+              "Could benefit from additional filters",
+              "May not fully exclude all benign activity"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule covers the primary indicator of the attack technique and uses appropriate logic to catch the execution of command shells by Microsoft Word. It is not overly narrow and considers the use of 'cmd.exe' and 'powershell.exe', making it sensitive to common attack variations.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Covers primary attack indicator",
+              "Sensitive to common variations"
+            ],
+            "weaknesses": [
+              "May not catch highly evasive techniques",
+              "Could be improved with more indicators"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule includes MITRE ATT&CK tags and references to authoritative sources, but lacks specific threat actor information and campaign names. The description is clear and detailed, explaining what the rule detects.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags",
+              "Clear description"
+            ],
+            "weaknesses": [
+              "Lacks threat actor information",
+              "No campaign names"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The rule uses specific and restrictive filters, avoids leading wildcards, and uses appropriate operators. The logsource is specific enough, and the detection logic is efficient.",
+          "confidence": 0.95,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Efficient detection logic",
+              "Specific filters"
+            ],
+            "weaknesses": [
+              "No obvious optimization issues"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vector for Phishing via Microsoft Word Document Execution, but may not detect advanced or sophisticated variants. It considers the main tools and frameworks, but not all possible sub-techniques.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vector",
+              "Considers main tools and frameworks"
+            ],
+            "weaknesses": [
+              "May not detect advanced variants",
+              "Limited sub-technique coverage"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes some filters to reduce false positives, but may not be effective in all scenarios. It lacks time-based or frequency-based logic and does not consider parent-child process relationships in detail.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Includes some filters",
+              "Considers legitimate processes"
+            ],
+            "weaknesses": [
+              "May not be effective in all scenarios",
+              "Lacks advanced logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates awareness of threat actor TTPs by detecting Microsoft Word spawning command shells, which is a common phishing technique. However, it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with real-world attack chains, but could be improved with more context.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Detects common phishing technique",
+              "Aligns with real-world attack chains"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign references",
+              "Limited context"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is ready for deployment with no syntax errors, a realistic log source, and tested detection logic. The severity level is appropriate, and the false positive rate is acceptable. However, the rule could be improved with more validation and testing.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Realistic log source",
+              "Tested detection logic",
+              "Appropriate severity level"
+            ],
+            "weaknesses": [
+              "Limited validation and testing",
+              "Potential for false positives"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides actionable information with a clear title and description, but could be improved with more context and references for next steps. The fields in detection are useful for pivoting and investigation, but may not be sufficient for all cases.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Clear title and description",
+              "Useful fields for investigation"
+            ],
+            "weaknesses": [
+              "Limited context and references",
+              "Potential for insufficient information"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is vulnerable to common evasion techniques such as renaming executables or files, and relies solely on process creation and command-line arguments. However, it detects behavior patterns and relationships, which can make it more robust.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns and relationships"
+            ],
+            "weaknesses": [
+              "Vulnerable to renaming and obfuscation",
+              "Relies on command-line arguments"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The rule detects the initial execution of the phishing technique via Microsoft Word document execution by identifying command shells spawned by WINWORD.EXE. However, it does not account for persistence mechanisms, lateral movement, data collection, or exfiltration activities. The detection logic is primarily focused on a single event.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:35:17.244203",
+          "metadata": {
+            "strengths": [
+              "Detects initial execution of phishing technique",
+              "Utilizes Sysmon for process creation monitoring"
+            ],
+            "weaknesses": [
+              "Lacks detection of persistence mechanisms",
+              "Does not account for lateral movement or data exfiltration"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.t1566 (Phishing via Microsoft Word Document Execution) scored 0.71/1.0 (Fair). Best performance in correctness (0.86). Needs improvement in detectability (0.46). Issues found in: evasion_resistance, multi_stage_detection",
+      "timestamp": "2026-01-19T14:35:17.244203",
+      "metadata": {
+        "attack_id": "attack.t1566",
+        "technique_name": "Phishing via Microsoft Word Document Execution",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6283333333333334,
+      "category_scores": {
+        "correctness": 0.74,
+        "quality": 0.6058823529411765,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.4555555555555555
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated, but some fields like 'status', 'author', and 'date' are missing. The provided fields have meaningful content, indicating a good structure. However, the absence of certain fields deducts from the completeness.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Meaningful content in populated fields",
+              "Proper logsource and detection structure"
+            ],
+            "weaknesses": [
+              "Missing required fields like status, author, and date"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The detection logic correctly identifies PowerShell execution activities, but the condition logic could be more sophisticated to reduce false positives. The selection criteria are straightforward and target the TTP behavior, but might not cover all evasion attempts.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Correct identification of PowerShell execution",
+              "Simple and understandable logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives due to simplicity",
+              "Limited coverage of evasion techniques"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule attempts to minimize false positives by targeting specific command-line patterns, but the use of broad conditions like '-enc' might still catch benign activity. More filters or conditions could enhance specificity.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Targets specific command-line patterns",
+              "Acknowledges potential false positives"
+            ],
+            "weaknesses": [
+              "Broad conditions might catch legitimate activity",
+              "Lack of additional filters for precision"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule covers basic indicators of PowerShell execution but might not catch variations or evasion attempts effectively. The logic is not overly narrow but lacks the use of wildcards, regex, or consideration of different tools and techniques.",
+          "confidence": 0.6,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Covers basic indicators of PowerShell execution"
+            ],
+            "weaknesses": [
+              "Limited coverage of variations and evasion attempts",
+              "Lack of advanced pattern matching"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes MITRE ATT&CK tags and a clear description, but lacks references to authoritative sources and threat actor information. The metadata provides some context, but could be more comprehensive.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags",
+              "Clear description"
+            ],
+            "weaknesses": [
+              "Lacks references to authoritative sources",
+              "No threat actor information"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule uses specific filters and avoids leading wildcards, but could be improved by using more indexed fields and optimizing the detection logic. The logsource is specific enough, but could be further refined.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Specific filters",
+              "Avoids leading wildcards"
+            ],
+            "weaknesses": [
+              "Could use more indexed fields",
+              "Detection logic could be optimized"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vector for PowerShell execution, but may not detect more advanced or sophisticated variants. It considers some sub-techniques, but could be improved by including more tools and frameworks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vector",
+              "Considers some sub-techniques"
+            ],
+            "weaknesses": [
+              "May not detect advanced variants",
+              "Could include more tools and frameworks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes some filters to reduce false positives, but could be improved by adding more specific exclusions and considering parent-child process relationships. The false positive guidance in metadata is limited.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Includes some filters",
+              "Considers legitimate administrative tasks"
+            ],
+            "weaknesses": [
+              "Could add more specific exclusions",
+              "Limited false positive guidance"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by targeting PowerShell execution with specific command-line patterns. However, it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with common threat actor behaviors but could be more comprehensive.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Targets specific PowerShell execution patterns",
+              "Aligns with common threat actor behaviors"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign or APT group references",
+              "Limited consideration of threat actor preferences"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The Sigma rule is well-structured and free of syntax errors, with a realistic log source and tested detection logic. The severity level is appropriate, and the false positive rate is acceptable. However, the rule could benefit from more detailed testing and validation.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Well-structured Sigma rule",
+              "Realistic log source",
+              "Acceptable false positive rate"
+            ],
+            "weaknesses": [
+              "Limited testing and validation",
+              "Potential for alert fatigue"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides some actionable information, including a clear title and description. However, the fields in detection could be more useful for pivoting and investigation, and the references for next steps are limited.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Clear title and description",
+              "Useful for initial investigation"
+            ],
+            "weaknesses": [
+              "Limited fields for pivoting and investigation",
+              "Insufficient references for next steps"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is vulnerable to common attacker evasion techniques, such as renaming executables or obfuscating command-line arguments. While it detects behavior patterns, it relies heavily on static indicators and does not consider multiple detection points.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns"
+            ],
+            "weaknesses": [
+              "Vulnerable to evasion techniques",
+              "Relies on static indicators"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The detection rule focuses on identifying PowerShell execution activities indicative of malicious behavior by analyzing command-line patterns and process images. However, it primarily detects initial execution and may not cover persistence, lateral movement, or data collection stages. The rule's logic is based on single-event detection, lacking correlation across multiple related events or stages.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:36:48.484642",
+          "metadata": {
+            "strengths": [
+              "Detects malicious PowerShell execution",
+              "Analyzes command-line patterns and process images"
+            ],
+            "weaknesses": [
+              "Limited to initial execution detection",
+              "Lacks correlation across multiple events or stages"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.execution (Detect PowerShell Execution via NLP Pattern Matching) scored 0.63/1.0 (Below Average). Best performance in realism (0.76). Needs improvement in detectability (0.46). Issues found in: detection_sensitivity, false_positive_resistance, evasion_resistance",
+      "timestamp": "2026-01-19T14:36:48.484642",
+      "metadata": {
+        "attack_id": "attack.execution",
+        "technique_name": "Detect PowerShell Execution via NLP Pattern Matching",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6966666666666665,
+      "category_scores": {
+        "correctness": 0.8600000000000001,
+        "quality": 0.7294117647058824,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.5444444444444445
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated, but some fields like 'status', 'author', and 'date' are missing. The provided fields have meaningful content, indicating a well-structured rule.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Properly populated fields",
+              "Meaningful content"
+            ],
+            "weaknesses": [
+              "Missing required fields",
+              "Lack of author and date information"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The detection logic correctly identifies the 'Create or Modify System Process' technique by focusing on suspicious process creation activities indicative of persistence mechanisms, using accurate selection criteria and sound condition logic.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria",
+              "Sound condition logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives due to legitimate PowerShell use"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule uses specific conditions like 'Image|endswith': '\\powershell.exe' and 'CommandLine|contains': '-enc', but could be improved with more filters to exclude benign activity and legitimate tools, potentially reducing false positives.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Specific conditions for PowerShell"
+            ],
+            "weaknesses": [
+              "Limited filters for benign activity",
+              "Potential for false positives"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule covers indicators of the attack technique and uses appropriate wildcards, but could be more sensitive by including additional indicators, tools, and techniques, as well as considering evasion attempts more thoroughly.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Covers indicators of the attack technique",
+              "Appropriate use of wildcards"
+            ],
+            "weaknesses": [
+              "Could be more comprehensive in covering evasion attempts"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes MITRE ATT&CK tags and references to authoritative sources, but lacks comprehensive metadata such as threat actor information, campaign names, and tools associated with the technique. The description is clear but could be more detailed. The rule structure is well-defined, following the Sigma rule format.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags",
+              "Clear description"
+            ],
+            "weaknesses": [
+              "Lacks threat actor information",
+              "Limited references"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is optimized for SIEM performance, using indexed fields like 'Image' and 'CommandLine', and avoids leading wildcards. The detection logic is straightforward, and the log source is specific enough. However, the use of 'contains' operator could be improved for better performance.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Uses indexed fields",
+              "Avoids leading wildcards"
+            ],
+            "weaknesses": [
+              "Could improve 'contains' operator usage"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vector for 'Create or Modify System Process' but could include more sub-techniques and variations. It detects both basic and advanced variants but may not consider all tools and frameworks. The rule focuses on initial execution and does not explicitly cover follow-on actions.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vector",
+              "Detects basic and advanced variants"
+            ],
+            "weaknesses": [
+              "Could include more sub-techniques",
+              "Limited consideration of tools and frameworks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes some filters but lacks comprehensive exclusions to reduce false positives. It does not explicitly filter out legitimate processes or consider time-based logic. The rule mentions false positives in the metadata but does not provide specific guidance.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Includes some filters"
+            ],
+            "weaknesses": [
+              "Lacks comprehensive exclusions",
+              "Does not consider time-based logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by detecting suspicious process creation activities indicative of persistence mechanisms. However, it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with common threat actor behaviors, but could be improved with more operational intel.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Detects suspicious process creation",
+              "Aligns with common threat actor behaviors"
+            ],
+            "weaknesses": [
+              "Lacks specific references to campaigns or APT groups",
+              "Limited operational intel"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is mostly ready for immediate deployment, with no syntax errors and a realistic log source. The detection logic has been tested and validated, and the severity level is appropriate for SOC triage. However, the false positive rate could be improved.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "No syntax errors",
+              "Realistic log source"
+            ],
+            "weaknesses": [
+              "Potential for false positives",
+              "Limited testing or validation"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides some actionable information for security analysts, with a clear title and description. However, the fields in detection could be more useful for pivoting and investigation, and the references could guide next steps more effectively.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Clear title and description",
+              "Provides some actionable information"
+            ],
+            "weaknesses": [
+              "Limited fields for pivoting and investigation",
+              "References could be more effective"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is somewhat robust against common attacker evasion techniques, detecting behavior patterns and relationships. However, it relies heavily on command-line arguments and does not consider obfuscation attempts or living-off-the-land evasions.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns and relationships"
+            ],
+            "weaknesses": [
+              "Relies heavily on command-line arguments",
+              "Does not consider obfuscation attempts or LOLBin evasions"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The detection rule focuses on identifying suspicious process creation activities indicative of persistence mechanisms, specifically targeting the 'Create or Modify System Process' technique. It detects initial execution or access of the technique by identifying PowerShell processes with encoded command lines, but it does not explicitly cover detection at multiple stages of the attack lifecycle such as lateral movement or data exfiltration. The rule's logic is primarily based on single-event detection.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:38:10.839937",
+          "metadata": {
+            "strengths": [
+              "Effectively targets a specific persistence technique",
+              "Utilizes Sysmon for process creation monitoring"
+            ],
+            "weaknesses": [
+              "Limited to detecting initial execution or persistence mechanisms",
+              "Does not account for lateral movement or post-exploitation activities"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.persistence (Detect Suspicious Process Creation for Persistence) scored 0.70/1.0 (Below Average). Best performance in correctness (0.86). Needs improvement in detectability (0.54). Issues found in: false_positive_resistance, evasion_resistance",
+      "timestamp": "2026-01-19T14:38:10.839937",
+      "metadata": {
+        "attack_id": "attack.persistence",
+        "technique_name": "Detect Suspicious Process Creation for Persistence",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6283333333333334,
+      "category_scores": {
+        "correctness": 0.74,
+        "quality": 0.6058823529411765,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.4555555555555555
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated with meaningful content, but some fields like 'references', 'author', and 'date' are missing. The provided fields are properly populated, indicating a good structure. However, the absence of certain fields deducts from the completeness.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Properly populated fields",
+              "Good structure"
+            ],
+            "weaknesses": [
+              "Missing fields like 'references', 'author', and 'date'"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The detection logic correctly identifies the attack technique by focusing on PowerShell and Invoke-WebRequest, which are common indicators of suspicious activity. However, the logic might be too simplistic and could potentially trigger on benign activity, lacking more specific conditions to filter out false positives.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Correct identification of attack technique",
+              "Simple and straightforward logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives due to simplicity",
+              "Lack of more specific conditions"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule attempts to minimize false positives by targeting specific indicators like PowerShell and Invoke-WebRequest. However, it lacks more precise filters and considerations for legitimate use cases, which could lead to false positives in production environments.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Targets specific indicators",
+              "Attempts to minimize false positives"
+            ],
+            "weaknesses": [
+              "Lack of precise filters",
+              "Insufficient consideration for legitimate use cases"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is somewhat sensitive to catching attack variations but could be improved by incorporating more indicators, using wildcards or regex for variations, and considering evasion techniques. Its current simplicity might allow for easy evasion by attackers.",
+          "confidence": 0.6,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Catches basic attack variations"
+            ],
+            "weaknesses": [
+              "Lack of comprehensive indicators",
+              "Vulnerability to evasion techniques"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes some metadata such as MITRE ATT&CK tags and a clear description, but lacks references to authoritative sources, threat actor information, and tools/malware families associated with the technique. The description is brief and does not fully explain the detection logic. The rule structure is mostly complete but could benefit from additional context.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags",
+              "Clear description of detection goal"
+            ],
+            "weaknesses": [
+              "Lacks references to authoritative sources",
+              "No threat actor or tool information"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-optimized for SIEM performance, using specific and restrictive filters first, avoiding leading wildcards, and utilizing appropriate operators. However, the use of 'contains' for the CommandLine filter might lead to slower query execution in some cases. The logsource is specific enough, focusing on Windows Sysmon process creation events.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Specific and restrictive filters",
+              "Avoids leading wildcards"
+            ],
+            "weaknesses": [
+              "Potential performance impact from 'contains' operator"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers a relevant attack technique by detecting suspicious application layer protocol activity through PowerShell, specifically targeting Invoke-WebRequest. However, it might not cover all variations of this technique, such as other PowerShell cmdlets or different protocols. The rule does not explicitly mention sub-techniques or consider multi-stage attacks.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Covers a specific and relevant attack vector",
+              "Targets a common tool (PowerShell)"
+            ],
+            "weaknesses": [
+              "May not cover all technique variations",
+              "Lacks consideration of sub-techniques or multi-stage attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes some basic filters but lacks comprehensive exclusions for legitimate processes or users. It does not consider time-based or frequency-based logic, parent-child process relationships, or whitelisting of admin tools. The false positive guidance in metadata is not specific, mentioning only general scenarios without detailed exclusions.",
+          "confidence": 0.6,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Basic filters are present"
+            ],
+            "weaknesses": [
+              "Lacks comprehensive exclusions for legitimate activity",
+              "No time-based or frequency-based logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by targeting PowerShell and Invoke-WebRequest, but lacks specific campaign or APT group context. It aligns with general threat actor preferences but doesn't consider unique parameters or timing. The detection logic is somewhat generic and doesn't fully incorporate operational knowledge of real-world attack chains.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Targets PowerShell and Invoke-WebRequest",
+              "Aligns with general threat actor preferences"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign or APT group context",
+              "Generic detection logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is mostly ready for deployment with no syntax errors, a realistic log source, and tested detection logic. The severity level is appropriate, and the false positive rate is acceptable. However, the rule could be improved with more specific guidance on handling false positives and minimizing alert fatigue.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "No syntax errors",
+              "Realistic log source"
+            ],
+            "weaknesses": [
+              "Could improve false positive handling",
+              "Limited guidance on alert fatigue"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides some actionable information with a clear title and description, but could be improved with more useful fields for pivoting and investigation. The severity level helps analysts prioritize, but more guidance on next steps and remediation would be beneficial.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Clear title and description",
+              "Helpful severity level"
+            ],
+            "weaknesses": [
+              "Limited fields for pivoting",
+              "Could improve guidance on next steps"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is somewhat vulnerable to evasion techniques, as it relies on command-line arguments and doesn't detect behavior patterns or relationships. It could be easily bypassed by renaming executables or using LOLBin evasions.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Detects Invoke-WebRequest"
+            ],
+            "weaknesses": [
+              "Relies on command-line arguments",
+              "Vulnerable to LOLBin evasions"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The detection rule focuses on identifying suspicious application layer protocol usage through NLP pattern matching in process command lines, specifically targeting PowerShell executions with Invoke-WebRequest. It primarily detects initial execution or access of the technique but lacks comprehensive coverage across multiple stages of the attack lifecycle. The rule's logic is mainly centered around single-event detection.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:39:23.260933",
+          "metadata": {
+            "strengths": [
+              "Specific targeting of PowerShell executions with Invoke-WebRequest",
+              "Utilizes NLP pattern matching for detection"
+            ],
+            "weaknesses": [
+              "Limited to detecting initial execution or access",
+              "Lacks correlation across multiple related events or stages"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.credential_access (Detect Suspicious Application Layer Protocol Activity) scored 0.63/1.0 (Below Average). Best performance in realism (0.76). Needs improvement in detectability (0.46). Issues found in: detection_sensitivity, false_positive_resistance, evasion_resistance",
+      "timestamp": "2026-01-19T14:39:23.260933",
+      "metadata": {
+        "attack_id": "attack.credential_access",
+        "technique_name": "Detect Suspicious Application Layer Protocol Activity",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6666666666666665,
+      "category_scores": {
+        "correctness": 0.74,
+        "quality": 0.6941176470588235,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.5444444444444445
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated, but some fields like 'references', 'author', and 'date' are missing. The provided fields have meaningful content.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Properly populated fields like title, id, and description",
+              "Includes MITRE ATT&CK tags"
+            ],
+            "weaknesses": [
+              "Missing fields like references, author, and date",
+              "Lack of comprehensive information in some fields"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The detection logic correctly identifies Suspicious Command and Scripting Interpreter Activity, but the condition logic could be simplified and made more efficient. The selection criteria are mostly accurate.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria for cmd.exe and command-line patterns",
+              "Correct identification of the attack technique"
+            ],
+            "weaknesses": [
+              "Overly complex condition logic",
+              "Potential for false positives due to broad command-line patterns"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule attempts to minimize false positives but could be more specific. It uses some exact matches and considers legitimate use cases, but the filters could be more comprehensive.",
+          "confidence": 0.6,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Uses exact matches for cmd.exe and some command-line patterns",
+              "Considers legitimate administrative tasks"
+            ],
+            "weaknesses": [
+              "Could be more specific to reduce false positives",
+              "Lack of comprehensive filters for benign activity"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule covers multiple indicators of the attack technique and uses wildcards appropriately to catch variations. However, it could be more sensitive to evasion attempts and include more case-insensitive matching.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Covers multiple indicators of the attack technique",
+              "Uses wildcards to catch variations"
+            ],
+            "weaknesses": [
+              "Could be more sensitive to evasion attempts",
+              "Limited case-insensitive matching"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes some metadata such as MITRE ATT&CK tags and a clear description, but lacks references to authoritative sources, threat actor information, and tools/malware families associated with the technique. The provided metadata is partially comprehensive but could be more detailed for better context and investigation. The rule structure and log source are well-defined, indicating a good foundation for detection.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Clear description",
+              "MITRE ATT&CK tags present"
+            ],
+            "weaknesses": [
+              "Lack of authoritative source references",
+              "Insufficient threat actor information"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is generally optimized for SIEM performance, using specific filters like 'endswith' and 'contains' appropriately. It avoids leading wildcards and uses indexed fields first, which is good for query execution efficiency. However, the condition logic could be simplified for better performance.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Appropriate use of 'endswith' and 'contains'",
+              "Avoids leading wildcards"
+            ],
+            "weaknesses": [
+              "Condition logic could be simplified"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers basic variants of Suspicious Command and Scripting Interpreter Activity but may not fully address advanced or sophisticated attack techniques. It includes detection for common command-line patterns but lacks consideration for different tools, frameworks, and multi-stage attacks.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Covers basic attack vectors",
+              "Includes common command-line patterns"
+            ],
+            "weaknesses": [
+              "May not cover advanced attack techniques",
+              "Lacks consideration for multi-stage attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes some basic filters but lacks comprehensive exclusions for legitimate processes, users, or paths. It does not consider time-based or frequency-based logic, parent-child process relationships, or whitelisting of admin tools, which could lead to false positives.",
+          "confidence": 0.6,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Basic filters are present"
+            ],
+            "weaknesses": [
+              "Lacks comprehensive exclusions",
+              "Does not consider time-based or frequency-based logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by targeting suspicious command and scripting interpreter activity, but it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with common threat actor behaviors, but it may not capture more sophisticated or tailored attacks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Targets suspicious command and scripting interpreter activity",
+              "Aligns with common threat actor behaviors"
+            ],
+            "weaknesses": [
+              "Lacks specific references to campaigns or APT groups",
+              "May not capture sophisticated attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-structured and ready for deployment, with no syntax errors or undefined fields. The log source is realistic, and the detection logic has been validated through SIEM verification.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Well-structured and ready for deployment",
+              "Validated through SIEM verification"
+            ],
+            "weaknesses": [
+              "May require additional tuning for specific environments",
+              "False positive rate could be improved"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides some actionable information, including a clear title and description, but it could be improved with more context and guidance for next steps in investigation and remediation.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Clear title and description",
+              "Provides some context for investigation"
+            ],
+            "weaknesses": [
+              "Could be improved with more guidance for next steps",
+              "Limited fields for pivoting and investigation"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is vulnerable to common evasion techniques, such as renaming executables or hiding command-line arguments. It relies heavily on command-line arguments and does not consider obfuscation attempts or living-off-the-land evasions.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns and relationships"
+            ],
+            "weaknesses": [
+              "Vulnerable to renaming executables or hiding command-line arguments",
+              "Does not consider obfuscation attempts or LOLBin evasions"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The detection rule focuses on identifying suspicious process creations involving PowerShell or CMD with specific command-line patterns, which can detect initial execution or access of the technique. However, it lacks explicit logic to correlate across multiple related events or stages, limiting its ability to detect persistence mechanisms, lateral movement activities, or data collection and exfiltration. The rule's condition is based on a simple 'or' statement, which may not effectively capture the complexity of multi-stage attacks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:40:51.975139",
+          "metadata": {
+            "strengths": [
+              "Detects suspicious process creations",
+              "Identifies specific command-line patterns"
+            ],
+            "weaknesses": [
+              "Lacks correlation across multiple events or stages",
+              "May not detect persistence or lateral movement activities"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.execution (Suspicious Command and Scripting Interpreter Activity) scored 0.67/1.0 (Below Average). Best performance in realism (0.76). Needs improvement in detectability (0.54). Issues found in: false_positive_resistance, evasion_resistance",
+      "timestamp": "2026-01-19T14:40:51.975139",
+      "metadata": {
+        "attack_id": "attack.execution",
+        "technique_name": "Suspicious Command and Scripting Interpreter Activity",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.7650000000000001,
+      "category_scores": {
+        "correctness": 0.8600000000000001,
+        "quality": 0.7823529411764706,
+        "effectiveness": 0.6933333333333332,
+        "realism": 0.8555555555555556,
+        "detectability": 0.6555555555555556
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The Sigma rule is mostly complete with required fields populated, but some fields like 'status', 'author', and 'date' are missing or not properly populated. The rule structure is well-defined, including log source, detection, and false positives. However, the completeness could be improved with more detailed information in certain fields.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:42:01.210585",
+          "metadata": {
+            "strengths": [
+              "Well-defined rule structure",
+              "Properly populated required fields"
+            ],
+            "weaknesses": [
+              "Missing or incomplete fields like status, author, and date"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The detection logic correctly identifies the attack technique by focusing on PowerShell command-line patterns indicative of obfuscation. The selection criteria are accurate, and the condition logic is sound, focusing on specific commands and parameters related to encoding and secure string conversions. This logic should trigger on actual attacks while minimizing false positives.",
+          "confidence": 0.95,
+          "timestamp": "2026-01-19T14:42:01.210585",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria",
+              "Sound condition logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives from legitimate administrative tasks"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule is somewhat specific, using exact matches for certain commands and parameters, but it could be improved by including more filters to exclude benign activity and legitimate tools. The rule does consider some legitimate use cases but might still catch normal business operations due to its focus on common PowerShell commands.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:42:01.210585",
+          "metadata": {
+            "strengths": [
+              "Uses exact matches for some commands",
+              "Considers some legitimate use cases"
+            ],
+            "weaknesses": [
+              "Could be improved with more filters for benign activity",
+              "Might catch normal business operations"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule covers key indicators of the attack technique, including encoded commands and secure string conversions, making it sensitive to various attack variations. However, its sensitivity could be enhanced by incorporating more wildcards or regex to catch command variations and different paths, as well as considering case-insensitive matching.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:42:01.210585",
+          "metadata": {
+            "strengths": [
+              "Covers key indicators of the attack technique",
+              "Sensitive to various attack variations"
+            ],
+            "weaknesses": [
+              "Could be improved with more wildcards or regex for variations",
+              "Lacks case-insensitive matching"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule includes MITRE ATT&CK tags and references to authoritative sources, providing context for investigation. However, it lacks specific threat actor information and campaign names. The description is clear and detailed, explaining what the rule detects.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Comprehensive MITRE ATT&CK tags",
+              "Clear description"
+            ],
+            "weaknesses": [
+              "Lack of threat actor information",
+              "No campaign names"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The rule uses indexed fields first and avoids leading wildcards, making it efficient for SIEM performance. The detection logic is straightforward, and the logsource is specific enough.",
+          "confidence": 0.95,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Efficient use of indexed fields",
+              "Specific logsource"
+            ],
+            "weaknesses": [
+              "No apparent optimization for very large datasets"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vectors for Detect Obfuscated Files or Information via PowerShell but may not include all sub-techniques or advanced variants. It considers different tools and frameworks but could be more comprehensive.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vectors",
+              "Considers different tools"
+            ],
+            "weaknesses": [
+              "May not cover all sub-techniques",
+              "Limited coverage of advanced variants"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes some filters to reduce false positives, such as excluding legitimate administrative tasks. However, it could benefit from more specific time-based or frequency-based logic and whitelisting of admin tools.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Excludes legitimate administrative tasks",
+              "Some false positive guidance"
+            ],
+            "weaknesses": [
+              "Limited time-based or frequency-based logic",
+              "No whitelisting of admin tools"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule demonstrates awareness of threat actor TTPs by targeting PowerShell obfuscation techniques, but lacks specific campaign or APT group references. It considers threat actor preferences for encoding and secure string conversions. However, it does not fully incorporate operational context or real-world attack chains.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Targets common obfuscation techniques",
+              "Considers threat actor preferences"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign references",
+              "Does not fully incorporate operational context"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The rule is ready for immediate deployment with no syntax errors, a realistic log source, and tested detection logic. The severity level is appropriate, and false positive guidance is provided. However, the false positive rate may still be a concern in production environments.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Realistic log source",
+              "Tested detection logic",
+              "Appropriate severity level"
+            ],
+            "weaknesses": [
+              "Potential false positive rate concern",
+              "No explicit testing or validation mentioned"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule provides actionable information with a clear title, sufficient context, and useful fields for investigation. However, it lacks references for next steps in investigation and remediation, and the severity level may not fully guide analyst prioritization.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Clear title and description",
+              "Useful fields for investigation",
+              "Severity level guidance"
+            ],
+            "weaknesses": [
+              "Lacks references for next steps",
+              "Severity level may not fully guide prioritization"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule detects behavior patterns and considers obfuscation attempts, but may be vulnerable to evasion techniques such as renaming executables or hiding command-line arguments. It does not use multiple detection points or robustly consider living-off-the-land evasions.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns",
+              "Considers obfuscation attempts"
+            ],
+            "weaknesses": [
+              "Vulnerable to evasion techniques",
+              "Lacks multiple detection points"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The detection rule focuses on identifying suspicious command-line patterns in PowerShell, which can detect initial execution of the technique. However, it lacks correlation across multiple related events or stages, and does not explicitly detect persistence, lateral movement, or data collection activities. The rule's logic is primarily based on single-event detection.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:42:01.211358",
+          "metadata": {
+            "strengths": [
+              "Detects suspicious command-line patterns in PowerShell",
+              "Identifies potential obfuscation of files or information"
+            ],
+            "weaknesses": [
+              "Limited to single-event detection",
+              "Lacks correlation across multiple related events or stages"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.t1568.001 (Detect Obfuscated Files or Information via PowerShell) scored 0.77/1.0 (Fair). Best performance in correctness (0.86). Needs improvement in detectability (0.66).",
+      "timestamp": "2026-01-19T14:42:01.211358",
+      "metadata": {
+        "attack_id": "attack.t1568.001",
+        "technique_name": "Detect Obfuscated Files or Information via PowerShell",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6966666666666665,
+      "category_scores": {
+        "correctness": 0.8600000000000001,
+        "quality": 0.7294117647058824,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.5444444444444445
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated, but some fields like 'status', 'author', and 'date' are missing. The provided fields are meaningful and not just placeholders.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Properly populated fields",
+              "Meaningful content"
+            ],
+            "weaknesses": [
+              "Missing required fields",
+              "Lack of author and date information"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The detection logic correctly identifies the Exfiltration Over C2 Channel via PowerShell technique by monitoring process creation events for PowerShell with suspicious command line arguments. The condition logic is sound and not overly complex.",
+          "confidence": 0.95,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria",
+              "Sound condition logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives due to legitimate PowerShell use",
+              "Limited consideration of evasion attempts"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule uses exact matches and includes filters to exclude benign activity, but it may not be specific enough to minimize false positives in production. The rule could be improved by considering more context and legitimate use cases.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Exact matches used where possible",
+              "Filters to exclude benign activity"
+            ],
+            "weaknesses": [
+              "Potential for false positives due to legitimate PowerShell use",
+              "Limited consideration of legitimate use cases"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule covers the Exfiltration Over C2 Channel via PowerShell technique and uses wildcards appropriately to catch variations. However, it may not be sensitive enough to catch all attack variations and evasion attempts.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Covers the technique and its variations",
+              "Uses wildcards appropriately"
+            ],
+            "weaknesses": [
+              "Potential for evasion attempts to bypass the rule",
+              "Limited consideration of different tools and techniques"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes some metadata such as MITRE ATT&CK tags and a clear description, but lacks references to authoritative sources, threat actor information, and campaign names. The description is detailed but could be more comprehensive.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Clear description",
+              "MITRE ATT&CK tags present"
+            ],
+            "weaknesses": [
+              "Lack of authoritative sources",
+              "No threat actor information"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule uses indexed fields first and avoids leading wildcards, making it efficient for SIEM performance. However, the use of 'contains' operator could be optimized further for better performance.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Uses indexed fields first",
+              "Avoids leading wildcards"
+            ],
+            "weaknesses": [
+              "Could optimize 'contains' operator"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vector for Exfiltration Over C2 Channel via PowerShell but may not include all sub-techniques and variations. It detects common variants but may not cover advanced or sophisticated attacks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vector",
+              "Detects common variants"
+            ],
+            "weaknesses": [
+              "May not cover all sub-techniques",
+              "Limited coverage of advanced attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule lacks effective filters and exclusions to reduce false positives, relying on basic conditions. It may generate false positives from legitimate PowerShell usage.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Basic conditions are present"
+            ],
+            "weaknesses": [
+              "Lack of effective filters",
+              "May generate false positives"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by targeting PowerShell with suspicious command line arguments, but lacks specific campaign context and references to APT groups or operations. The detection logic aligns with common Exfiltration Over C2 Channel techniques, but may not fully capture the complexity of real-world attacks. The rule's focus on '-enc' command line arguments shows an understanding of encoding techniques used by attackers.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Targets suspicious PowerShell activity",
+              "Considers encoding techniques"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign context",
+              "May not capture complex attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-structured and free of syntax errors, with a realistic log source and tested detection logic. The severity level is appropriate for SOC triage, and the false positive rate is acceptable. However, the rule may benefit from additional testing and validation in diverse production environments to minimize alert fatigue.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Well-structured and realistic log source",
+              "Appropriate severity level"
+            ],
+            "weaknesses": [
+              "May require additional testing",
+              "Potential for alert fatigue"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides some actionable information, such as the process and command line arguments, but could be improved with additional context and guidance for next steps in investigation and remediation. The severity level helps analysts prioritize their response, but the rule may benefit from more detailed references and false positive guidance.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Provides some actionable information",
+              "Clear severity level"
+            ],
+            "weaknesses": [
+              "Lacks detailed investigation guidance",
+              "Limited false positive guidance"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is vulnerable to common evasion techniques, such as renaming executables or hiding command line arguments. While it detects behavior patterns and relationships, it relies heavily on static indicators and command line arguments, making it susceptible to obfuscation attempts and LOLBin evasions.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns and relationships"
+            ],
+            "weaknesses": [
+              "Vulnerable to evasion techniques",
+              "Relies on static indicators"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule detects Exfiltration Over C2 Channel via PowerShell by monitoring process creation events for PowerShell with suspicious command line arguments, indicating initial execution detection. However, it lacks explicit detection of persistence, lateral movement, and data collection stages. The rule's logic is primarily focused on single-event detection.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:43:05.888148",
+          "metadata": {
+            "strengths": [
+              "Detects initial execution of the technique",
+              "Monitors process creation events for suspicious PowerShell activity"
+            ],
+            "weaknesses": [
+              "Lacks detection of persistence and lateral movement stages",
+              "Does not correlate across multiple related events or stages"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for custom.attack (Exfiltration Over C2 Channel via PowerShell) scored 0.70/1.0 (Below Average). Best performance in correctness (0.86). Needs improvement in detectability (0.54). Issues found in: false_positive_resistance, evasion_resistance",
+      "timestamp": "2026-01-19T14:43:05.888148",
+      "metadata": {
+        "attack_id": "custom.attack",
+        "technique_name": "Exfiltration Over C2 Channel via PowerShell",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6666666666666665,
+      "category_scores": {
+        "correctness": 0.8600000000000001,
+        "quality": 0.6705882352941177,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.4555555555555555
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The Sigma rule provided has most of the required fields populated with meaningful content, including title, id, description, logsource, detection, and tags. However, some fields like references, author, and date are missing. The rule structure is mostly complete but lacks a few essential details.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Properly populated logsource and detection fields",
+              "Includes MITRE ATT&CK tags"
+            ],
+            "weaknesses": [
+              "Missing references, author, and date fields",
+              "Lacks a status field"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The detection logic correctly identifies WMI activity via PowerShell by focusing on the 'Get-WmiObject' command-line pattern. The condition logic is straightforward and effectively targets the specified TTP behavior without being overly complex or redundant.",
+          "confidence": 0.95,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria for WMI activity",
+              "Sound condition logic"
+            ],
+            "weaknesses": [
+              "Could potentially be evaded by simple command-line modifications",
+              "Does not account for other WMI-related commands"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule attempts to minimize false positives by targeting specific PowerShell activity related to WMI. However, it may still catch benign administrative tasks or scripts using WMI for legitimate purposes, as indicated in the false positives section. The rule could benefit from additional filters or conditions to better distinguish between malicious and benign activity.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Targets specific WMI-related command",
+              "Acknowledges potential false positives"
+            ],
+            "weaknesses": [
+              "May not effectively exclude all benign activity",
+              "Lacks additional filters for precision"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule covers a specific indicator of WMI activity but may not catch variations or evasion attempts effectively. It relies on a straightforward command-line pattern match, which could be evaded by attackers using different commands, paths, or obfuscation techniques. Enhancing the rule with wildcards, regex, or additional conditions could improve its sensitivity to various attack techniques.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Covers a specific WMI-related technique",
+              "Easy to understand and implement"
+            ],
+            "weaknesses": [
+              "Vulnerable to evasion techniques",
+              "Does not account for different tools or techniques"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes some metadata such as MITRE ATT&CK tags and a clear description, but lacks references to authoritative sources, threat actor information, and tools/malware families associated with the technique. The provided metadata is useful but not comprehensive. The rule structure is well-defined, following the Sigma rule format.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Clear description",
+              "MITRE ATT&CK tags present"
+            ],
+            "weaknesses": [
+              "Lack of authoritative source references",
+              "No threat actor information"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-optimized for SIEM performance, using specific and restrictive filters first, avoiding leading wildcards, and appropriately using 'contains' and 'endswith' operators. However, the logsource could be more specific, and there's room for further optimization by considering additional indexed fields.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Avoids leading wildcards",
+              "Appropriate use of operators"
+            ],
+            "weaknesses": [
+              "Logsource could be more specific",
+              "Potential for further optimization"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vector for detecting WMI activity via PowerShell but might not include all relevant sub-techniques or variations. It detects basic and some advanced variants but could be improved by considering additional tools, frameworks, and multi-stage attacks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vector",
+              "Detects basic and some advanced variants"
+            ],
+            "weaknesses": [
+              "May not cover all sub-techniques",
+              "Limited consideration of tools and frameworks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes some basic filters but lacks effective exclusions to significantly reduce false positives. It does not consider time-based or frequency-based logic, parent-child process relationships, or whitelisting of admin tools, which are crucial for minimizing false positives.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Basic filters are present"
+            ],
+            "weaknesses": [
+              "Lack of effective exclusions",
+              "No consideration of time-based or frequency-based logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by detecting WMI activity via PowerShell, but it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with common threat actor behaviors, but it may not cover all possible scenarios. The rule's focus on Get-WmiObject commands is a good start, but it could be improved with more context.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Detects WMI activity via PowerShell",
+              "Aligns with common threat actor behaviors"
+            ],
+            "weaknesses": [
+              "Lacks specific references to campaigns or APT groups",
+              "May not cover all possible scenarios"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-structured and ready for deployment, with no syntax errors or undefined fields. The log source is realistic, and the detection logic has been tested. However, the false positive rate may be a concern, and the rule could be improved with more specific guidance on handling false positives.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Well-structured and ready for deployment",
+              "Realistic log source"
+            ],
+            "weaknesses": [
+              "Potential false positive rate concern",
+              "Lacks specific guidance on handling false positives"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides some actionable information, such as the process and command line, but it could be improved with more context and guidance for analysts. The rule title and description are clear, but the fields in detection could be more useful for pivoting and investigation.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Clear rule title and description",
+              "Provides some actionable information"
+            ],
+            "weaknesses": [
+              "Could be improved with more context and guidance",
+              "Fields in detection could be more useful"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is vulnerable to common evasion techniques, such as renaming executables or obfuscating command-line arguments. The rule relies solely on command-line arguments and does not detect behavior patterns or relationships. It could be improved with more robust detection logic and consideration of evasion attempts.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Detects WMI activity via PowerShell"
+            ],
+            "weaknesses": [
+              "Vulnerable to evasion techniques",
+              "Relies solely on command-line arguments"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The detection rule focuses on identifying WMI activity executed through PowerShell by recognizing specific command-line patterns, primarily targeting the initial execution stage. It lacks comprehensive coverage across multiple stages of the attack lifecycle, such as persistence, lateral movement, and data collection or exfiltration. The rule's logic is based on a single-event detection mechanism.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:44:08.638132",
+          "metadata": {
+            "strengths": [
+              "Specific command-line pattern identification",
+              "Focus on PowerShell as a common attack vector"
+            ],
+            "weaknesses": [
+              "Limited to initial execution detection",
+              "Lacks correlation across multiple related events or stages"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.execution (Detect Windows Management Instrumentation (WMI) Activity via PowerShell) scored 0.67/1.0 (Below Average). Best performance in correctness (0.86). Needs improvement in detectability (0.46). Issues found in: false_positive_resistance, evasion_resistance, multi_stage_detection",
+      "timestamp": "2026-01-19T14:44:08.638132",
+      "metadata": {
+        "attack_id": "attack.execution",
+        "technique_name": "Detect Windows Management Instrumentation (WMI) Activity via PowerShell",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6516666666666667,
+      "category_scores": {
+        "correctness": 0.74,
+        "quality": 0.6588235294117647,
+        "effectiveness": 0.64,
+        "realism": 0.7555555555555555,
+        "detectability": 0.4555555555555555
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated, but some fields like 'status', 'author', and 'date' are missing. The provided fields have meaningful content, but the absence of these fields deducts from the completeness.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:45:18.530166",
+          "metadata": {
+            "strengths": [
+              "Meaningful content in provided fields",
+              "Properly formatted Sigma rule"
+            ],
+            "weaknesses": [
+              "Missing required fields",
+              "Lack of author and date information"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The detection logic correctly identifies Network Service Discovery via PowerShell, but the condition logic could be improved for more specific matching. The use of 'Get-Process' might not be the most accurate indicator for this technique.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Correct identification of the technique",
+              "Use of standard Sigma fields"
+            ],
+            "weaknesses": [
+              "Potential for false positives due to broad condition",
+              "Lack of additional indicators for better accuracy"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule attempts to minimize false positives but could be more specific. The use of 'Get-Process' and filtering by PowerShell.exe is a good start, but more conditions or filters might be needed to exclude benign activity effectively.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Attempt to filter out benign activity",
+              "Use of specific process and command"
+            ],
+            "weaknesses": [
+              "Potential for catching legitimate administrative tasks",
+              "Lack of additional filters for better specificity"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is somewhat sensitive to catching attack variations but could be improved. It currently relies on a specific command and does not account for potential evasions or variations in the attack technique.",
+          "confidence": 0.6,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Catches the basic form of the attack technique",
+              "Potential for expansion to include more indicators"
+            ],
+            "weaknesses": [
+              "Limited scope for catching variations",
+              "Vulnerability to evasion techniques"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule includes MITRE ATT&CK tags and references to authoritative sources, but lacks specific threat actor information and campaign names. The description is clear and explains what the rule detects.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags",
+              "Clear description"
+            ],
+            "weaknesses": [
+              "Lacks threat actor information",
+              "No campaign names"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The rule uses indexed fields first and avoids leading wildcards, making it efficient for SIEM performance. The logsource is specific enough, and the detection logic is well-structured.",
+          "confidence": 0.95,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Efficient use of indexed fields",
+              "Well-structured detection logic"
+            ],
+            "weaknesses": [
+              "No notable weaknesses"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vector for Network Service Discovery via PowerShell but may not include all sub-techniques or advanced variants. It detects common tools and frameworks but may not consider multi-stage attacks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vector",
+              "Detects common tools"
+            ],
+            "weaknesses": [
+              "May not include all sub-techniques",
+              "Limited consideration of multi-stage attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes some filters to reduce false positives, but they may not be comprehensive enough. It lacks time-based or frequency-based logic and does not consider parent-child process relationships.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Includes some filters",
+              "Considers legitimate paths"
+            ],
+            "weaknesses": [
+              "Filters may not be comprehensive",
+              "Lacks time-based or frequency-based logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by targeting Network Service Discovery via PowerShell, but it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with common threat actor behaviors, but it may not fully capture the complexity of real-world attacks. The rule's focus on 'Get-Process' commands is a good start, but it might not be comprehensive enough.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Targets a relevant threat actor TTP",
+              "Aligns with common threat actor behaviors"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign or APT group references",
+              "May not capture complex real-world attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-structured and free of syntax errors, with a realistic log source and tested detection logic. The severity level is set to 'medium', which is appropriate for SOC triage and prioritization. However, the false positive rate might be a concern, as the rule may generate alerts for legitimate administrative scripts or benign PowerShell usage.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Well-structured and error-free",
+              "Realistic log source and tested detection logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives from legitimate scripts",
+              "May require tuning for specific environments"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides a clear and concise title, as well as a description that offers some context for investigation and response. However, the fields in detection might not be comprehensive enough for pivoting and investigation, and the rule could benefit from more detailed guidance on next steps and remediation.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Clear and concise title and description",
+              "Provides some context for investigation"
+            ],
+            "weaknesses": [
+              "Limited fields for pivoting and investigation",
+              "Could benefit from more detailed guidance"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is vulnerable to common attacker evasion techniques, such as renaming executables or files, and it relies heavily on command-line arguments that can be hidden or obfuscated. While the rule detects behavior patterns, it may not be robust enough against more sophisticated evasion attempts.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns",
+              "Not solely reliant on static indicators"
+            ],
+            "weaknesses": [
+              "Vulnerable to executable renaming and command-line argument obfuscation",
+              "May not be robust against sophisticated evasion attempts"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 4,
+          "normalized_score": 0.4,
+          "explanation": "The detection rule focuses on identifying the initial execution of PowerShell scripts or commands related to network service discovery. It lacks the capability to detect persistence mechanisms, lateral movement activities, data collection, exfiltration, or impact activities. The rule primarily relies on single-event detection without correlating across multiple related events or stages.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:45:18.531174",
+          "metadata": {
+            "strengths": [
+              "Detects initial execution of network service discovery via PowerShell",
+              "Utilizes Sysmon for process creation monitoring"
+            ],
+            "weaknesses": [
+              "Limited to single-event detection",
+              "Lacks correlation across multiple stages of the attack lifecycle"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.t1568 (Network Service Discovery via PowerShell) scored 0.65/1.0 (Below Average). Best performance in realism (0.76). Needs improvement in detectability (0.46). Issues found in: detection_sensitivity, evasion_resistance, multi_stage_detection",
+      "timestamp": "2026-01-19T14:45:18.531174",
+      "metadata": {
+        "attack_id": "attack.t1568",
+        "technique_name": "Network Service Discovery via PowerShell",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6416666666666667,
+      "category_scores": {
+        "correctness": 0.74,
+        "quality": 0.6058823529411765,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.5444444444444445
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule has most required Sigma fields populated, but some fields like 'status', 'references', 'author', and 'date' are missing or not properly populated. The provided fields are meaningful and not just placeholders.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Properly populated title and description",
+              "Correct logsource and detection fields"
+            ],
+            "weaknesses": [
+              "Missing status, references, author, and date fields",
+              "Lack of comprehensive references"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The detection logic correctly identifies the Archive Collected Data technique by monitoring process creation events for known archiving tools and PowerShell commands. However, the condition logic could be improved for better accuracy and to reduce false positives.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria for archiving tools",
+              "Use of standard Sigma fields"
+            ],
+            "weaknesses": [
+              "Condition logic could be more complex to handle variations",
+              "Potential for false positives due to legitimate use of archiving tools"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule is somewhat specific but could be improved to minimize false positives. It uses exact matches for some archiving tools but lacks filters to exclude benign activity and legitimate tools effectively.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Use of exact matches for some archiving tools",
+              "Consideration of legitimate use cases"
+            ],
+            "weaknesses": [
+              "Lack of comprehensive filters for benign activity",
+              "Potential for catching normal business operations"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule covers basic indicators of the Archive Collected Data technique but lacks the sensitivity to catch attack variations and evasion attempts effectively. It does not use wildcards or regex appropriately to catch variations.",
+          "confidence": 0.6,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Covers basic indicators of the technique",
+              "Use of standard Sigma fields"
+            ],
+            "weaknesses": [
+              "Lack of wildcards or regex for catching variations",
+              "Narrow focus that could be easily evaded"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes some metadata, such as MITRE ATT&CK tags and a description, but lacks comprehensive information like threat actor details, campaign names, and tools associated with the technique. The provided metadata is correct but not exhaustive. References to authoritative sources are also limited.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags",
+              "Provides a clear description"
+            ],
+            "weaknesses": [
+              "Lacks threat actor information",
+              "Limited references to authoritative sources"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-optimized for SIEM performance, using indexed fields like Image and CommandLine, and avoiding leading wildcards. The detection logic is straightforward, and the use of 'endswith' and 'contains' operators is appropriate. However, the rule could be further improved by considering additional log sources or more specific filters.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Uses indexed fields efficiently",
+              "Avoids leading wildcards"
+            ],
+            "weaknesses": [
+              "Could benefit from additional log sources",
+              "More specific filters could enhance performance"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vectors for Archive Collected Data via NLP Pattern Matching, including known archiving tools and PowerShell commands. However, it may not detect more sophisticated or custom variants, and does not explicitly consider sub-techniques or multi-stage attacks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vectors",
+              "Includes detection for known archiving tools"
+            ],
+            "weaknesses": [
+              "May not detect custom or sophisticated variants",
+              "Does not explicitly consider sub-techniques or multi-stage attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes some basic filters, such as excluding legitimate use of archiving tools for routine backups, but could be improved with more specific exclusions, time-based or frequency-based logic, and consideration of parent-child process relationships. The false positive guidance in metadata is somewhat helpful but not detailed enough.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Excludes some legitimate use cases",
+              "Provides basic false positive guidance"
+            ],
+            "weaknesses": [
+              "Could benefit from more specific exclusions",
+              "Lacks time-based or frequency-based logic"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates some awareness of threat actor TTPs by monitoring process creation events for known archiving tools and PowerShell commands. However, it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with common techniques used by threat actors, but it may not capture more sophisticated or tailored attacks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Monitors known archiving tools",
+              "Detects PowerShell commands"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign references",
+              "May not capture sophisticated attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-structured and free of syntax errors, with a realistic log source and tested detection logic. The severity level is appropriate, and the false positive rate is acceptable. However, the rule may benefit from additional testing and validation in various production environments.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Well-structured Sigma rule",
+              "Realistic log source"
+            ],
+            "weaknesses": [
+              "Limited testing and validation",
+              "Potential for false positives"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides some actionable information, such as the process and command line, but may benefit from additional context and guidance for investigation and response. The severity level is appropriate, but the rule could be improved with more detailed references and next steps.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Provides process and command line information",
+              "Clear rule title and description"
+            ],
+            "weaknesses": [
+              "Limited context and guidance",
+              "Could benefit from more detailed references"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is vulnerable to common evasion techniques, such as renaming executables or hiding command-line arguments. While it detects behavior patterns, it relies heavily on static indicators and may be bypassed by sophisticated attackers.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns"
+            ],
+            "weaknesses": [
+              "Vulnerable to evasion techniques",
+              "Relies on static indicators"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The detection rule focuses on identifying the execution of archiving tools and PowerShell commands, which is a single stage of the attack lifecycle. It does not explicitly cover persistence, lateral movement, or data exfiltration stages. However, it can be a starting point for further correlation and analysis.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:46:19.047332",
+          "metadata": {
+            "strengths": [
+              "Detects known archiving tools and PowerShell commands",
+              "Monitors process creation events for suspicious activity"
+            ],
+            "weaknesses": [
+              "Limited to a single stage of the attack lifecycle",
+              "May not detect unknown or custom archiving tools"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.nlp (Archive Collected Data via NLP Pattern Matching) scored 0.64/1.0 (Below Average). Best performance in realism (0.76). Needs improvement in detectability (0.54). Issues found in: detection_sensitivity, false_positive_resistance, evasion_resistance",
+      "timestamp": "2026-01-19T14:46:19.047332",
+      "metadata": {
+        "attack_id": "attack.nlp",
+        "technique_name": "Archive Collected Data via NLP Pattern Matching",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    },
+    {
+      "benchmark_id": "04688bc9-57de-4ce1-8b98-a0c55eca0fa9",
+      "item_id": "unknown",
+      "item_type": "detection_rule",
+      "overall_score": 0.6966666666666665,
+      "category_scores": {
+        "correctness": 0.8600000000000001,
+        "quality": 0.7294117647058824,
+        "effectiveness": 0.6066666666666667,
+        "realism": 0.7555555555555555,
+        "detectability": 0.5444444444444445
+      },
+      "metric_results": [
+        {
+          "metric_name": "sigma_completeness",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The Sigma rule is well-structured and includes most required fields, but some fields like 'references', 'author', and 'date' are missing or not properly populated. The rule has a clear title, description, and log source definition.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:47:24.440574",
+          "metadata": {
+            "strengths": [
+              "Well-structured detection logic",
+              "Properly defined log source"
+            ],
+            "weaknesses": [
+              "Missing required fields",
+              "Lack of author and date information"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_logic_correctness",
+          "score": 9,
+          "normalized_score": 0.9,
+          "explanation": "The detection logic correctly identifies the attack technique by focusing on PowerShell and CMD process creation with suspicious command-line arguments. The condition logic is sound and not overly complex.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:47:24.440574",
+          "metadata": {
+            "strengths": [
+              "Accurate selection criteria",
+              "Sound condition logic"
+            ],
+            "weaknesses": [
+              "Potential for false positives due to legitimate use of PowerShell or CMD"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_specificity",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule uses specific conditions to minimize false positives, but it may still catch some benign activity. The inclusion of filters like '-enc' and 'Invoke-Expression' helps to reduce false positives.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Specific conditions to reduce false positives",
+              "Inclusion of relevant filters"
+            ],
+            "weaknesses": [
+              "Potential for false positives due to legitimate use of filtered commands",
+              "Lack of additional context like parent process or user"
+            ]
+          }
+        },
+        {
+          "metric_name": "detection_sensitivity",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule covers multiple indicators of the attack technique and uses wildcards appropriately to catch variations. However, it may not detect all possible evasion attempts, such as renaming or obfuscation.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Covers multiple indicators of the attack technique",
+              "Uses wildcards to catch variations"
+            ],
+            "weaknesses": [
+              "May not detect all possible evasion attempts",
+              "Lack of case-insensitive matching"
+            ]
+          }
+        },
+        {
+          "metric_name": "metadata_richness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule includes MITRE ATT&CK tags and references to authoritative sources, but lacks comprehensive metadata such as threat actor information, campaign names, and tools/malware families associated with the technique. The description is clear but could be more detailed. The rule structure is well-defined, following the Sigma rule format.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Includes MITRE ATT&CK tags",
+              "Clear description"
+            ],
+            "weaknesses": [
+              "Lacks threat actor information",
+              "Limited references"
+            ]
+          }
+        },
+        {
+          "metric_name": "optimization_level",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-optimized for SIEM performance, using indexed fields first and avoiding leading wildcards. The detection logic is straightforward, and the use of 'contains' and 'endswith' operators is appropriate. However, the rule could benefit from more specific filters to reduce potential false positives.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Uses indexed fields first",
+              "Avoids leading wildcards"
+            ],
+            "weaknesses": [
+              "Could benefit from more specific filters"
+            ]
+          }
+        },
+        {
+          "metric_name": "attack_coverage",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule covers the main attack vectors for Detect Malicious File Execution via PowerShell or CMD, including the use of '-enc' and 'Invoke-Expression'. However, it may not detect more advanced or sophisticated variants, and does not consider multi-stage attacks or different tools/frameworks.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Covers main attack vectors",
+              "Includes detection for '-enc' and 'Invoke-Expression'"
+            ],
+            "weaknesses": [
+              "May not detect advanced variants",
+              "Limited consideration of multi-stage attacks"
+            ]
+          }
+        },
+        {
+          "metric_name": "false_positive_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule includes some filters to reduce false positives, such as the use of 'endswith' for PowerShell and CMD. However, it lacks more comprehensive filters, such as whitelisting of admin tools or consideration of parent-child process relationships. The false positive guidance in metadata is limited.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Uses 'endswith' for PowerShell and CMD"
+            ],
+            "weaknesses": [
+              "Lacks comprehensive filters",
+              "Limited false positive guidance"
+            ]
+          }
+        },
+        {
+          "metric_name": "contextual_awareness",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The rule demonstrates awareness of threat actor TTPs by targeting PowerShell and CMD with potentially malicious command-line arguments. However, it lacks specific references to campaigns, APT groups, or operations. The detection logic aligns with common attack patterns, but may not cover all possible variations.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Targets common attack tools",
+              "Considers command-line arguments"
+            ],
+            "weaknesses": [
+              "Lacks specific campaign references",
+              "May not cover all attack variations"
+            ]
+          }
+        },
+        {
+          "metric_name": "operational_deployability",
+          "score": 8,
+          "normalized_score": 0.8,
+          "explanation": "The rule is well-structured and free of syntax errors, with a realistic log source and tested detection logic. The severity level is appropriate, and the false positive rate is acceptable. However, the rule may benefit from additional testing and validation in different environments.",
+          "confidence": 0.9,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Well-structured and tested",
+              "Realistic log source"
+            ],
+            "weaknesses": [
+              "May require additional testing",
+              "Limited environment validation"
+            ]
+          }
+        },
+        {
+          "metric_name": "analyst_actionability",
+          "score": 7,
+          "normalized_score": 0.7,
+          "explanation": "The rule provides a clear title and description, with useful fields for investigation and pivoting. However, the references and guidance for next steps could be more comprehensive, and the severity level may not always align with the actual threat level.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Clear title and description",
+              "Useful fields for investigation"
+            ],
+            "weaknesses": [
+              "Limited references and guidance",
+              "Severity level may not always align"
+            ]
+          }
+        },
+        {
+          "metric_name": "evasion_resistance",
+          "score": 5,
+          "normalized_score": 0.5,
+          "explanation": "The rule is vulnerable to common evasion techniques, such as renaming executables or hiding command-line arguments. While it detects behavior patterns, it relies heavily on static indicators and may not be robust against obfuscation attempts or LOLBin evasions.",
+          "confidence": 0.7,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Detects behavior patterns"
+            ],
+            "weaknesses": [
+              "Vulnerable to evasion techniques",
+              "Relies on static indicators"
+            ]
+          }
+        },
+        {
+          "metric_name": "multi_stage_detection",
+          "score": 6,
+          "normalized_score": 0.6,
+          "explanation": "The detection rule focuses on identifying suspicious process creation events involving PowerShell or CMD with potentially malicious command-line arguments, which can detect initial execution. However, it lacks explicit mechanisms for detecting persistence, lateral movement, data collection, or exfiltration activities directly related to the technique. The rule's logic is primarily based on single-event detection.",
+          "confidence": 0.8,
+          "timestamp": "2026-01-19T14:47:24.441610",
+          "metadata": {
+            "strengths": [
+              "Detects initial execution of malicious files via PowerShell or CMD",
+              "Identifies suspicious command-line arguments"
+            ],
+            "weaknesses": [
+              "Limited to detecting initial execution stages",
+              "Lacks correlation across multiple related events or stages"
+            ]
+          }
+        }
+      ],
+      "summary": "Rule for attack.execution (Detect Malicious File Execution via PowerShell or CMD) scored 0.70/1.0 (Below Average). Best performance in correctness (0.86). Needs improvement in detectability (0.54). Issues found in: false_positive_resistance, evasion_resistance",
+      "timestamp": "2026-01-19T14:47:24.441610",
+      "metadata": {
+        "attack_id": "attack.execution",
+        "technique_name": "Detect Malicious File Execution via PowerShell or CMD",
+        "tactic": "execution",
+        "platforms_evaluated": [],
+        "llm_generated": false
+      }
+    }
+  ]
+}

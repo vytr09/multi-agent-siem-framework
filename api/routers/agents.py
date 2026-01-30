@@ -75,6 +75,13 @@ async def stop_agents():
     await agent_manager.stop_all()
     return {"status": "stopped"}
 
+@router.post("/cancel_pipeline")
+async def cancel_pipeline():
+    """Cancel running pipeline without stopping all agents"""
+    result = await agent_manager.cancel_pipeline()
+    return result
+
+
 @router.post("/run_file")
 async def run_pipeline_from_file(
     filename: str = Body(..., embed=True), 

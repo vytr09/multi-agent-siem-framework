@@ -32,6 +32,17 @@ async def websocket_logs(websocket: WebSocket):
             LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
             LOG_FILE.touch()
 
+        # Send last 100 lines as history immediately
+        try:
+            with open(LOG_FILE, "r") as f:
+                lines = f.readlines()
+                # Send the tail first
+                for line in lines[-100:]:
+                    await websocket.send_text(line.strip())
+        except Exception as e:
+            logger.error(f"Failed to send log history: {e}")
+
+        # Stream new lines
         with open(LOG_FILE, "r") as f:
             # Move to end of file to stream only new logs
             f.seek(0, os.SEEK_END)
@@ -44,7 +55,7 @@ async def websocket_logs(websocket: WebSocket):
                     except Exception:
                         break # Client disconnected
                 else:
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(0.1) # Faster polling (0.1s)
     except WebSocketDisconnect:
         logger.info("Client disconnected from log stream")
     except Exception as e:

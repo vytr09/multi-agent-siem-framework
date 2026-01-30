@@ -198,7 +198,23 @@ class AgentManager:
             self.orchestrator = None
             
         self.is_initialized = False
+        self.pipeline_status = "idle"
         logger.info("AgentManager stopped and state reset")
+
+    async def cancel_pipeline(self):
+        """Cancel running pipeline without full reset"""
+        if self.pipeline_status == "running":
+            self.pipeline_status = "cancelled"
+            logger.info("Pipeline cancellation requested")
+            
+            # Signal cancellation to orchestrator if possible
+            if self.orchestrator:
+                # Set a cancel flag that agents can check
+                self.orchestrator.cancel_requested = True
+                
+            return {"status": "cancelled", "message": "Pipeline cancellation requested"}
+        else:
+            return {"status": "not_running", "message": f"Pipeline is {self.pipeline_status}"}
 
 # Global instance
 agent_manager = AgentManager()

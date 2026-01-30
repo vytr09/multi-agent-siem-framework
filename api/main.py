@@ -52,6 +52,8 @@ from fastapi.staticfiles import StaticFiles
 app.include_router(knowledge.router, prefix="/knowledge", tags=["Knowledge Base"])
 from api.routers import pipeline
 app.include_router(pipeline.router, prefix="/pipeline", tags=["Pipeline"])
+from api.routers import history
+app.include_router(history.router, prefix="/history", tags=["History"])
 
 # Mount uploads directory
 app.mount("/uploads", StaticFiles(directory="data/uploads"), name="uploads")
