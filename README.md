@@ -104,6 +104,24 @@ THREATWISE implements a layered architecture consisting of four specialized AI a
 
 ## Installation
 
+### Quick Setup (Automated)
+
+Run the interactive setup wizard for one-click installation:
+
+```powershell
+.\scripts\setup.ps1
+```
+
+The script will automatically:
+- Check prerequisites (Python, Node.js)
+- Create virtual environment and install dependencies
+- Configure `.env` with interactive prompts
+- Optionally setup web dashboard
+- Initialize knowledge base
+- Start services
+
+### Manual Installation
+
 See [INSTALLATION.md](INSTALLATION.md) for comprehensive setup instructions.
 
 ### Prerequisites

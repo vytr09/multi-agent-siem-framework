@@ -2,6 +2,20 @@
 
 This guide provides step-by-step instructions for setting up the THREATWISE framework.
 
+## Quick Setup (Automated)
+
+For one-click installation, run the interactive setup script:
+
+```powershell
+.\scripts\setup.ps1
+```
+
+The wizard will guide you through all configuration steps.
+
+**For manual installation or troubleshooting, continue with the sections below.**
+
+---
+
 ## System Requirements
 
 ### Hardware
@@ -48,6 +62,11 @@ pip install -r requirements.txt
 ```
 
 **Expected time**: 2-3 minutes
+
+**For development with exact frozen versions:**
+```bash
+pip install -r requirements-dev.txt
+```
 
 ### 4. Configure Environment Variables
 
