@@ -218,7 +218,7 @@ async def main():
             files = [Path(args.dir) / args.file]
     else:
         source_dir = Path(args.dir)
-        files = list(source_dir.glob("*.pdf")) + list(source_dir.glob("*.txt"))
+        files = list(source_dir.glob("*.pdf")) + list(source_dir.glob("*.txt")) + list(source_dir.glob("*.md"))
         
     if args.limit:
         files = files[:args.limit]
