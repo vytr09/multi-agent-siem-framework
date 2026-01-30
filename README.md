@@ -19,8 +19,6 @@ A multi-agent framework for automated SIEM rule generation from Cyber Threat Int
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Documentation](#documentation)
-- [Performance Metrics](#performance-metrics)
-- [Publications](#publications)
 - [License](#license)
 
 ---
